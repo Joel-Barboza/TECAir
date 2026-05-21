@@ -56,21 +56,6 @@ npm run deploy
 
 ## Visual studio
 
-En crear el archivo appsettings.json, poner los valores de acuerdo a lo que se tenga en postgresql (usuario y contraseña)
-```json
-{
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Microsoft.AspNetCore": "Warning"
-    }
-  },
-  "AllowedHosts": "*",
-  "ConnectionStrings": {
-    "PostgresConnection": "Host=localhost;Port=5432;Database=TECAir;Username=SU_USERNAME;Password=SU_CONTRASEÑA"
-  }
-}
-```
 
 ```bash
 dotnet publish -c Release -o C:\inetpub\TECAirAPI
