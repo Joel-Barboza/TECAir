@@ -67,7 +67,7 @@ En crear el archivo appsettings.json, poner los valores de acuerdo a lo que se t
   },
   "AllowedHosts": "*",
   "ConnectionStrings": {
-    "PostgresConnection": "Host=localhost;Port=5432;Database=postgres;Username=SU_USERNAME;Password=SU_CONTRASEÑA"
+    "PostgresConnection": "Host=localhost;Port=5432;Database=TECAir;Username=SU_USERNAME;Password=SU_CONTRASEÑA"
   }
 }
 ```
