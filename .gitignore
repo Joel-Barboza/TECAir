@@ -4,3 +4,5 @@ backend/wwwroot/*
 TECAirAPI/.vs
 TECAirAPI/bin
 TECAirAPI/obj
+TECAirAPI/appsettings.Development.json
+TECAirAPI/appsettings.json
