@@ -1,0 +1,6 @@
+# Frontend
+backend/wwwroot/*
+
+TECAirAPI/.vs
+TECAirAPI/bin
+TECAirAPI/obj
