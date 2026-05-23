@@ -1,0 +1,14 @@
+.usuarios-placeholder {
+  height: 400px;               /* espacio fijo */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 2px dashed #3b82f6;  /* borde punteado azul */
+  background-color: #f3f4f6;    /* gris claro */
+  border-radius: 10px;
+  text-align: center;
+  padding: 20px;
+  color: #1f2937;               /* color del texto */
+  font-family: Arial, sans-serif;
+}

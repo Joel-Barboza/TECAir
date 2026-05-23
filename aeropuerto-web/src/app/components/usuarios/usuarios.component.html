@@ -1,0 +1,37 @@
+<h2>Gestión de Usuarios - Aeropuerto</h2>
+
+<!-- Formulario para agregar usuario -->
+<form (ngSubmit)="agregarUsuario()">
+  <input type="text" placeholder="Nombre" [(ngModel)]="nuevoUsuario.nombre" name="nombre" required>
+  <input type="text" placeholder="Apellido1" [(ngModel)]="nuevoUsuario.apellido1" name="apellido1" required>
+  <input type="text" placeholder="Apellido2" [(ngModel)]="nuevoUsuario.apellido2" name="apellido2">
+  <input type="email" placeholder="Email" [(ngModel)]="nuevoUsuario.email" name="email" required>
+  <input type="text" placeholder="Teléfono" [(ngModel)]="nuevoUsuario.telefono" name="telefono" required>
+  <input type="number" placeholder="Carnet" [(ngModel)]="nuevoUsuario.carnet" name="carnet">
+  <input type="text" placeholder="Universidad" [(ngModel)]="nuevoUsuario.universidad" name="universidad">
+  <button type="submit">Agregar Usuario</button>
+</form>
+
+<!-- Tabla de usuarios -->
+<table border="1" style="margin-top:20px;">
+  <tr>
+    <th>Nombre</th>
+    <th>Apellido1</th>
+    <th>Apellido2</th>
+    <th>Email</th>
+    <th>Teléfono</th>
+    <th>Carnet</th>
+    <th>Universidad</th>
+    <th>Acciones</th>
+  </tr>
+  <tr *ngFor="let u of usuarios">
+    <td>{{ u.nombre }}</td>
+    <td>{{ u.apellido1 }}</td>
+    <td>{{ u.apellido2 }}</td>
+    <td>{{ u.email }}</td>
+    <td>{{ u.telefono }}</td>
+    <td>{{ u.carnet }}</td>
+    <td>{{ u.universidad }}</td>
+    <td><button (click)="eliminarUsuario(u.usuarioId)">Eliminar</button></td>
+  </tr>
+</table>
