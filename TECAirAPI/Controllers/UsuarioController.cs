@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TECAirAPI.Models;
-using TECAirAPI.Data;
 using Microsoft.EntityFrameworkCore;
+using TECAirAPI.Data;
+using TECAirAPI.Models;
 
 namespace TECAirAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/aeropuerto/[controller]")]
     [ApiController]
     public class UsuariosController : ControllerBase
     {
@@ -16,82 +16,82 @@ namespace TECAirAPI.Controllers
             _context = context;
         }
 
-        // GET: api/Usuarios
+        // GET: api/aeropuerto/Usuarios
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Usuario>>> GetUsuarios()
         {
-            return await _context.Usuarios.ToListAsync();
-        }
-
-        // GET: api/Usuarios/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Usuario>> GetUsuario(int id)
-        {
-            var usuario = await _context.Usuarios.FindAsync(id);
-            if (usuario == null)
+            try
             {
-                return NotFound();
+                return await _context.Usuarios.ToListAsync();
             }
-            return usuario;
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al obtener usuarios: {ex.Message}");
+            }
         }
 
-        // POST: api/Usuarios
+        // POST: api/aeropuerto/Usuarios
         [HttpPost]
-        public async Task<ActionResult<Usuario>> PostUsuario(Usuario usuario)
+        public async Task<ActionResult<Usuario>> CrearUsuario(Usuario usuario)
         {
-            _context.Usuarios.Add(usuario);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetUsuario), new { id = usuario.UsuarioId }, usuario);
+            try
+            {
+                _context.Usuarios.Add(usuario);
+                await _context.SaveChangesAsync();
+                return CreatedAtAction(nameof(GetUsuarios), new { id = usuario.UsuarioId }, usuario);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al crear usuario: {ex.Message}");
+            }
         }
 
-        // PUT: api/Usuarios/5
+        // PUT: api/aeropuerto/Usuarios/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUsuario(int id, Usuario usuario)
+        public async Task<IActionResult> ActualizarUsuario(int id, Usuario usuario)
         {
             if (id != usuario.UsuarioId)
-            {
-                return BadRequest();
-            }
+                return BadRequest("El ID del usuario no coincide.");
 
             _context.Entry(usuario).State = EntityState.Modified;
 
             try
             {
                 await _context.SaveChangesAsync();
+                return NoContent();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UsuarioExists(id))
-                {
+                if (!_context.Usuarios.Any(e => e.UsuarioId == id))
                     return NotFound();
-                }
                 else
-                {
                     throw;
-                }
             }
-            return NoContent();
-        }
-
-        // DELETE: api/Usuarios/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUsuario(int id)
-        {
-            var usuario = await _context.Usuarios.FindAsync(id);
-            if (usuario == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                return StatusCode(500, $"Error al actualizar usuario: {ex.Message}");
             }
-
-            _context.Usuarios.Remove(usuario);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
         }
 
-        private bool UsuarioExists(int id)
+        // DELETE: api/aeropuerto/Usuarios/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> EliminarUsuario(int id)
         {
-            return _context.Usuarios.Any(e => e.UsuarioId == id);
+            try
+            {
+                var usuario = await _context.Usuarios.FindAsync(id);
+                if (usuario == null)
+                    return NotFound($"No se encontró el usuario con id {id}");
+
+                _context.Usuarios.Remove(usuario);
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al eliminar usuario: {ex.Message}");
+            }
         }
     }
 }

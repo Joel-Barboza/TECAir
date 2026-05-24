@@ -1,5 +1,4 @@
 <div class="vuelos-dashboard">
-  <!-- Tabla de vuelos -->
   <div class="vuelos-table">
     <h3>Lista de vuelos</h3>
     <div *ngIf="vuelos.length === 0" class="placeholder">
@@ -7,37 +6,51 @@
     </div>
     <table *ngIf="vuelos.length > 0">
       <tr>
-        <th>Origen</th>
+        <th>Aeropuerto ID</th>
+        <th>Avion ID</th>
+        <th>Asientos</th>
         <th>Destino</th>
-        <th>Precio</th>
-        <th>Periodo</th>
+        <th>Salida</th>
+        <th>Fecha Salida</th>
+        <th>Fecha Llegada</th>
         <th>Acciones</th>
       </tr>
       <tr *ngFor="let v of vuelos">
-        <td>{{v.origen}}</td>
-        <td>{{v.destino}}</td>
-        <td>{{v.precio}}</td>
-        <td>{{v.periodo}}</td>
-        <td><button (click)="eliminarVuelo(v.vueloId!)">Eliminar</button></td>
+        <td>{{v.AeropuertoId}}</td>
+        <td>{{v.AvionId}}</td>
+        <td>{{v.Asientos}}</td>
+        <td>{{v.Destino}}</td>
+        <td>{{v.Salida}}</td>
+        <td>{{v.FechaSalida | date:'short'}}</td>
+        <td>{{v.FechaLlegada | date:'short'}}</td>
+        <td><button (click)="eliminarVuelo(v.VueloId!)">Eliminar</button></td>
       </tr>
     </table>
   </div>
 
-  <!-- Formulario -->
   <div class="vuelos-form">
     <h3>Agregar nuevo vuelo</h3>
     <form (ngSubmit)="agregarVuelo()">
-      <label>Origen</label>
-      <input type="text" placeholder="Ej: San José" [(ngModel)]="nuevoVuelo.origen" name="origen" required />
+      <label>Aeropuerto ID</label>
+      <input type="number" [(ngModel)]="nuevoVuelo.AeropuertoId" name="aeropuertoId" required />
+
+      <label>Avión ID</label>
+      <input type="number" [(ngModel)]="nuevoVuelo.AvionId" name="avionId" required />
+
+      <label>Asientos</label>
+      <input type="number" [(ngModel)]="nuevoVuelo.Asientos" name="asientos" required />
 
       <label>Destino</label>
-      <input type="text" placeholder="Ej: Liberia" [(ngModel)]="nuevoVuelo.destino" name="destino" required />
+      <input type="text" [(ngModel)]="nuevoVuelo.Destino" name="destino" required />
 
-      <label>Precio</label>
-      <input type="number" placeholder="Ej: 50" [(ngModel)]="nuevoVuelo.precio" name="precio" required />
+      <label>Salida</label>
+      <input type="text" [(ngModel)]="nuevoVuelo.Salida" name="salida" required />
 
-      <label>Periodo</label>
-      <input type="text" placeholder="Ej: 01/06/2026 - 30/06/2026" [(ngModel)]="nuevoVuelo.periodo" name="periodo" />
+      <label>Fecha Salida</label>
+      <input type="datetime-local" [(ngModel)]="nuevoVuelo.FechaSalida" name="fechaSalida" required />
+
+      <label>Fecha Llegada</label>
+      <input type="datetime-local" [(ngModel)]="nuevoVuelo.FechaLlegada" name="fechaLlegada" required />
 
       <button type="submit">Agregar vuelo</button>
     </form>

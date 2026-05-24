@@ -5,7 +5,6 @@
   font-family: Arial, sans-serif;
 }
 
-/* Tabla de usuarios / placeholder */
 .usuarios-table {
   flex: 1;
 }
@@ -27,14 +26,12 @@
   border-radius: 10px;
   background-color: #f3f4f6;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
   color: #1f2937;
 }
 
-/* Formulario */
 .usuarios-form {
   flex: 1;
   background-color: #ffffff;

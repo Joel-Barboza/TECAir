@@ -37,8 +37,6 @@ export class MaletasComponent {
   }
 
   eliminarMaleta(id: number) {
-    this.maletasService.eliminarMaleta(id).subscribe(() => {
-      this.cargarMaletas();
-    });
+    this.maletasService.eliminarMaleta(id).subscribe(() => this.cargarMaletas());
   }
 }

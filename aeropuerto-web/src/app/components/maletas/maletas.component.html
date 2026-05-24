@@ -7,8 +7,8 @@
     </div>
     <table *ngIf="maletas.length > 0">
       <tr>
-        <th>ID Reserva</th>
-        <th>Peso</th>
+        <th>Reserva ID</th>
+        <th>Peso (kg)</th>
         <th>Color</th>
         <th>Costo Adicional</th>
         <th>Acciones</th>
@@ -27,7 +27,7 @@
   <div class="maletas-form">
     <h3>Agregar nueva maleta</h3>
     <form (ngSubmit)="agregarMaleta()">
-      <label>ID Reserva</label>
+      <label>Reserva ID</label>
       <input type="number" [(ngModel)]="nuevaMaleta.reservaId" name="reservaId" required />
 
       <label>Peso (kg)</label>
@@ -37,7 +37,7 @@
       <input type="text" [(ngModel)]="nuevaMaleta.color" name="color" required />
 
       <label>Costo Adicional</label>
-      <input type="number" [(ngModel)]="nuevaMaleta.costoAdicional" name="costoAdicional" />
+      <input type="number" [(ngModel)]="nuevaMaleta.costoAdicional" name="costoAdicional" required />
 
       <button type="submit">Agregar Maleta</button>
     </form>

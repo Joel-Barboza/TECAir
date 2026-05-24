@@ -4,20 +4,19 @@ import { Observable } from 'rxjs';
 
 export interface Promocion {
   promocionId?: number;
-  vueloId?: number;   // opcional, si la promo se asocia a un vuelo
+  vueloId: number;
   origen: string;
   destino: string;
-  precio: number;
+  descuento: number;
   fechaInicio: string;
   fechaFin: string;
-  imagenUrl?: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class PromocionesService {
-  private apiUrl = 'https://localhost:5001/api/aeropuerto/Promociones';
+  private apiUrl = 'http://localhost:5005/api/aeropuerto/Promociones';
 
   constructor(private http: HttpClient) {}
 
@@ -29,7 +28,7 @@ export class PromocionesService {
     return this.http.post<Promocion>(this.apiUrl, promo);
   }
 
-  eliminarPromocion(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  eliminarPromocion(promocionId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${promocionId}`);
   }
 }

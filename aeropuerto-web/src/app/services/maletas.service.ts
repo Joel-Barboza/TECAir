@@ -14,7 +14,7 @@ export interface Maleta {
   providedIn: 'root'
 })
 export class MaletasService {
-  private apiUrl = 'https://localhost:5001/api/aeropuerto/Maletas'; // Ajusta al puerto de tu API
+  private apiUrl = 'http://localhost:5005/api/aeropuerto/Maletas';
 
   constructor(private http: HttpClient) {}
 
@@ -26,7 +26,7 @@ export class MaletasService {
     return this.http.post<Maleta>(this.apiUrl, maleta);
   }
 
-  eliminarMaleta(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  eliminarMaleta(maletaId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${maletaId}`);
   }
 }

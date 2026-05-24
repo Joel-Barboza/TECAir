@@ -3,18 +3,21 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface Vuelo {
-  vueloId?: number;
-  origen: string;
-  destino: string;
-  precio: number;
-  periodo: string;
+  VueloId?: number;
+  AeropuertoId: number;
+  AvionId: number;
+  Asientos: number;
+  Destino: string;
+  Salida: string;
+  FechaSalida: string; // para datetime-local
+  FechaLlegada: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class VuelosService {
-  private apiUrl = 'https://localhost:5001/api/aeropuerto/Vuelos'; // Ajusta al puerto correcto
+  private apiUrl = 'https://localhost:5005/api/aeropuerto/Vuelos'; // Ajusta al puerto de tu API
 
   constructor(private http: HttpClient) {}
 

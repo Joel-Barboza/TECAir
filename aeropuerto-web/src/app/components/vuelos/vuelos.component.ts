@@ -13,10 +13,13 @@ import { VuelosService, Vuelo } from '../../services/vuelos.service';
 export class VuelosComponent {
   vuelos: Vuelo[] = [];
   nuevoVuelo: Vuelo = {
-    origen: '',
-    destino: '',
-    precio: 0,
-    periodo: ''
+    AeropuertoId: 0,
+    AvionId: 0,
+    Asientos: 0,
+    Destino: '',
+    Salida: '',
+    FechaSalida: '',
+    FechaLlegada: ''
   };
 
   constructor(private vuelosService: VuelosService) {
@@ -24,21 +27,26 @@ export class VuelosComponent {
   }
 
   cargarVuelos() {
-    this.vuelosService.getVuelos().subscribe(data => {
-      this.vuelos = data;
-    });
+    this.vuelosService.getVuelos().subscribe(data => this.vuelos = data);
   }
 
   agregarVuelo() {
+    console.log('Agregando vuelo:', this.nuevoVuelo);
     this.vuelosService.crearVuelo(this.nuevoVuelo).subscribe(() => {
       this.cargarVuelos();
-      this.nuevoVuelo = { origen: '', destino: '', precio: 0, periodo: '' };
+      this.nuevoVuelo = {
+        AeropuertoId: 0,
+        AvionId: 0,
+        Asientos: 0,
+        Destino: '',
+        Salida: '',
+        FechaSalida: '',
+        FechaLlegada: ''
+      };
     });
   }
 
   eliminarVuelo(id: number) {
-    this.vuelosService.eliminarVuelo(id).subscribe(() => {
-      this.cargarVuelos();
-    });
+    this.vuelosService.eliminarVuelo(id).subscribe(() => this.cargarVuelos());
   }
 }

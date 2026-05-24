@@ -7,14 +7,15 @@ export interface Reserva {
   usuarioId: number;
   vueloId: number;
   fechaReserva: string;
-  cantidadAsientos: number;
+  asientosReservados: number;
+  estadoPago: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReservasService {
-  private apiUrl = 'https://localhost:5001/api/aeropuerto/Reservas'; // Ajusta al puerto de tu API
+  private apiUrl = 'http://localhost:5005/api/aeropuerto/Reservas';
 
   constructor(private http: HttpClient) {}
 

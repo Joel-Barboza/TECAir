@@ -20,33 +20,50 @@ namespace TECAirAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Reserva>>> GetReservas()
         {
-            return await _context.Reservas.ToListAsync();
+            try
+            {
+                return await _context.Reservas.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al obtener reservas: {ex.Message}");
+            }
         }
 
         // POST: api/aeropuerto/Reservas
         [HttpPost]
         public async Task<ActionResult<Reserva>> CrearReserva(Reserva reserva)
         {
-            _context.Reservas.Add(reserva);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetReservas), new { id = reserva.ReservaId }, reserva);
+            try
+            {
+                _context.Reservas.Add(reserva);
+                await _context.SaveChangesAsync();
+                return CreatedAtAction(nameof(GetReservas), new { id = reserva.ReservaId }, reserva);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al crear reserva: {ex.Message}");
+            }
         }
 
-        // DELETE: api/aeropuerto/Reservas/5
+        // DELETE: api/aeropuerto/Reservas/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> EliminarReserva(int id)
         {
-            var reserva = await _context.Reservas.FindAsync(id);
-            if (reserva == null)
+            try
             {
-                return NotFound();
+                var reserva = await _context.Reservas.FindAsync(id);
+                if (reserva == null) return NotFound();
+
+                _context.Reservas.Remove(reserva);
+                await _context.SaveChangesAsync();
+
+                return NoContent();
             }
-
-            _context.Reservas.Remove(reserva);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al eliminar reserva: {ex.Message}");
+            }
         }
     }
 }

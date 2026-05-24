@@ -17,8 +17,7 @@ export interface Usuario {
   providedIn: 'root'
 })
 export class UsuarioService {
-  // 
-  private apiUrl = 'https://localhost:5001/api/aeropuerto/Usuarios'; 
+  private apiUrl = 'http://localhost:5005/api/aeropuerto/Usuarios'; // Ajusta al puerto correcto
 
   constructor(private http: HttpClient) { }
 

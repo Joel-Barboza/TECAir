@@ -16,34 +16,51 @@ namespace TECAirAPI.Controllers
             _context = context;
         }
 
-        // GET: api/aeropuerto/Maletas
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Maleta>>> GetMaletas()
         {
-            return await _context.Maletas.ToListAsync();
+            try
+            {
+                return await _context.Maletas.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al obtener maletas: {ex.Message}");
+            }
         }
 
-        // POST: api/aeropuerto/Maletas
         [HttpPost]
         public async Task<ActionResult<Maleta>> CrearMaleta(Maleta maleta)
         {
-            _context.Maletas.Add(maleta);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetMaletas), new { id = maleta.MaletaId }, maleta);
+            try
+            {
+                _context.Maletas.Add(maleta);
+                await _context.SaveChangesAsync();
+                return CreatedAtAction(nameof(GetMaletas), new { id = maleta.MaletaId }, maleta);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al crear maleta: {ex.Message}");
+            }
         }
 
-        // DELETE: api/aeropuerto/Maletas/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> EliminarMaleta(int id)
         {
-            var maleta = await _context.Maletas.FindAsync(id);
-            if (maleta == null) return NotFound();
+            try
+            {
+                var maleta = await _context.Maletas.FindAsync(id);
+                if (maleta == null) return NotFound();
 
-            _context.Maletas.Remove(maleta);
-            await _context.SaveChangesAsync();
+                _context.Maletas.Remove(maleta);
+                await _context.SaveChangesAsync();
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al eliminar maleta: {ex.Message}");
+            }
         }
     }
 }

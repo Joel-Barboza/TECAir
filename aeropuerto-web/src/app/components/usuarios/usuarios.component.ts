@@ -27,13 +27,10 @@ export class UsuariosComponent {
   }
 
   cargarUsuarios() {
-    this.usuarioService.getUsuarios().subscribe(data => {
-      this.usuarios = data;
-    });
+    this.usuarioService.getUsuarios().subscribe(data => this.usuarios = data);
   }
 
   agregarUsuario() {
-    console.log('agregarUsuario disparado');
     this.usuarioService.crearUsuario(this.nuevoUsuario).subscribe(() => {
       this.cargarUsuarios();
       this.nuevoUsuario = {

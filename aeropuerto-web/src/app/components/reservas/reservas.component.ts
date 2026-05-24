@@ -16,7 +16,8 @@ export class ReservasComponent {
     usuarioId: 0,
     vueloId: 0,
     fechaReserva: '',
-    cantidadAsientos: 1
+    asientosReservados: 1,
+    estadoPago: 'Pendiente'
   };
 
   constructor(private reservasService: ReservasService) {
@@ -36,14 +37,13 @@ export class ReservasComponent {
         usuarioId: 0,
         vueloId: 0,
         fechaReserva: '',
-        cantidadAsientos: 1
+        asientosReservados: 1,
+        estadoPago: 'Pendiente'
       };
     });
   }
 
   eliminarReserva(id: number) {
-    this.reservasService.eliminarReserva(id).subscribe(() => {
-      this.cargarReservas();
-    });
+    this.reservasService.eliminarReserva(id).subscribe(() => this.cargarReservas());
   }
 }

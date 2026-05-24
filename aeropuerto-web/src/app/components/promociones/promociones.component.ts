@@ -13,9 +13,10 @@ import { PromocionesService, Promocion } from '../../services/promociones.servic
 export class PromocionesComponent {
   promociones: Promocion[] = [];
   nuevaPromocion: Promocion = {
+    vueloId: 0,
     origen: '',
     destino: '',
-    precio: 0,
+    descuento: 0,
     fechaInicio: '',
     fechaFin: ''
   };
@@ -34,9 +35,10 @@ export class PromocionesComponent {
     this.promocionesService.crearPromocion(this.nuevaPromocion).subscribe(() => {
       this.cargarPromociones();
       this.nuevaPromocion = {
+        vueloId: 0,
         origen: '',
         destino: '',
-        precio: 0,
+        descuento: 0,
         fechaInicio: '',
         fechaFin: ''
       };
@@ -44,8 +46,6 @@ export class PromocionesComponent {
   }
 
   eliminarPromocion(id: number) {
-    this.promocionesService.eliminarPromocion(id).subscribe(() => {
-      this.cargarPromociones();
-    });
+    this.promocionesService.eliminarPromocion(id).subscribe(() => this.cargarPromociones());
   }
 }
