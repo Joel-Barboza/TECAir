@@ -1,0 +1,35 @@
+<div class="reservas-dashboard">
+  <div class="reservas-table">
+    <h3>Mis reservas</h3>
+
+    <p *ngIf="mensaje" class="success">{{ mensaje }}</p>
+    <p *ngIf="error" class="error">{{ error }}</p>
+
+    <div *ngIf="reservas.length === 0" class="placeholder">
+      No hay reservas registradas.
+    </div>
+
+    <table *ngIf="reservas.length > 0">
+      <thead>
+        <tr>
+          <th>Usuario</th>
+          <th>Vuelo</th>
+          <th>Fecha de reserva</th>
+          <th>Asientos</th>
+          <th>Pago</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let reserva of reservas">
+          <td>{{ getNombreUsuario(reserva.usuarioId) }}</td>
+          <td>{{ getRutaVuelo(reserva.vueloId) }}</td>
+          <td>{{ reserva.fechaReserva | date:'short' }}</td>
+          <td>{{ reserva.asientosReservados }}</td>
+          <td>{{ reserva.estadoPago }}</td>
+          <td><button type="button" (click)="cancelarReserva(reserva.reservaId!)">Cancelar</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

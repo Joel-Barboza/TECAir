@@ -5,7 +5,7 @@ import { RouterOutlet } from '@angular/router';
   selector: 'app-root',
   imports: [RouterOutlet],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrls: ['./app.css']
 })
 export class App {
   protected readonly title = signal('reservaciones-web');
@@ -13,7 +13,7 @@ export class App {
 
   async checkServerOn(): Promise<void> { 
     try {
-      const response = await fetch('http://localhost:5005/api/usuario');
+      const response = await fetch('http://localhost:5262/api/aeropuerto/Usuarios');
  
       if (!response.ok) {
         throw new Error(`Error ${response.status}: ${response.statusText}`);

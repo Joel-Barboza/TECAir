@@ -1,0 +1,43 @@
+<div class="usuarios-dashboard">
+  <div class="usuarios-form">
+    <h3>Mi perfil</h3>
+    <form (ngSubmit)="crearUsuario()">
+      <label>Nombre completo</label>
+      <input type="text" [(ngModel)]="nuevoUsuario.nombre" name="nombre" required />
+
+      <label>Apellido 1</label>
+      <input type="text" [(ngModel)]="nuevoUsuario.apellido1" name="apellido1" required />
+
+      <label>Apellido 2</label>
+      <input type="text" [(ngModel)]="nuevoUsuario.apellido2" name="apellido2" />
+
+      <label>Correo electrónico</label>
+      <input type="email" [(ngModel)]="nuevoUsuario.email" name="email" required />
+
+      <label>Teléfono</label>
+      <input type="tel" [(ngModel)]="nuevoUsuario.telefono" name="telefono" required />
+
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" [(ngModel)]="esEstudiante" name="esEstudiante" (change)="toggleEstudiante()" />
+          Soy estudiante
+        </label>
+      </div>
+
+      <div *ngIf="esEstudiante" class="estudiante-info">
+        <label>Universidad</label>
+        <input type="text" [(ngModel)]="nuevoUsuario.universidad" name="universidad" />
+
+        <label>Carnet</label>
+        <input type="number" [(ngModel)]="nuevoUsuario.carnet" name="carnet" />
+      </div>
+
+      <button type="submit">Crear Perfil</button>
+    </form>
+
+    <div class="messages">
+      <p class="success" *ngIf="mensaje">{{ mensaje }}</p>
+      <p class="error" *ngIf="error">{{ error }}</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,62 @@
+:host {
+  display: block;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.promociones-dashboard {
+  display: flex;
+}
+
+.promociones-table {
+  flex: 1;
+}
+
+.promociones-table h3 {
+  margin-top: 0;
+}
+
+.promociones-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.promociones-table th,
+.promociones-table td {
+  border: 1px solid #d1d5db;
+  padding: 10px;
+  text-align: left;
+}
+
+.promociones-table th {
+  background-color: #f3f4f6;
+  font-weight: bold;
+}
+
+.promociones-table .placeholder {
+  height: 400px;
+  border: 2px dashed #3b82f6;
+  border-radius: 10px;
+  background-color: #f3f4f6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #1f2937;
+}
+
+.empty {
+  color: #546e7a;
+}
+
+.info {
+  color: #0277bd;
+}
+
+.error {
+  color: #d32f2f;
+}
