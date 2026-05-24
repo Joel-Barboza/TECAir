@@ -79,11 +79,29 @@ Nombre: AeropuertoWeb
 Puerto: 5007
 Carpeta: C:\inetpub\wwwroot\AeropuertoWeb
 
+
 Configuración Inicial de la App Móvil (Expo SDK)
-Cuando se inicializa el proyecto por primera vez o se restauran dependencias, el asistente de Expo podría solicitar la selección de la versión del SDK.
-Seleccionar siempre `Latest (SDK 56)` o `Recommended for most projects`.
+Instalación de dependencias
+Abrir la terminal en la raíz de la carpeta de la aplicación móvil (`TECAirMobile`) y ejecutar: 
+```bash
+npm install
+```
 
 Dependencias Locales Obligatorias
-Libreria sqlite, ubicarse en `TECAirMobile/` y escribir en consola npx expo install expo-sqlite
+Libreria sqlite, ubicarse en `TECAirMobile/` y escribir en consola 
+```bash
+npx expo install expo-sqlite
+```
 
+En la terminal del proyecto móvil, iniciar el servidor de desarrollo de Expo:
+¿Cómo correrlo y probarlo?
+En Emulador:
+```bash
+npx expo start
+```
+cuando expo start termine de cargar, se ve un código QR y varias opciones en la terminal:
+Presiona la tecla a en la terminal para abrir el emulador de Android.
+Presiona la tecla i en la terminal para abrir el simulador de iOS.
 
+Cuando se inicializa el proyecto por primera vez o se restauran dependencias, el asistente de Expo podría solicitar la selección de la versión del SDK.
+Seleccionar siempre `Latest (SDK 56)` o `Recommended for most projects`.
