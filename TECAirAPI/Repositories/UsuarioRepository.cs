@@ -1,6 +1,8 @@
 using TECAirAPI.Data;
 using TECAirAPI.Models;
 
+namespace TECAirAPI.Repositories;
+
 public class UsuarioRepository
 {
     private readonly AppDbContext _context;

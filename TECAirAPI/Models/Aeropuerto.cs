@@ -1,4 +1,5 @@
-// Aeropuerto.cs
+namespace TECAirAPI.Models;
+
 public class Aeropuerto
 {
     public int AeropuertoId { get; set; }  // aeropuerto_id

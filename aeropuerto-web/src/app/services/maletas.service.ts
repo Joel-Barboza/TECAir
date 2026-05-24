@@ -14,7 +14,7 @@ export interface Maleta {
   providedIn: 'root'
 })
 export class MaletasService {
-  private apiUrl = 'http://localhost:5005/api/aeropuerto/Maletas';
+  private apiUrl = 'http://localhost:5262/api/aeropuerto/Maletas';
 
   constructor(private http: HttpClient) {}
 

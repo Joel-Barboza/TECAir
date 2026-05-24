@@ -1,4 +1,5 @@
-// Avion.cs
+namespace TECAirAPI.Models;
+
 public class Avion
 {
     public int AvionId { get; set; }  // avion_id

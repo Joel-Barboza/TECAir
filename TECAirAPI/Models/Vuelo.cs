@@ -1,4 +1,5 @@
-// Vuelo.cs
+namespace TECAirAPI.Models;
+
 public class Vuelo
 {
     public int VueloId { get; set; }  // vuelo_id

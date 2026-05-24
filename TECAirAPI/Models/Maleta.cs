@@ -1,4 +1,5 @@
-// Maleta.cs
+namespace TECAirAPI.Models;
+
 public class Maleta
 {
     public int MaletaId { get; set; }  // maleta_id

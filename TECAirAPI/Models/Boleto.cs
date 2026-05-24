@@ -1,4 +1,5 @@
-// Boleto.cs
+namespace TECAirAPI.Models;
+
 public class Boleto
 {
     public int BoletoId { get; set; }  // boleto_id

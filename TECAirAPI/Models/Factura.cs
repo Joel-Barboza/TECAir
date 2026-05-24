@@ -1,4 +1,5 @@
-// Factura.cs
+namespace TECAirAPI.Models;
+
 public class Factura
 {
     public int FacturaId { get; set; }  // factura_id

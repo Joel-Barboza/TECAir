@@ -1,4 +1,5 @@
-﻿// Usuario.cs
+﻿namespace TECAirAPI.Models;
+
 public class Usuario
 {
     public int UsuarioId { get; set; }  // usuario_id

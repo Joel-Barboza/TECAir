@@ -1,4 +1,5 @@
-// Reserva.cs
+namespace TECAirAPI.Models;
+
 public class Reserva
 {
     public int ReservaId { get; set; }  // reserva_id

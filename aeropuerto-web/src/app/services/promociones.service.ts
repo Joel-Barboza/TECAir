@@ -16,7 +16,7 @@ export interface Promocion {
   providedIn: 'root'
 })
 export class PromocionesService {
-  private apiUrl = 'http://localhost:5005/api/aeropuerto/Promociones';
+  private apiUrl = 'http://localhost:5262/api/aeropuerto/Promociones';
 
   constructor(private http: HttpClient) {}
 

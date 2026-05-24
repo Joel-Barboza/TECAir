@@ -1,4 +1,5 @@
-// Asiento.cs
+namespace TECAirAPI.Models;
+
 public class Asiento
 {
     public int AsientoId { get; set; }  // asiento_id

@@ -17,7 +17,7 @@ export interface Vuelo {
   providedIn: 'root'
 })
 export class VuelosService {
-  private apiUrl = 'https://localhost:5005/api/aeropuerto/Vuelos'; // Ajusta al puerto de tu API
+  private apiUrl = 'http://localhost:5262/api/aeropuerto/Vuelos';
 
   constructor(private http: HttpClient) {}
 

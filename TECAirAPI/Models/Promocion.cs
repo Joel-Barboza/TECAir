@@ -1,4 +1,5 @@
-// Promocion.cs
+namespace TECAirAPI.Models;
+
 public class Promocion
 {
     public int PromocionId { get; set; }  // promocion_id
