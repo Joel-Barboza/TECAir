@@ -1,7 +1,10 @@
 <div class="maletas-dashboard">
   <!-- Tabla de maletas -->
   <div class="maletas-table">
-    <h3>Lista de maletas</h3>
+    <div class="table-header">
+      <h3>Lista de maletas</h3>
+      <button type="button" class="btn-refresh" (click)="cargarMaletas()">&#8635; Actualizar</button>
+    </div>
     <div *ngIf="maletas.length === 0" class="placeholder">
       No hay maletas registradas
     </div>

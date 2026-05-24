@@ -1,7 +1,10 @@
 <div class="promociones-dashboard">
   <!-- Tabla de promociones -->
   <div class="promociones-table">
-    <h3>Lista de promociones</h3>
+    <div class="table-header">
+      <h3>Lista de promociones</h3>
+      <button type="button" class="btn-refresh" (click)="cargarPromociones()">&#8635; Actualizar</button>
+    </div>
     <div *ngIf="promociones.length === 0" class="placeholder">
       No hay promociones registradas
     </div>

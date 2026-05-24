@@ -9,6 +9,31 @@
   flex: 1;
 }
 
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.table-header h3 {
+  margin: 0;
+}
+
+.btn-refresh {
+  padding: 6px 14px;
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-refresh:hover {
+  background-color: #4b5563;
+}
+
 .reservas-table table {
   width: 100%;
   border-collapse: collapse;

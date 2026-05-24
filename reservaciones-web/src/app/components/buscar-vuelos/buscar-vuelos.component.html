@@ -1,49 +1,50 @@
 <div class="vuelos-dashboard">
+
+  <!-- Búsqueda -->
   <div class="search-section">
     <h3>Buscar Vuelos</h3>
-    <form (ngSubmit)="buscar()" class="search-form">
-      <div class="form-group">
-        <label for="origen">Aeropuerto de origen</label>
-        <input type="text" id="origen" [(ngModel)]="origen" name="origen" placeholder="Ej. San José" />
-      </div>
-      <div class="form-group">
-        <label for="destino">Aeropuerto de llegada</label>
-        <input type="text" id="destino" [(ngModel)]="destino" name="destino" placeholder="Ej. Liberia" />
-      </div>
+    <form (ngSubmit)="buscar()">
+      <label for="origen">Aeropuerto de origen</label>
+      <input type="text" id="origen" [(ngModel)]="origen" name="origen" placeholder="Ej. San José" />
+
+      <label for="destino">Aeropuerto de llegada</label>
+      <input type="text" id="destino" [(ngModel)]="destino" name="destino" placeholder="Ej. Liberia" />
+
       <button type="submit" class="btn-search">Buscar</button>
     </form>
   </div>
 
-  <div class="results-section" *ngIf="resultados.length > 0 || mensaje">
+  <!-- Resultados -->
+  <div class="results-section">
     <h3>Vuelos disponibles</h3>
-    <p *ngIf="mensaje" class="info">{{ mensaje }}</p>
-    <div *ngIf="resultados.length === 0" class="placeholder">
-      No se encontraron vuelos con esos aeropuertos.
+
+    <p class="info" *ngIf="mensaje && resultados.length === 0">{{ mensaje }}</p>
+
+    <div *ngIf="resultados.length === 0 && !mensaje" class="placeholder">
+      Ingrese origen y destino para buscar vuelos.
     </div>
+
     <table *ngIf="resultados.length > 0">
-      <thead>
-        <tr>
-          <th>Origen</th>
-          <th>Destino</th>
-          <th>Salida</th>
-          <th>Llegada</th>
-          <th>Asientos</th>
-          <th>Acción</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let vuelo of resultados">
-          <td>{{ vuelo.salida }}</td>
-          <td>{{ vuelo.destino }}</td>
-          <td>{{ vuelo.fechaSalida | date:'short' }}</td>
-          <td>{{ vuelo.fechaLlegada | date:'short' }}</td>
-          <td>{{ vuelo.asientos }}</td>
-          <td><button type="button" (click)="seleccionarVuelo(vuelo)" class="btn-select">Reservar</button></td>
-        </tr>
-      </tbody>
+      <tr>
+        <th>Origen</th>
+        <th>Destino</th>
+        <th>Fecha Salida</th>
+        <th>Fecha Llegada</th>
+        <th>Asientos</th>
+        <th>Acción</th>
+      </tr>
+      <tr *ngFor="let vuelo of resultados">
+        <td>{{ vuelo.salida }}</td>
+        <td>{{ vuelo.destino }}</td>
+        <td>{{ vuelo.fechaSalida | date:'short' }}</td>
+        <td>{{ vuelo.fechaLlegada | date:'short' }}</td>
+        <td>{{ vuelo.asientos }}</td>
+        <td><button type="button" class="btn-select" (click)="seleccionarVuelo(vuelo)">Reservar</button></td>
+      </tr>
     </table>
   </div>
 
+  <!-- Confirmar Reserva -->
   <div class="booking-section" *ngIf="selectedVuelo">
     <h3>Confirmar Reserva</h3>
     <div class="flight-info">
@@ -52,45 +53,44 @@
       <p><strong>Llegada:</strong> {{ selectedVuelo.fechaLlegada | date:'short' }}</p>
     </div>
 
-    <form (ngSubmit)="crearReserva()" class="booking-form">
-      <div class="form-group">
-        <label for="usuarioId">Seleccione su usuario</label>
-        <select id="usuarioId" [(ngModel)]="usuarioSeleccionadoId" name="usuarioId" required>
-          <option [value]="0">-- Seleccione un usuario --</option>
-          <option *ngFor="let usuario of usuarios" [value]="usuario.usuarioId">{{ usuario.nombre }} {{ usuario.apellido1 }}</option>
-        </select>
-      </div>
+    <form (ngSubmit)="crearReserva()">
+      <label for="usuarioId">Seleccione su usuario</label>
+      <select id="usuarioId" [(ngModel)]="usuarioSeleccionadoId" name="usuarioId" required>
+        <option [value]="0">-- Seleccione un usuario --</option>
+        <option *ngFor="let usuario of usuarios" [value]="usuario.usuarioId">
+          {{ usuario.nombre }} {{ usuario.apellido1 }}
+        </option>
+      </select>
 
-      <div class="form-group">
-        <label for="asientos">Cantidad de asientos</label>
-        <input type="number" id="asientos" [(ngModel)]="asientosReservados" name="asientos" min="1" [max]="selectedVuelo.asientos" required />
-      </div>
+      <label for="asientos">Cantidad de asientos</label>
+      <input type="number" id="asientos" [(ngModel)]="asientosReservados" name="asientos"
+             min="1" [max]="selectedVuelo.asientos" required />
 
       <fieldset class="payment-section">
         <legend>Información de Pago</legend>
-        <div class="form-group">
-          <label for="tarjeta">Número de tarjeta</label>
-          <input type="text" id="tarjeta" [(ngModel)]="tarjeta" name="tarjeta" placeholder="0000 0000 0000 0000" required />
-        </div>
-        <div class="form-group">
-          <label for="vencimiento">Vencimiento</label>
-          <input type="text" id="vencimiento" [(ngModel)]="vencimiento" name="vencimiento" placeholder="MM/AA" required />
-        </div>
-        <div class="form-group">
-          <label for="cvc">CVC</label>
-          <input type="text" id="cvc" [(ngModel)]="cvc" name="cvc" placeholder="123" required />
-        </div>
+
+        <label for="tarjeta">Número de tarjeta</label>
+        <input type="text" id="tarjeta" [(ngModel)]="tarjeta" name="tarjeta"
+               placeholder="0000 0000 0000 0000" required />
+
+        <label for="vencimiento">Vencimiento</label>
+        <input type="text" id="vencimiento" [(ngModel)]="vencimiento" name="vencimiento"
+               placeholder="MM/AA" required />
+
+        <label for="cvc">CVC</label>
+        <input type="text" id="cvc" [(ngModel)]="cvc" name="cvc"
+               placeholder="123" required />
       </fieldset>
 
-      <div class="form-actions">
-        <button type="submit" class="btn-confirm">Confirmar Reserva</button>
-        <button type="button" (click)="selectedVuelo = null" class="btn-cancel">Cancelar</button>
-      </div>
+      <button type="submit" class="btn-confirm">Confirmar Reserva</button>
+      <button type="button" class="btn-cancel" (click)="selectedVuelo = null">Cancelar</button>
     </form>
   </div>
 
-  <div class="messages">
-    <p class="success" *ngIf="mensaje && !error">{{ mensaje }}</p>
+  <!-- Mensajes globales -->
+  <div style="flex: 0 0 100%">
+    <p class="success" *ngIf="mensaje && !error && !selectedVuelo">{{ mensaje }}</p>
     <p class="error" *ngIf="error">{{ error }}</p>
   </div>
+
 </div>

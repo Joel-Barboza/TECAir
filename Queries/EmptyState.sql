@@ -170,3 +170,7 @@ ADD CONSTRAINT fk_promocion_vuelo
 FOREIGN KEY (vuelo_id)
 REFERENCES vuelo(vuelo_id);
 
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO tecair_user;
+GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO tecair_user;
+

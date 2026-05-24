@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -16,4 +16,11 @@ export class DashboardComponent {
     { nombre: 'Reservas', valor: 'reservas' },
     { nombre: 'Promociones', valor: 'promociones' }
   ];
+
+  constructor(private router: Router) {}
+
+  get seccionActual(): string {
+    const seg = this.router.url.split('/').pop() || 'usuarios';
+    return this.menu.find(m => m.valor === seg)?.nombre ?? 'TECAir';
+  }
 }

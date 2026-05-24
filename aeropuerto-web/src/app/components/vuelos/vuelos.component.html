@@ -1,6 +1,9 @@
 <div class="vuelos-dashboard">
   <div class="vuelos-table">
-    <h3>Lista de vuelos</h3>
+    <div class="table-header">
+      <h3>Lista de vuelos</h3>
+      <button type="button" class="btn-refresh" (click)="cargarVuelos()">&#8635; Actualizar</button>
+    </div>
     <div *ngIf="vuelos.length === 0" class="placeholder">
       No hay vuelos registrados
     </div>

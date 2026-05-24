@@ -1,11 +1,8 @@
-:host {
-  display: block;
-  padding: 20px;
-  font-family: Arial, sans-serif;
-}
-
 .reservas-dashboard {
   display: flex;
+  gap: 30px;
+  padding: 20px;
+  font-family: Arial, sans-serif;
 }
 
 .reservas-table {
@@ -14,21 +11,39 @@
 
 .reservas-table h3 {
   margin-top: 0;
+  margin-bottom: 15px;
 }
 
+/* Filtro */
+.filtro-usuario {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.filtro-usuario label {
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.filtro-usuario select {
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+/* Tabla */
 .reservas-table table {
   width: 100%;
   border-collapse: collapse;
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
-  overflow: hidden;
 }
 
 .reservas-table th,
 .reservas-table td {
   border: 1px solid #d1d5db;
-  padding: 10px;
+  padding: 8px;
   text-align: left;
 }
 
@@ -50,25 +65,29 @@
 }
 
 .reservas-table button {
+  padding: 5px 10px;
   background-color: #ef4444;
   color: white;
-  padding: 8px 12px;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
 }
 
-.reservas-table button:hover {
-  background-color: #dc2626;
-}
-
+/* Mensajes */
 .success {
   color: #10b981;
-  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #ecfdf5;
+  border-radius: 5px;
+  border: 1px solid #d1fae5;
+  margin-bottom: 10px;
 }
 
 .error {
   color: #ef4444;
-  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #fef2f2;
+  border-radius: 5px;
+  border: 1px solid #fecaca;
+  margin-bottom: 10px;
 }
-

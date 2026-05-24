@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Usuario, UsuarioService } from '../../services/usuario.service';
@@ -10,63 +10,108 @@ import { Usuario, UsuarioService } from '../../services/usuario.service';
   templateUrl: './usuarios.component.html',
   styleUrls: ['./usuarios.component.css']
 })
-export class UsuariosComponent {
-  nuevoUsuario: Usuario = {
-    nombre: '',
-    apellido1: '',
-    apellido2: '',
-    email: '',
-    telefono: ''
-  };
+export class UsuariosComponent implements OnInit {
+  usuarios: Usuario[] = [];
+  formulario: Usuario = this.formularioVacio();
   esEstudiante = false;
+  modoEdicion = false;
+  mostrarFormulario = false;
   mensaje = '';
   error = '';
 
   constructor(private usuarioService: UsuarioService) {}
 
+  ngOnInit(): void {
+    this.cargarUsuarios();
+  }
+
+  private formularioVacio(): Usuario {
+    return { nombre: '', apellido1: '', apellido2: '', email: '', telefono: '' };
+  }
+
+  cargarUsuarios(): void {
+    this.usuarioService.getUsuarios().subscribe({
+      next: (data) => (this.usuarios = data),
+      error: () => (this.error = 'No se pudieron cargar los usuarios.')
+    });
+  }
+
+  abrirEditar(usuario: Usuario): void {
+    this.formulario = { ...usuario };
+    this.esEstudiante = !!(usuario.carnet || usuario.universidad);
+    this.modoEdicion = true;
+    this.mostrarFormulario = true;
+    this.mensaje = '';
+    this.error = '';
+  }
+
+  cancelar(): void {
+    this.formulario = this.formularioVacio();
+    this.esEstudiante = false;
+    this.modoEdicion = false;
+    this.mostrarFormulario = false;
+  }
+
   toggleEstudiante(): void {
     if (!this.esEstudiante) {
-      this.nuevoUsuario.carnet = undefined;
-      this.nuevoUsuario.universidad = undefined;
+      this.formulario.carnet = undefined;
+      this.formulario.universidad = undefined;
     }
   }
 
-  crearUsuario(): void {
+  guardar(): void {
     this.error = '';
     this.mensaje = '';
+    this.mostrarFormulario = true;
 
-    if (!this.nuevoUsuario.nombre || !this.nuevoUsuario.apellido1 || !this.nuevoUsuario.email || !this.nuevoUsuario.telefono) {
+    if (!this.formulario.nombre || !this.formulario.apellido1 || !this.formulario.email || !this.formulario.telefono) {
       this.error = 'Debe completar nombre, apellido, correo y teléfono.';
       return;
     }
 
-    if (this.esEstudiante && (!this.nuevoUsuario.universidad || !this.nuevoUsuario.carnet)) {
+    if (this.esEstudiante && (!this.formulario.universidad || !this.formulario.carnet)) {
       this.error = 'Ingrese universidad y carnet para estudiantes.';
       return;
     }
 
     const usuarioAEnviar: Usuario = {
-      ...this.nuevoUsuario,
-      carnet: this.esEstudiante ? this.nuevoUsuario.carnet : undefined,
-      universidad: this.esEstudiante ? this.nuevoUsuario.universidad : undefined
+      ...this.formulario,
+      carnet: this.esEstudiante ? this.formulario.carnet : undefined,
+      universidad: this.esEstudiante ? this.formulario.universidad : undefined
     };
 
-    this.usuarioService.crearUsuario(usuarioAEnviar).subscribe({
+    if (this.modoEdicion) {
+      this.usuarioService.actualizarUsuario(usuarioAEnviar).subscribe({
+        next: () => {
+          this.mensaje = 'Usuario actualizado correctamente.';
+          this.modoEdicion = false;
+          this.mostrarFormulario = false;
+          this.formulario = this.formularioVacio();
+          this.cargarUsuarios();
+        },
+        error: () => (this.error = 'No se pudo actualizar el usuario.')
+      });
+    } else {
+      this.usuarioService.crearUsuario(usuarioAEnviar).subscribe({
+        next: () => {
+          this.mensaje = 'Usuario agregado correctamente.';
+          this.formulario = this.formularioVacio();
+          this.esEstudiante = false;
+          this.cargarUsuarios();
+        },
+        error: () => (this.error = 'No se pudo crear el usuario.')
+      });
+    }
+  }
+
+  eliminar(usuarioId: number): void {
+    if (!confirm('¿Desea eliminar este usuario?')) return;
+    this.usuarioService.eliminarUsuario(usuarioId).subscribe({
       next: () => {
-        this.mensaje = 'Perfil creado correctamente. Puedes buscar vuelos ahora.';
-        this.nuevoUsuario = {
-          nombre: '',
-          apellido1: '',
-          apellido2: '',
-          email: '',
-          telefono: ''
-        };
-        this.esEstudiante = false;
+        this.mensaje = 'Usuario eliminado.';
+        this.cargarUsuarios();
       },
-      error: (err) => {
-        this.error = 'No se pudo crear el perfil.';
-        console.error(err);
-      }
+      error: () => (this.error = 'No se pudo eliminar el usuario.')
     });
   }
 }

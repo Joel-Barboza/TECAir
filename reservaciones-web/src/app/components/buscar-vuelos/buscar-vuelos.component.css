@@ -1,20 +1,20 @@
-:host {
-  display: block;
-  padding: 20px;
-  font-family: Arial, sans-serif;
-}
-
 .vuelos-dashboard {
   display: flex;
   gap: 30px;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  flex-wrap: wrap;
 }
 
+/* --- BÚSQUEDA --- */
 .search-section {
   flex: 1;
+  min-width: 240px;
   background-color: #ffffff;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+  align-self: flex-start;
 }
 
 .search-section h3 {
@@ -22,69 +22,42 @@
   margin-bottom: 15px;
 }
 
-.search-form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.form-group {
-  margin-bottom: 10px;
-}
-
-.form-group label {
+.search-section label {
   display: block;
+  margin-top: 10px;
   font-weight: bold;
-  margin-bottom: 5px;
 }
 
-.form-group input,
-.form-group select {
+.search-section input {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #d1d5db;
+  padding: 8px;
+  margin-top: 5px;
   border-radius: 5px;
-  font-size: 14px;
+  border: 1px solid #d1d5db;
   box-sizing: border-box;
 }
 
-.btn-search,
-.btn-select,
-.btn-confirm,
-.btn-cancel {
-  padding: 10px 15px;
-  background-color: #3b82f6;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.btn-cancel {
-  background-color: #6b7280;
-}
-
+/* --- RESULTADOS --- */
 .results-section {
-  flex: 1;
+  flex: 2;
+  min-width: 300px;
 }
 
 .results-section h3 {
   margin-top: 0;
+  margin-bottom: 15px;
 }
 
 .results-section table {
   width: 100%;
   border-collapse: collapse;
   background-color: white;
-  border-radius: 10px;
-  box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
-  overflow: hidden;
 }
 
 .results-section th,
 .results-section td {
   border: 1px solid #d1d5db;
-  padding: 10px;
+  padding: 8px;
   text-align: left;
 }
 
@@ -105,72 +78,107 @@
   color: #1f2937;
 }
 
+/* --- FORMULARIO DE RESERVA --- */
 .booking-section {
+  flex: 0 0 100%;
   background-color: #ffffff;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
-  margin-top: 20px;
 }
 
 .booking-section h3 {
   margin-top: 0;
+  margin-bottom: 15px;
 }
 
 .flight-info {
   background-color: #f3f4f6;
-  padding: 15px;
+  padding: 12px;
   border-radius: 5px;
   margin-bottom: 15px;
 }
 
-.booking-form {
-  margin-top: 15px;
+.flight-info p {
+  margin: 4px 0;
+}
+
+.booking-section label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.booking-section input,
+.booking-section select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border-radius: 5px;
+  border: 1px solid #d1d5db;
+  box-sizing: border-box;
 }
 
 .payment-section {
-  background-color: #f3f4f6;
-  padding: 15px;
   border: 1px solid #d1d5db;
   border-radius: 5px;
-  margin: 15px 0;
-}
-
-.form-actions {
-  display: flex;
-  gap: 10px;
+  padding: 15px;
   margin-top: 15px;
 }
 
-.form-actions button {
-  flex: 1;
-  padding: 12px;
+.payment-section legend {
+  font-weight: bold;
+  padding: 0 5px;
 }
 
-.messages {
+/* --- BOTONES --- */
+.btn-search,
+.btn-select,
+.btn-confirm {
   margin-top: 15px;
+  padding: 10px 15px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
+.btn-cancel {
+  margin-top: 15px;
+  margin-left: 8px;
+  padding: 10px 15px;
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* --- MENSAJES --- */
 .success {
   color: #10b981;
-  padding: 10px;
+  padding: 8px 12px;
   background-color: #ecfdf5;
   border-radius: 5px;
   border: 1px solid #d1fae5;
+  margin-top: 10px;
 }
 
 .error {
   color: #ef4444;
-  padding: 10px;
+  padding: 8px 12px;
   background-color: #fef2f2;
   border-radius: 5px;
   border: 1px solid #fecaca;
+  margin-top: 10px;
 }
 
 .info {
-  color: #0277bd;
-  padding: 10px;
-  background-color: #e0f7ff;
+  color: #1e40af;
+  padding: 8px 12px;
+  background-color: #eff6ff;
   border-radius: 5px;
-  border: 1px solid #b3e5fc;
+  border: 1px solid #bfdbfe;
+  margin-top: 10px;
 }

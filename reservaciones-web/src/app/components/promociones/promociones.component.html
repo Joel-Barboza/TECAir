@@ -1,35 +1,23 @@
 <div class="promociones-dashboard">
-  <div class="promociones-table">
-    <h3>Promociones</h3>
+  <h3>Promociones disponibles</h3>
 
-    <p *ngIf="mensaje" class="info">{{ mensaje }}</p>
-    <p *ngIf="error" class="error">{{ error }}</p>
+  <p *ngIf="error" class="error">{{ error }}</p>
 
-    <div *ngIf="promociones.length === 0" class="placeholder">
-      Actualmente no hay promociones registradas.
+  <div *ngIf="promociones.length === 0 && !error" class="placeholder">
+    Actualmente no hay promociones registradas.
+  </div>
+
+  <div class="promociones-grid" *ngIf="promociones.length > 0">
+    <div class="promo-card" *ngFor="let promo of promociones">
+      <div class="promo-ruta">
+        <span class="promo-ciudad">{{ promo.origen }}</span>
+        <span class="promo-flecha">→</span>
+        <span class="promo-ciudad">{{ promo.destino }}</span>
+      </div>
+      <div class="promo-descuento">{{ promo.descuento }}% de descuento</div>
+      <div class="promo-periodo">
+        Válido del {{ promo.fechaInicio | date:'dd/MM/yyyy' }} al {{ promo.fechaFin | date:'dd/MM/yyyy' }}
+      </div>
     </div>
-
-    <table *ngIf="promociones.length > 0">
-      <thead>
-        <tr>
-          <th>Vuelo</th>
-          <th>Origen</th>
-          <th>Destino</th>
-          <th>Descuento</th>
-          <th>Fecha Inicio</th>
-          <th>Fecha Fin</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let promo of promociones">
-          <td>{{ promo.vueloId }}</td>
-          <td>{{ promo.origen }}</td>
-          <td>{{ promo.destino }}</td>
-          <td>{{ promo.descuento }}%</td>
-          <td>{{ promo.fechaInicio | date:'shortDate' }}</td>
-          <td>{{ promo.fechaFin | date:'shortDate' }}</td>
-        </tr>
-      </tbody>
-    </table>
   </div>
 </div>

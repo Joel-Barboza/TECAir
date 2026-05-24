@@ -1,7 +1,10 @@
 <div class="reservas-dashboard">
   <!-- Tabla de reservas -->
   <div class="reservas-table">
-    <h3>Lista de reservas</h3>
+    <div class="table-header">
+      <h3>Lista de reservas</h3>
+      <button type="button" class="btn-refresh" (click)="cargarReservas()">&#8635; Actualizar</button>
+    </div>
     <div *ngIf="reservas.length === 0" class="placeholder">
       No hay reservas registradas
     </div>

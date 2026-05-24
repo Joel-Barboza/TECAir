@@ -3,29 +3,14 @@
     <img src="assets/logo.png" alt="Logo TECAir" class="logo" />
     <h2>Reservaciones</h2>
     <ul>
-      <li *ngFor="let item of menu" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <li *ngFor="let item of menu" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
         <a [routerLink]="['/', item.valor]">{{ item.nombre }}</a>
       </li>
     </ul>
   </nav>
 
   <main class="main-content">
-    <h1>{{ seccionSeleccionada | titlecase }}</h1>
-
-    <div *ngIf="seccionSeleccionada === 'usuarios'">
-      <app-usuarios></app-usuarios>
-    </div>
-
-    <div *ngIf="seccionSeleccionada === 'vuelos'">
-      <app-vuelos></app-vuelos>
-    </div>
-
-    <div *ngIf="seccionSeleccionada === 'reservas'">
-      <app-reservas></app-reservas>
-    </div>
-
-    <div *ngIf="seccionSeleccionada === 'promociones'">
-      <app-promociones></app-promociones>
-    </div>
+    <h1>{{ seccionActual }}</h1>
+    <router-outlet />
   </main>
 </div>

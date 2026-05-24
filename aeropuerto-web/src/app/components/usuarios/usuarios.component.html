@@ -1,7 +1,10 @@
 <div class="usuarios-dashboard">
   <!-- Tabla de usuarios -->
   <div class="usuarios-table">
-    <h3>Lista de usuarios</h3>
+    <div class="table-header">
+      <h3>Lista de usuarios</h3>
+      <button type="button" class="btn-refresh" (click)="cargarUsuarios()">&#8635; Actualizar</button>
+    </div>
     <div *ngIf="usuarios.length === 0" class="placeholder">
       No hay usuarios registrados
     </div>
