@@ -79,4 +79,11 @@ Nombre: AeropuertoWeb
 Puerto: 5007
 Carpeta: C:\inetpub\wwwroot\AeropuertoWeb
 
+Configuración Inicial de la App Móvil (Expo SDK)
+Cuando se inicializa el proyecto por primera vez o se restauran dependencias, el asistente de Expo podría solicitar la selección de la versión del SDK.
+Seleccionar siempre `Latest (SDK 56)` o `Recommended for most projects`.
+
+Dependencias Locales Obligatorias
+Libreria sqlite, ubicarse en `TECAirMobile/` y escribir en consola npx expo install expo-sqlite
+
 
