@@ -1,0 +1,45 @@
+<div class="reservas-dashboard">
+  <!-- Tabla de reservas -->
+  <div class="reservas-table">
+    <h3>Lista de reservas</h3>
+    <div *ngIf="reservas.length === 0" class="placeholder">
+      No hay reservas registradas
+    </div>
+    <table *ngIf="reservas.length > 0">
+      <tr>
+        <th>ID Usuario</th>
+        <th>ID Vuelo</th>
+        <th>Fecha Reserva</th>
+        <th>Cantidad Asientos</th>
+        <th>Acciones</th>
+      </tr>
+      <tr *ngFor="let r of reservas">
+        <td>{{r.usuarioId}}</td>
+        <td>{{r.vueloId}}</td>
+        <td>{{r.fechaReserva}}</td>
+        <td>{{r.cantidadAsientos}}</td>
+        <td><button (click)="eliminarReserva(r.reservaId!)">Eliminar</button></td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Formulario de nueva reserva -->
+  <div class="reservas-form">
+    <h3>Agregar nueva reserva</h3>
+    <form (ngSubmit)="agregarReserva()">
+      <label>ID Usuario</label>
+      <input type="number" [(ngModel)]="nuevaReserva.usuarioId" name="usuarioId" required />
+
+      <label>ID Vuelo</label>
+      <input type="number" [(ngModel)]="nuevaReserva.vueloId" name="vueloId" required />
+
+      <label>Fecha Reserva</label>
+      <input type="date" [(ngModel)]="nuevaReserva.fechaReserva" name="fechaReserva" required />
+
+      <label>Cantidad Asientos</label>
+      <input type="number" [(ngModel)]="nuevaReserva.cantidadAsientos" name="cantidadAsientos" min="1" required />
+
+      <button type="submit">Agregar Reserva</button>
+    </form>
+  </div>
+</div>

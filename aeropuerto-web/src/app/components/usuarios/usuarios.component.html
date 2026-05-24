@@ -1,37 +1,61 @@
-<h2>Gestión de Usuarios - Aeropuerto</h2>
+<div class="usuarios-dashboard">
+  <!-- Tabla de usuarios -->
+  <div class="usuarios-table">
+    <h3>Lista de usuarios</h3>
+    <div *ngIf="usuarios.length === 0" class="placeholder">
+      <p>No hay usuarios registrados</p>
+      <small>Agrega un nuevo usuario usando el formulario de la derecha.</small>
+    </div>
+    <table *ngIf="usuarios.length > 0">
+      <tr>
+        <th>Nombre</th>
+        <th>Apellido1</th>
+        <th>Apellido2</th>
+        <th>Email</th>
+        <th>Teléfono</th>
+        <th>Carnet</th>
+        <th>Universidad</th>
+        <th>Acciones</th>
+      </tr>
+      <tr *ngFor="let u of usuarios">
+        <td>{{u.nombre}}</td>
+        <td>{{u.apellido1}}</td>
+        <td>{{u.apellido2}}</td>
+        <td>{{u.email}}</td>
+        <td>{{u.telefono}}</td>
+        <td>{{u.carnet}}</td>
+        <td>{{u.universidad}}</td>
+        <td><button (click)="eliminarUsuario(u.usuarioId!)">Eliminar</button></td>
+      </tr>
+    </table>
+  </div>
 
-<!-- Formulario para agregar usuario -->
-<form (ngSubmit)="agregarUsuario()">
-  <input type="text" placeholder="Nombre" [(ngModel)]="nuevoUsuario.nombre" name="nombre" required>
-  <input type="text" placeholder="Apellido1" [(ngModel)]="nuevoUsuario.apellido1" name="apellido1" required>
-  <input type="text" placeholder="Apellido2" [(ngModel)]="nuevoUsuario.apellido2" name="apellido2">
-  <input type="email" placeholder="Email" [(ngModel)]="nuevoUsuario.email" name="email" required>
-  <input type="text" placeholder="Teléfono" [(ngModel)]="nuevoUsuario.telefono" name="telefono" required>
-  <input type="number" placeholder="Carnet" [(ngModel)]="nuevoUsuario.carnet" name="carnet">
-  <input type="text" placeholder="Universidad" [(ngModel)]="nuevoUsuario.universidad" name="universidad">
-  <button type="submit">Agregar Usuario</button>
-</form>
+  <!-- Formulario para agregar -->
+  <div class="usuarios-form">
+    <h3>Agregar nuevo usuario</h3>
+    <form (ngSubmit)="agregarUsuario()">
+      <label>Nombre</label>
+      <input type="text" placeholder="Ej: Juan" [(ngModel)]="nuevoUsuario.nombre" name="nombre" required />
 
-<!-- Tabla de usuarios -->
-<table border="1" style="margin-top:20px;">
-  <tr>
-    <th>Nombre</th>
-    <th>Apellido1</th>
-    <th>Apellido2</th>
-    <th>Email</th>
-    <th>Teléfono</th>
-    <th>Carnet</th>
-    <th>Universidad</th>
-    <th>Acciones</th>
-  </tr>
-  <tr *ngFor="let u of usuarios">
-    <td>{{ u.nombre }}</td>
-    <td>{{ u.apellido1 }}</td>
-    <td>{{ u.apellido2 }}</td>
-    <td>{{ u.email }}</td>
-    <td>{{ u.telefono }}</td>
-    <td>{{ u.carnet }}</td>
-    <td>{{ u.universidad }}</td>
-    <td><button (click)="eliminarUsuario(u.usuarioId)">Eliminar</button></td>
-  </tr>
-</table>
+      <label>Primer Apellido</label>
+      <input type="text" placeholder="Ej: Pérez" [(ngModel)]="nuevoUsuario.apellido1" name="apellido1" required />
+
+      <label>Segundo Apellido</label>
+      <input type="text" placeholder="Ej: Gómez" [(ngModel)]="nuevoUsuario.apellido2" name="apellido2" />
+
+      <label>Email</label>
+      <input type="email" placeholder="Ej: juan@mail.com" [(ngModel)]="nuevoUsuario.email" name="email" required />
+
+      <label>Teléfono</label>
+      <input type="text" placeholder="Ej: 88888888" [(ngModel)]="nuevoUsuario.telefono" name="telefono" required />
+
+      <label>Carnet</label>
+      <input type="number" placeholder="Ej: 20201234" [(ngModel)]="nuevoUsuario.carnet" name="carnet" />
+
+      <label>Universidad</label>
+      <input type="text" placeholder="Ej: TEC" [(ngModel)]="nuevoUsuario.universidad" name="universidad" />
+
+      <button type="submit">Agregar usuario</button>
+    </form>
+  </div>
+</div>

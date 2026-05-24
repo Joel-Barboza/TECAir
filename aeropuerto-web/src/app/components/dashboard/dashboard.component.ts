@@ -1,13 +1,24 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UsuariosComponent } from '../usuarios/usuarios.component'; // importa el componente standalone
+import { VuelosComponent } from '../vuelos/vuelos.component'; // nuevo
+import { ReservasComponent } from '../reservas/reservas.component'; // nuevo
+import { PromocionesComponent } from '../promociones/promociones.component'; // nuevo
+import { MaletasComponent } from '../maletas/maletas.component'; // nuevo
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
   standalone: true,
-  imports: [CommonModule, UsuariosComponent]  // <-- agrega aquí
+  imports: [
+    CommonModule,
+    UsuariosComponent,
+    VuelosComponent,
+    ReservasComponent,
+    PromocionesComponent,
+    MaletasComponent
+  ]
 })
 export class DashboardComponent {
   seccionSeleccionada = 'usuarios';

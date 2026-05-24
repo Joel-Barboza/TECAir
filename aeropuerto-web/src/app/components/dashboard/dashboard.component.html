@@ -14,25 +14,25 @@
   <!-- Contenido principal -->
   <main class="main-content">
     <h1>{{ seccionSeleccionada | titlecase }}</h1>
-    
+
     <div *ngIf="seccionSeleccionada === 'usuarios'">
       <app-usuarios></app-usuarios>
     </div>
 
     <div *ngIf="seccionSeleccionada === 'vuelos'">
-      <p>Sección de vuelos (origen, destino, precio, periodo).</p>
+      <app-vuelos></app-vuelos>
     </div>
 
     <div *ngIf="seccionSeleccionada === 'reservas'">
-      <p>Sección de reservas.</p>
+      <app-reservas></app-reservas>
     </div>
 
     <div *ngIf="seccionSeleccionada === 'promociones'">
-      <p>Sección de promociones.</p>
+      <app-promociones></app-promociones>
     </div>
 
     <div *ngIf="seccionSeleccionada === 'maletas'">
-      <p>Sección de maletas.</p>
+      <app-maletas></app-maletas>
     </div>
   </main>
 </div>

@@ -13,7 +13,6 @@ import { UsuarioService, Usuario } from '../../services/usuario.service';
 export class UsuariosComponent {
   usuarios: Usuario[] = [];
   nuevoUsuario: Usuario = {
-    usuarioId: 0,
     nombre: '',
     apellido1: '',
     apellido2: '',
@@ -23,9 +22,7 @@ export class UsuariosComponent {
     universidad: ''
   };
 
-  constructor(private usuarioService: UsuarioService) { }
-
-  ngOnInit(): void {
+  constructor(private usuarioService: UsuarioService) {
     this.cargarUsuarios();
   }
 
@@ -36,10 +33,10 @@ export class UsuariosComponent {
   }
 
   agregarUsuario() {
+    console.log('agregarUsuario disparado');
     this.usuarioService.crearUsuario(this.nuevoUsuario).subscribe(() => {
       this.cargarUsuarios();
       this.nuevoUsuario = {
-        usuarioId: 0,
         nombre: '',
         apellido1: '',
         apellido2: '',
@@ -52,10 +49,8 @@ export class UsuariosComponent {
   }
 
   eliminarUsuario(id: number) {
-    if(confirm('¿Desea eliminar este usuario?')) {
-      this.usuarioService.eliminarUsuario(id).subscribe(() => {
-        this.cargarUsuarios();
-      });
-    }
+    this.usuarioService.eliminarUsuario(id).subscribe(() => {
+      this.cargarUsuarios();
+    });
   }
 }

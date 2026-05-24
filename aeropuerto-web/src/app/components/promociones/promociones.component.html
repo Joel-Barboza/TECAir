@@ -1,0 +1,50 @@
+<div class="promociones-dashboard">
+  <!-- Tabla de promociones -->
+  <div class="promociones-table">
+    <h3>Lista de promociones</h3>
+    <div *ngIf="promociones.length === 0" class="placeholder">
+      No hay promociones registradas
+    </div>
+    <table *ngIf="promociones.length > 0">
+      <tr>
+        <th>Origen</th>
+        <th>Destino</th>
+        <th>Precio</th>
+        <th>Fecha Inicio</th>
+        <th>Fecha Fin</th>
+        <th>Acciones</th>
+      </tr>
+      <tr *ngFor="let p of promociones">
+        <td>{{p.origen}}</td>
+        <td>{{p.destino}}</td>
+        <td>{{p.precio}}</td>
+        <td>{{p.fechaInicio}}</td>
+        <td>{{p.fechaFin}}</td>
+        <td><button (click)="eliminarPromocion(p.promocionId!)">Eliminar</button></td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Formulario -->
+  <div class="promociones-form">
+    <h3>Agregar nueva promoción</h3>
+    <form (ngSubmit)="agregarPromocion()">
+      <label>Origen</label>
+      <input type="text" [(ngModel)]="nuevaPromocion.origen" name="origen" required />
+
+      <label>Destino</label>
+      <input type="text" [(ngModel)]="nuevaPromocion.destino" name="destino" required />
+
+      <label>Precio</label>
+      <input type="number" [(ngModel)]="nuevaPromocion.precio" name="precio" required />
+
+      <label>Fecha Inicio</label>
+      <input type="date" [(ngModel)]="nuevaPromocion.fechaInicio" name="fechaInicio" />
+
+      <label>Fecha Fin</label>
+      <input type="date" [(ngModel)]="nuevaPromocion.fechaFin" name="fechaFin" />
+
+      <button type="submit">Agregar promoción</button>
+    </form>
+  </div>
+</div>

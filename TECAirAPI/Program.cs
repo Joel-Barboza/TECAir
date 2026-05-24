@@ -18,21 +18,20 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(
-        builder.Configuration.GetConnectionString("PostgresConnection")
-    ));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection"))
+);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.UseCors("AllowAngular");
+
 app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseAuthorization();
-
-app.UseCors("AllowAngular");
 
 app.MapControllers();
 

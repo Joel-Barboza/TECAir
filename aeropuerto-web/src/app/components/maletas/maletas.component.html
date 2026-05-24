@@ -1,0 +1,45 @@
+<div class="maletas-dashboard">
+  <!-- Tabla de maletas -->
+  <div class="maletas-table">
+    <h3>Lista de maletas</h3>
+    <div *ngIf="maletas.length === 0" class="placeholder">
+      No hay maletas registradas
+    </div>
+    <table *ngIf="maletas.length > 0">
+      <tr>
+        <th>ID Reserva</th>
+        <th>Peso</th>
+        <th>Color</th>
+        <th>Costo Adicional</th>
+        <th>Acciones</th>
+      </tr>
+      <tr *ngFor="let m of maletas">
+        <td>{{m.reservaId}}</td>
+        <td>{{m.peso}}</td>
+        <td>{{m.color}}</td>
+        <td>{{m.costoAdicional}}</td>
+        <td><button (click)="eliminarMaleta(m.maletaId!)">Eliminar</button></td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Formulario -->
+  <div class="maletas-form">
+    <h3>Agregar nueva maleta</h3>
+    <form (ngSubmit)="agregarMaleta()">
+      <label>ID Reserva</label>
+      <input type="number" [(ngModel)]="nuevaMaleta.reservaId" name="reservaId" required />
+
+      <label>Peso (kg)</label>
+      <input type="number" [(ngModel)]="nuevaMaleta.peso" name="peso" required />
+
+      <label>Color</label>
+      <input type="text" [(ngModel)]="nuevaMaleta.color" name="color" required />
+
+      <label>Costo Adicional</label>
+      <input type="number" [(ngModel)]="nuevaMaleta.costoAdicional" name="costoAdicional" />
+
+      <button type="submit">Agregar Maleta</button>
+    </form>
+  </div>
+</div>
