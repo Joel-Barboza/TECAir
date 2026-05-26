@@ -1,0 +1,199 @@
+<div class="vuelos-dashboard">
+
+  <!-- ===== BÚSQUEDA ===== -->
+  <div class="search-section">
+    <h3>Chequeo de pasajeros</h3>
+
+    <!-- <label for="tipoBusqueda">Buscar por</label>
+    <select id="tipoBusqueda" [(ngModel)]="tipoBusqueda" name="tipoBusqueda">
+      <option value="email">Email</option>
+      <option value="carnet">Carnet</option>
+    </select> -->
+
+    <label for="valorBusqueda">{{ labelBusqueda }}</label>
+    <input
+      type="text"
+      id="valorBusqueda"
+      [(ngModel)]="valorBusqueda"
+      name="valorBusqueda"
+      [placeholder]="placeholderBusqueda"
+    />
+
+    <button class="btn-search" (click)="buscarReservas()" [disabled]="cargando">
+      {{ cargando ? 'Buscando...' : 'Buscar' }}
+    </button>
+
+    <p class="error" *ngIf="error && reservas.length === 0">{{ error }}</p>
+  </div>
+
+  <!-- ===== RESULTADOS ===== -->
+  <div class="results-section">
+    <h3>Reservaciones encontradas</h3>
+
+    <div *ngIf="reservas.length === 0 && !error" class="placeholder">
+      Ingrese el email o carnet del pasajero para buscar reservaciones.
+    </div>
+
+    <table *ngIf="reservas.length > 0">
+      <tr>
+        <th>Vuelo</th>
+        <th>Origen</th>
+        <th>Destino</th>
+        <th>Fecha salida</th>
+        <th>Asientos</th>
+        <th>Estado</th>
+        <th></th>
+      </tr>
+      <tr *ngFor="let reserva of reservas">
+        <td>#{{ reserva.vuelo.vueloId }}</td>
+        <td>{{ reserva.vuelo.salida }}</td>
+        <td>{{ reserva.vuelo.destino }}</td>
+        <td>{{ reserva.vuelo.fechaSalida | date:'short' }}</td>
+        <td>{{ reserva.asientosReservados }}</td>
+        <td>
+          <span class="badge badge-ok">{{ reserva.estadoPago }}</span>
+        </td>
+        <td>
+          <button class="btn-select" (click)="seleccionarReserva(reserva)">
+            Seleccionar
+          </button>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ===== SELECCIÓN DE ASIENTOS ===== -->
+  <div class="booking-section" *ngIf="reservaSeleccionada">
+    <h3>Seleccionar asientos</h3>
+
+    <div class="flight-info">
+      <p><strong>Pasajero:</strong> {{ reservaSeleccionada.usuario }}</p>
+      <p>
+        <strong>Vuelo #{{ reservaSeleccionada.vuelo.vueloId }}:</strong>
+        {{ reservaSeleccionada.vuelo.salida }} → {{ reservaSeleccionada.vuelo.destino }}
+      </p>
+      <p>
+        <strong>Salida:</strong>
+        {{ reservaSeleccionada.vuelo.fechaSalida | date:'medium' }}
+      </p>
+      <p>
+        <strong>Debe seleccionar:</strong>
+        {{ reservaSeleccionada.asientosReservados }} asiento(s) &nbsp;|&nbsp;
+        <strong>Seleccionados:</strong> {{ asientosSeleccionados.length }}
+      </p>
+    </div>
+
+    <!-- Leyenda -->
+    <div class="seat-legend">
+      <span class="legend-item">
+        <span class="legend-box"></span> Disponible
+      </span>
+      <span class="legend-item">
+        <span class="legend-box selected"></span> Seleccionado
+      </span>
+      <span class="legend-item">
+        <span class="legend-box occupied"></span> Ocupado
+      </span>
+    </div>
+
+    <!-- Encabezado de columnas -->
+    <div class="seat-col-header">
+      <span *ngFor="let col of columnas">{{ col }}</span>
+    </div>
+
+    <!-- Grilla de asientos -->
+    <div class="seat-grid">
+      <ng-container *ngFor="let fila of filas">
+        <span class="seat-row-label">{{ fila }}</span>
+        <button
+          *ngFor="let col of columnas"
+          type="button"
+          class="seat-btn"
+          [class.selected]="estaSeleccionado(fila + col)"
+          [class.occupied]="estaOcupado(fila + col)"
+          [disabled]="estaOcupado(fila + col)"
+          (click)="toggleAsiento(fila + col)"
+        >
+          {{ fila + col }}
+        </button>
+      </ng-container>
+    </div>
+
+    <p class="error" *ngIf="error">{{ error }}</p>
+
+    <button
+      class="btn-confirm"
+      (click)="confirmarCheckin()"
+      [disabled]="cargando || asientosSeleccionados.length !== reservaSeleccionada.asientosReservados"
+    >
+      {{ cargando ? 'Procesando...' : 'Confirmar Check-in' }}
+    </button>
+    <button class="btn-cancel" (click)="cancelar()">Cancelar</button>
+  </div>
+
+  <!-- ===== PASES DE ABORDAR ===== -->
+  <div style="flex: 0 0 100%" *ngIf="pasesGenerados.length > 0">
+    <p class="success">✓ {{ mensaje }}</p>
+
+    <div class="pase-abordar" *ngFor="let pase of pasesGenerados">
+      <div class="pase-header">
+        <div>
+          <span class="pase-airline">✈ TECAir</span>
+          <span class="pase-label">Pase de abordar</span>
+        </div>
+        <div class="pase-actions">
+          <button class="btn-pase btn-print" (click)="imprimirPase(pase)">
+            🖨 Imprimir
+          </button>
+          <button class="btn-pase btn-email" (click)="enviarCorreo(pase)">
+            📧 Enviar por correo
+          </button>
+          <button class="btn-pase btn-movil" (click)="enviarMovil(pase)">
+            📱 Enviar al móvil
+          </button>
+        </div>
+      </div>
+
+      <div class="pase-grid">
+        <div class="pase-field">
+          <label>Pasajero</label>
+          <span>{{ pase.pasajero }}</span>
+        </div>
+        <div class="pase-field">
+          <label>Vuelo</label>
+          <span>{{ pase.vuelo }}</span>
+        </div>
+        <div class="pase-field">
+          <label>Asiento</label>
+          <span class="pase-asiento">{{ pase.asiento }}</span>
+        </div>
+        <div class="pase-field">
+          <label>Puerta</label>
+          <span class="pase-puerta">{{ pase.puerta }}</span>
+        </div>
+        <div class="pase-field">
+          <label>Origen</label>
+          <span>{{ pase.origen }}</span>
+        </div>
+        <div class="pase-field">
+          <label>Destino</label>
+          <span>{{ pase.destino }}</span>
+        </div>
+        <div class="pase-field">
+          <label>Fecha</label>
+          <span>{{ pase.fechaSalida }}</span>
+        </div>
+        <div class="pase-field">
+          <label>Hora de salida</label>
+          <span>{{ pase.horaSalida }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensajes globales de error -->
+  <div style="flex: 0 0 100%" *ngIf="error && !reservaSeleccionada && pasesGenerados.length === 0">
+    <p class="error">{{ error }}</p>
+  </div>
+
+</div>

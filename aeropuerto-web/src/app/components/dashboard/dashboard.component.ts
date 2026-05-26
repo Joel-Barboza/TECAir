@@ -4,7 +4,8 @@ import { UsuariosComponent } from '../usuarios/usuarios.component'; // importa e
 import { VuelosComponent } from '../vuelos/vuelos.component'; // nuevo
 import { ReservasComponent } from '../reservas/reservas.component'; // nuevo
 import { PromocionesComponent } from '../promociones/promociones.component'; // nuevo
-import { MaletasComponent } from '../maletas/maletas.component'; // nuevo
+import { MaletasComponent } from '../maletas/maletas.component';
+import { CheckInComponent } from "../check-in/check-in.component"; // nuevo
 
 @Component({
   selector: 'app-dashboard',
@@ -17,8 +18,9 @@ import { MaletasComponent } from '../maletas/maletas.component'; // nuevo
     VuelosComponent,
     ReservasComponent,
     PromocionesComponent,
-    MaletasComponent
-  ]
+    MaletasComponent,
+    CheckInComponent
+]
 })
 export class DashboardComponent {
   seccionSeleccionada = 'usuarios';
@@ -28,7 +30,8 @@ export class DashboardComponent {
     { nombre: 'Vuelos', valor: 'vuelos' },
     { nombre: 'Reservas', valor: 'reservas' },
     { nombre: 'Promociones', valor: 'promociones' },
-    { nombre: 'Maletas', valor: 'maletas' }
+    { nombre: 'Maletas', valor: 'maletas' },
+    { nombre: 'Check-in', valor: 'check-in' }
   ];
 
   seleccionarSeccion(valor: string) {
