@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Usuario, UsuarioService } from '../../services/usuario.service';
 import { Vuelo, VuelosService } from '../../services/vuelos.service';
 import { Reserva, ReservasService } from '../../services/reservas.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-buscar-vuelos',
@@ -17,8 +17,6 @@ export class BuscarVuelosComponent implements OnInit {
   destino = '';
   vuelos: Vuelo[] = [];
   resultados: Vuelo[] = [];
-  usuarios: Usuario[] = [];
-  usuarioSeleccionadoId = 0;
   selectedVuelo: Vuelo | null = null;
   asientosReservados = 1;
   tarjeta = '';
@@ -26,44 +24,23 @@ export class BuscarVuelosComponent implements OnInit {
   cvc = '';
   mensaje = '';
   error = '';
+  buscado = false;
 
   constructor(
     private vuelosService: VuelosService,
-    private usuarioService: UsuarioService,
-    private reservasService: ReservasService
+    private reservasService: ReservasService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
-    this.cargarVuelos();
-    this.cargarUsuarios();
-  }
-
-  cargarVuelos(): void {
     this.vuelosService.getVuelos().subscribe({
-      next: (data) => {
-        this.vuelos = data;
-        this.resultados = data;
-      },
-      error: (err) => {
-        this.error = 'No se pudieron cargar los vuelos.';
-        console.error(err);
-      }
-    });
-  }
-
-  cargarUsuarios(): void {
-    this.usuarioService.getUsuarios().subscribe({
-      next: (data) => {
-        this.usuarios = data;
-      },
-      error: (err) => {
-        this.error = 'No se pudieron cargar los usuarios.';
-        console.error(err);
-      }
+      next: (data) => (this.vuelos = data),
+      error: () => (this.error = 'No se pudieron cargar los vuelos.')
     });
   }
 
   buscar(): void {
+    this.buscado = true;
     const origenTexto = this.origen.trim().toLowerCase();
     const destinoTexto = this.destino.trim().toLowerCase();
 
@@ -73,11 +50,7 @@ export class BuscarVuelosComponent implements OnInit {
       return cumpleOrigen && cumpleDestino;
     });
 
-    if (this.resultados.length === 0) {
-      this.mensaje = 'No se encontraron vuelos con esos aeropuertos.';
-    } else {
-      this.mensaje = '';
-    }
+    this.mensaje = this.resultados.length === 0 ? 'No se encontraron vuelos con esos aeropuertos.' : '';
     this.selectedVuelo = null;
   }
 
@@ -86,34 +59,30 @@ export class BuscarVuelosComponent implements OnInit {
     this.mensaje = '';
     this.error = '';
     this.asientosReservados = 1;
+    this.tarjeta = '';
+    this.vencimiento = '';
+    this.cvc = '';
   }
 
   crearReserva(): void {
     this.error = '';
     this.mensaje = '';
 
-    if (!this.selectedVuelo) {
-      this.error = 'Seleccione un vuelo antes de reservar.';
-      return;
-    }
-
-    if (!this.usuarioSeleccionadoId) {
-      this.error = 'Seleccione un usuario existente o cree uno en la sección Usuarios.';
-      return;
-    }
+    const usuario = this.authService.currentUser;
+    if (!usuario?.usuarioId || !this.selectedVuelo) return;
 
     if (this.asientosReservados < 1) {
       this.error = 'Debe reservar al menos un asiento.';
       return;
     }
 
-    if (!this.tarjeta || !this.vencimiento || !this.cvc) {
-      this.error = 'Complete los datos de la tarjeta para el pago.';
+    if (!this.tarjeta.trim() || !this.vencimiento.trim() || !this.cvc.trim()) {
+      this.error = 'Complete todos los datos de la tarjeta de crédito.';
       return;
     }
 
     const nuevaReserva: Reserva = {
-      usuarioId: this.usuarioSeleccionadoId,
+      usuarioId: usuario.usuarioId,
       vueloId: this.selectedVuelo.vueloId,
       fechaReserva: new Date().toISOString(),
       asientosReservados: this.asientosReservados,
@@ -122,18 +91,14 @@ export class BuscarVuelosComponent implements OnInit {
 
     this.reservasService.crearReserva(nuevaReserva).subscribe({
       next: () => {
-        this.mensaje = 'Reserva realizada con éxito y pago confirmado.';
+        this.mensaje = '¡Reserva confirmada! El pago fue procesado exitosamente.';
         this.selectedVuelo = null;
-        this.usuarioSeleccionadoId = 0;
         this.asientosReservados = 1;
         this.tarjeta = '';
         this.vencimiento = '';
         this.cvc = '';
       },
-      error: (err) => {
-        this.error = 'No se pudo completar la reserva.';
-        console.error(err);
-      }
+      error: () => (this.error = 'No se pudo completar la reserva. Intente de nuevo.')
     });
   }
 }

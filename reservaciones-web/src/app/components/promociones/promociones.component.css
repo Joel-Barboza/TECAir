@@ -1,5 +1,5 @@
 .promociones-dashboard {
-  padding: 20px;
+  padding: 20px 30px;
   font-family: Arial, sans-serif;
 }
 
@@ -20,15 +20,14 @@
   color: #1f2937;
 }
 
-/* Tarjetas de promociones */
 .promociones-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 16px;
 }
 
 .promo-card {
-  background: linear-gradient(135deg, #1f2937 0%, #3b82f6 100%);
+  background-color: #1f2937;
   color: white;
   border-radius: 10px;
   padding: 20px;
@@ -36,9 +35,9 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  min-width: 240px;
+  min-width: 220px;
   flex: 1;
-  max-width: 320px;
+  max-width: 300px;
 }
 
 .promo-ruta {
@@ -55,15 +54,15 @@
 }
 
 .promo-flecha {
-  font-size: 18px;
-  opacity: 0.8;
+  font-size: 16px;
+  color: #3b82f6;
 }
 
 .promo-descuento {
   text-align: center;
   font-size: 20px;
   font-weight: bold;
-  background-color: rgba(255,255,255,0.15);
+  background-color: #3b82f6;
   border-radius: 5px;
   padding: 8px 0;
 }
@@ -71,7 +70,7 @@
 .promo-periodo {
   text-align: center;
   font-size: 13px;
-  opacity: 0.85;
+  color: #9ca3af;
 }
 
 .error {

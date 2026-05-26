@@ -1,39 +1,49 @@
-<div class="reservas-dashboard">
-  <div class="reservas-table">
-    <h3>Lista de reservas</h3>
+<div class="reservas-page">
 
-    <div class="filtro-usuario">
-      <label for="filtroUsuario">Filtrar por usuario:</label>
-      <select id="filtroUsuario" [(ngModel)]="usuarioFiltroId" (change)="aplicarFiltro()">
-        <option [value]="0">-- Todos --</option>
-        <option *ngFor="let u of usuarios" [value]="u.usuarioId">{{ u.nombre }} {{ u.apellido1 }}</option>
-      </select>
-    </div>
-
-    <p class="success" *ngIf="mensaje">{{ mensaje }}</p>
-    <p class="error" *ngIf="error">{{ error }}</p>
-
-    <div *ngIf="reservas.length === 0" class="placeholder">
-      No hay reservas registradas.
-    </div>
-
-    <table *ngIf="reservas.length > 0">
-      <tr>
-        <th>Usuario</th>
-        <th>Vuelo</th>
-        <th>Fecha Reserva</th>
-        <th>Asientos</th>
-        <th>Estado Pago</th>
-        <th>Acciones</th>
-      </tr>
-      <tr *ngFor="let reserva of reservas">
-        <td>{{ getNombreUsuario(reserva.usuarioId) }}</td>
-        <td>{{ getRutaVuelo(reserva.vueloId) }}</td>
-        <td>{{ reserva.fechaReserva | date:'short' }}</td>
-        <td>{{ reserva.asientosReservados }}</td>
-        <td>{{ reserva.estadoPago }}</td>
-        <td><button (click)="cancelarReserva(reserva.reservaId!)">Cancelar</button></td>
-      </tr>
-    </table>
+  <div class="reservas-toolbar">
+    <button class="btn-refresh" (click)="cargarDatos()">Actualizar</button>
   </div>
+
+  <p class="msg-success" *ngIf="mensaje">{{ mensaje }}</p>
+  <p class="msg-error" *ngIf="error">{{ error }}</p>
+
+  <div class="loading" *ngIf="cargando">Cargando reservas...</div>
+
+  <div class="empty-state" *ngIf="!cargando && reservas.length === 0 && !error">
+    <p>No tiene reservas activas.</p>
+    <p class="empty-hint">Vaya a <strong>Buscar Vuelos</strong> para hacer su primera reserva.</p>
+  </div>
+
+  <div class="reservas-list" *ngIf="!cargando && reservas.length > 0">
+    <div class="reserva-card" *ngFor="let reserva of reservas">
+      <div class="reserva-top">
+        <div class="reserva-ruta">{{ getRutaVuelo(reserva.vueloId) }}</div>
+        <span class="estado-badge" [class.pagado]="reserva.estadoPago === 'Pagado'">
+          {{ reserva.estadoPago }}
+        </span>
+      </div>
+
+      <div class="reserva-details">
+        <div class="detail-item">
+          <span class="detail-label">Fecha del vuelo</span>
+          <span class="detail-value">{{ getFechaVuelo(reserva.vueloId) | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Reservado el</span>
+          <span class="detail-value">{{ reserva.fechaReserva | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Asientos</span>
+          <span class="detail-value">{{ reserva.asientosReservados }}</span>
+        </div>
+      </div>
+
+      <div class="reserva-actions">
+        <button class="btn-cancel" (click)="cancelarReserva(reserva.reservaId!)">
+          Cancelar reserva
+        </button>
+      </div>
+    </div>
+  </div>
+
 </div>
