@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { UsuarioService, Usuario } from '../../services/usuario.service';
+import { UsuarioService, Usuario, UsuarioDto } from '../../services/usuario.service';
 
 @Component({
   selector: 'app-usuarios',
@@ -11,7 +11,7 @@ import { UsuarioService, Usuario } from '../../services/usuario.service';
   imports: [CommonModule, FormsModule]
 })
 export class UsuariosComponent implements OnInit {
-  usuarios: Usuario[] = [];
+  usuarios: UsuarioDto[] = [];
   formulario: Usuario = this.formularioVacio();
   esEstudiante = false;
   modoEdicion = false;
@@ -42,8 +42,18 @@ export class UsuariosComponent implements OnInit {
     });
   }
 
-  abrirEditar(usuario: Usuario): void {
-    this.formulario = { ...usuario };
+  abrirEditar(usuario: UsuarioDto): void {
+    this.formulario = {
+      usuarioId: usuario.usuarioId,
+      nombre: usuario.nombre,
+      apellido1: usuario.apellido1,
+      apellido2: usuario.apellido2,
+      email: usuario.email,
+      telefono: usuario.telefono,
+      carnet: usuario.carnet,
+      universidad: usuario.universidad
+    };
+
     this.esEstudiante = !!(usuario.carnet || usuario.universidad);
     this.modoEdicion = true;
     this.mostrarFormulario = true;
@@ -85,7 +95,7 @@ export class UsuariosComponent implements OnInit {
       universidad: this.esEstudiante ? this.formulario.universidad : undefined
     };
 
-    if (this.modoEdicion) {
+    if (this.modoEdicion && usuarioAEnviar.usuarioId) {
       this.usuarioService.actualizarUsuario(usuarioAEnviar).subscribe({
         next: () => {
           this.mensaje = 'Usuario actualizado correctamente.';

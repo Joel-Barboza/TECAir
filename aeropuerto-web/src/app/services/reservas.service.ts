@@ -11,6 +11,19 @@ export interface Reserva {
   estadoPago: string;
 }
 
+export interface ReservaDto {
+  reservaId: number;
+  usuarioId: number;
+  nombreUsuario: string;
+  codigoUsuario: string; // USR-0001, etc.
+  vueloId: number;
+  codigoVuelo: string; // VUE-001, etc.
+  descripcionVuelo: string; // "VUE-001 - Origen → Destino - 26/05/2026"
+  fechaReserva: string;
+  asientosReservados: number;
+  estadoPago: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -19,12 +32,12 @@ export class ReservasService {
 
   constructor(private http: HttpClient) {}
 
-  getReservas(): Observable<Reserva[]> {
-    return this.http.get<Reserva[]>(this.apiUrl);
+  getReservas(): Observable<ReservaDto[]> {
+    return this.http.get<ReservaDto[]>(this.apiUrl);
   }
 
-  crearReserva(reserva: Reserva): Observable<Reserva> {
-    return this.http.post<Reserva>(this.apiUrl, reserva);
+  crearReserva(reserva: Reserva): Observable<ReservaDto> {
+    return this.http.post<ReservaDto>(this.apiUrl, reserva);
   }
 
   actualizarReserva(reserva: Reserva): Observable<void> {

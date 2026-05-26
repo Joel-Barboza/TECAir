@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TECAirAPI.Data;
 using TECAirAPI.Models;
+using TECAirAPI.DTOs;
+using TECAirAPI.Helpers;
 
 namespace TECAirAPI.Controllers
 {
@@ -16,13 +18,46 @@ namespace TECAirAPI.Controllers
             _context = context;
         }
 
+        private VueloDto ConvertirADto(Vuelo vuelo, Aeropuerto aeropuerto, Avion avion)
+        {
+            return new VueloDto
+            {
+                VueloId = vuelo.VueloId,
+                CodigoVisible = CodeGenerator.GenerateVueloCode(vuelo.VueloId),
+                AeropuertoId = vuelo.AeropuertoId,
+                NombreAeropuerto = aeropuerto?.Nombre ?? "Aeropuerto no encontrado",
+                UbicacionAeropuerto = aeropuerto?.Ubicacion ?? "",
+                AvionId = vuelo.AvionId,
+                ModeloAvion = avion?.Modelo ?? "Avión no encontrado",
+                CapacidadAvion = avion?.Capacidad ?? 0,
+                Asientos = vuelo.Asientos,
+                Origen = vuelo.Salida,
+                Destino = vuelo.Destino,
+                RutaDescripcion = CodeGenerator.GenerateRutaDescripcion(vuelo.Salida, vuelo.Destino),
+                FechaSalida = vuelo.FechaSalida,
+                FechaLlegada = vuelo.FechaLlegada,
+                DescripcionCompleta = CodeGenerator.GenerateVueloDescripcion(vuelo.VueloId, vuelo.Salida, vuelo.Destino, vuelo.FechaSalida)
+            };
+        }
+
         // GET: api/aeropuerto/Vuelos
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Vuelo>>> GetVuelos()
+        public async Task<ActionResult<IEnumerable<VueloDto>>> GetVuelos()
         {
             try
             {
-                return await _context.Vuelos.ToListAsync();
+                var vuelos = await _context.Vuelos.ToListAsync();
+                var aeropuertos = await _context.Aeropuertos.ToDictionaryAsync(a => a.AeropuertoId);
+                var aviones = await _context.Aviones.ToDictionaryAsync(a => a.AvionId);
+
+                var vuelosDtos = vuelos.Select(v =>
+                {
+                    aeropuertos.TryGetValue(v.AeropuertoId, out var aeropuerto);
+                    aviones.TryGetValue(v.AvionId, out var avion);
+                    return ConvertirADto(v, aeropuerto, avion);
+                }).ToList();
+
+                return Ok(vuelosDtos);
             }
             catch (Exception ex)
             {
@@ -32,13 +67,27 @@ namespace TECAirAPI.Controllers
 
         // POST: api/aeropuerto/Vuelos
         [HttpPost]
-        public async Task<ActionResult<Vuelo>> CrearVuelo(Vuelo vuelo)
+        public async Task<ActionResult<VueloDto>> CrearVuelo(Vuelo vuelo)
         {
             try
             {
+                var aeropuerto = await _context.Aeropuertos.FindAsync(vuelo.AeropuertoId);
+                if (aeropuerto == null)
+                    return BadRequest($"No existe el aeropuerto con id {vuelo.AeropuertoId}");
+
+                vuelo.Salida = aeropuerto.Ubicacion;
+
+                var avionExiste = await _context.Aviones.AnyAsync(a => a.AvionId == vuelo.AvionId);
+                if (!avionExiste)
+                    return BadRequest($"No existe el avión con id {vuelo.AvionId}");
+
                 _context.Vuelos.Add(vuelo);
                 await _context.SaveChangesAsync();
-                return CreatedAtAction(nameof(GetVuelos), new { id = vuelo.VueloId }, vuelo);
+
+                var avion = await _context.Aviones.FindAsync(vuelo.AvionId);
+
+                var vueloDto = ConvertirADto(vuelo, aeropuerto!, avion!);
+                return CreatedAtAction(nameof(GetVuelos), new { id = vuelo.VueloId }, vueloDto);
             }
             catch (Exception ex)
             {
@@ -53,10 +102,19 @@ namespace TECAirAPI.Controllers
             if (id != vuelo.VueloId)
                 return BadRequest("El ID de la URL no coincide con el ID del vuelo");
 
-            _context.Entry(vuelo).State = EntityState.Modified;
-
             try
             {
+                var aeropuerto = await _context.Aeropuertos.FindAsync(vuelo.AeropuertoId);
+                if (aeropuerto == null)
+                    return BadRequest($"No existe el aeropuerto con id {vuelo.AeropuertoId}");
+
+                vuelo.Salida = aeropuerto.Ubicacion;
+
+                var avionExiste = await _context.Aviones.AnyAsync(a => a.AvionId == vuelo.AvionId);
+                if (!avionExiste)
+                    return BadRequest($"No existe el avión con id {vuelo.AvionId}");
+
+                _context.Entry(vuelo).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
                 return NoContent();
             }

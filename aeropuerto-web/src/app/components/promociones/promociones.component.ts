@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PromocionesService, Promocion } from '../../services/promociones.service';
+import { PromocionesService, Promocion, PromocionDto } from '../../services/promociones.service';
+import { VuelosService, VueloDto } from '../../services/vuelos.service';
 
 @Component({
   selector: 'app-promociones',
@@ -11,17 +12,34 @@ import { PromocionesService, Promocion } from '../../services/promociones.servic
   imports: [CommonModule, FormsModule]
 })
 export class PromocionesComponent implements OnInit {
-  promociones: Promocion[] = [];
+  promociones: PromocionDto[] = [];
   formulario: Promocion = this.formularioVacio();
   modoEdicion = false;
   mostrarFormulario = false;
   mensaje = '';
   error = '';
+  vuelos: VueloDto[] = [];
 
-  constructor(private promocionesService: PromocionesService) {}
+  constructor(
+    private promocionesService: PromocionesService,
+    private vuelosService: VuelosService
+  ) {}
 
   ngOnInit(): void {
     this.cargarPromociones();
+    this.cargarVuelos();
+  }
+
+  private cargarVuelos(): void {
+    this.vuelosService.getVuelos().subscribe({
+      next: (data) => {
+        this.vuelos = data;
+        this.sincronizarRutaConVuelo();
+      },
+      error: (err) => {
+        console.error('Error cargando vuelos:', err);
+      }
+    });
   }
 
   private formularioVacio(): Promocion {
@@ -33,6 +51,15 @@ export class PromocionesComponent implements OnInit {
       fechaInicio: '',
       fechaFin: ''
     };
+  }
+
+  sincronizarRutaConVuelo(): void {
+    const vueloSeleccionado = this.vuelos.find(
+      vuelo => vuelo.vueloId === Number(this.formulario.vueloId)
+    );
+
+    this.formulario.origen = vueloSeleccionado?.origen ?? '';
+    this.formulario.destino = vueloSeleccionado?.destino ?? '';
   }
 
   cargarPromociones(): void {
@@ -48,11 +75,19 @@ export class PromocionesComponent implements OnInit {
     });
   }
 
-  abrirEditar(promocion: Promocion): void {
-    this.formulario = { ...promocion };
-    // Transformar fechas al formato correcto para date input
-    this.formulario.fechaInicio = this.formatearFecha(promocion.fechaInicio);
-    this.formulario.fechaFin = this.formatearFecha(promocion.fechaFin);
+  abrirEditar(promocion: PromocionDto): void {
+    this.formulario = {
+      promocionId: promocion.promocionId,
+      vueloId: promocion.vueloId,
+      origen: promocion.origen,
+      destino: promocion.destino,
+      descuento: promocion.descuento,
+      fechaInicio: this.formatearFecha(promocion.fechaInicio),
+      fechaFin: this.formatearFecha(promocion.fechaFin)
+    };
+
+    this.sincronizarRutaConVuelo();
+
     this.modoEdicion = true;
     this.mostrarFormulario = true;
     this.mensaje = '';
@@ -61,7 +96,6 @@ export class PromocionesComponent implements OnInit {
 
   private formatearFecha(fecha: string): string {
     if (!fecha) return '';
-    // Remover zona horaria si existe y dejar solo la fecha
     return fecha.split('+')[0].split('Z')[0].split('T')[0];
   }
 
@@ -75,7 +109,9 @@ export class PromocionesComponent implements OnInit {
     this.error = '';
     this.mensaje = '';
 
-    if (!this.formulario.vueloId || !this.formulario.origen || !this.formulario.destino || 
+    this.sincronizarRutaConVuelo();
+
+    if (!this.formulario.vueloId || !this.formulario.origen || !this.formulario.destino ||
         !this.formulario.descuento || !this.formulario.fechaInicio || !this.formulario.fechaFin) {
       this.error = 'Debe completar todos los campos.';
       return;

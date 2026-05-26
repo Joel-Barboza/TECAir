@@ -2,7 +2,7 @@
   <!-- Tabla de promociones -->
   <div class="promociones-table">
     <div class="table-header">
-      <h3>Lista de promociones</h3>
+      <h3>🎉 Lista de Promociones</h3>
       <button type="button" class="btn-refresh" (click)="cargarPromociones()">&#8635; Actualizar</button>
     </div>
 
@@ -12,58 +12,79 @@
     <div *ngIf="promociones.length === 0" class="placeholder">
       No hay promociones registradas
     </div>
-    <table *ngIf="promociones.length > 0">
-      <tr>
-        <th>Vuelo ID</th>
-        <th>Origen</th>
-        <th>Destino</th>
-        <th>Descuento (%)</th>
-        <th>Fecha Inicio</th>
-        <th>Fecha Fin</th>
-        <th>Acciones</th>
-      </tr>
-      <tr *ngFor="let p of promociones">
-        <td>{{p.vueloId}}</td>
-        <td>{{p.origen}}</td>
-        <td>{{p.destino}}</td>
-        <td>{{p.descuento}}</td>
-        <td>{{p.fechaInicio | date:'shortDate'}}</td>
-        <td>{{p.fechaFin | date:'shortDate'}}</td>
-        <td>
-          <button class="btn-edit" (click)="abrirEditar(p)">Editar</button>
-          <button class="btn-delete" (click)="eliminarPromocion(p.promocionId!)">Eliminar</button>
-        </td>
-      </tr>
+    <table *ngIf="promociones.length > 0" class="tabla-promociones">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Vuelo</th>
+          <th>Ruta</th>
+          <th>Descuento</th>
+          <th>Vigencia</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of promociones" class="fila-promo">
+          <td><strong>PROMO-{{ p.promocionId | number:'3.0-0' }}</strong></td>
+          <td><span class="codigo-vuelo">{{ p.codigoVuelo }}</span></td>
+          <td>{{ p.origen }} → {{ p.destino }}</td>
+          <td><span class="descuento">-{{ p.descuento }}%</span></td>
+          <td>{{ p.fechaInicio | date:'dd/MM' }} a {{ p.fechaFin | date:'dd/MM' }}</td>
+          <td class="acciones">
+            <button class="btn-edit" (click)="abrirEditar(p)" title="Editar">✏️</button>
+            <button class="btn-delete" (click)="eliminarPromocion(p.promocionId)" title="Eliminar">🗑️</button>
+          </td>
+        </tr>
+      </tbody>
     </table>
   </div>
 
   <!-- Formulario -->
   <div class="promociones-form" *ngIf="mostrarFormulario">
-    <h3>{{ modoEdicion ? 'Editar promoción' : 'Agregar nueva promoción' }}</h3>
+    <h3>{{ modoEdicion ? '✏️ Editar promoción' : '➕ Agregar nueva promoción' }}</h3>
 
     <p class="error" *ngIf="error && mostrarFormulario">{{ error }}</p>
 
-    <form (ngSubmit)="guardar()">
-      <label>Vuelo ID</label>
-      <input type="number" [(ngModel)]="formulario.vueloId" name="vueloId" required />
+    <form (ngSubmit)="guardar()" class="form-promo">
+      <div class="form-group">
+        <label for="vuelo">Seleccionar Vuelo</label>
+        <select [(ngModel)]="formulario.vueloId" name="vueloId" id="vuelo" (ngModelChange)="sincronizarRutaConVuelo()" required>
+          <option [ngValue]="0" disabled>Seleccionar vuelo...</option>
+          <option *ngFor="let v of vuelos" [ngValue]="v.vueloId">
+            {{ v.descripcionCompleta }}
+          </option>
+        </select>
+      </div>
 
-      <label>Origen</label>
-      <input type="text" [(ngModel)]="formulario.origen" name="origen" required />
+      <div class="form-group">
+        <label for="origen">Ciudad de Origen</label>
+        <input type="text" [(ngModel)]="formulario.origen" name="origen" id="origen" placeholder="Se completa al seleccionar el vuelo" readonly required />
+      </div>
 
-      <label>Destino</label>
-      <input type="text" [(ngModel)]="formulario.destino" name="destino" required />
+      <div class="form-group">
+        <label for="destino">Ciudad de Destino</label>
+        <input type="text" [(ngModel)]="formulario.destino" name="destino" id="destino" placeholder="Se completa al seleccionar el vuelo" readonly required />
+      </div>
 
-      <label>Descuento (%)</label>
-      <input type="number" [(ngModel)]="formulario.descuento" name="descuento" required />
+      <div class="form-group">
+        <label for="descuento">Descuento (%)</label>
+        <input type="number" [(ngModel)]="formulario.descuento" name="descuento" id="descuento" min="1" max="100" required />
+      </div>
 
-      <label>Fecha Inicio</label>
-      <input type="date" [(ngModel)]="formulario.fechaInicio" name="fechaInicio" required />
+      <div class="form-group">
+        <label for="fechaInicio">Fecha de Inicio</label>
+        <input type="date" [(ngModel)]="formulario.fechaInicio" name="fechaInicio" id="fechaInicio" required />
+      </div>
 
-      <label>Fecha Fin</label>
-      <input type="date" [(ngModel)]="formulario.fechaFin" name="fechaFin" required />
+      <div class="form-group">
+        <label for="fechaFin">Fecha de Fin</label>
+        <input type="date" [(ngModel)]="formulario.fechaFin" name="fechaFin" id="fechaFin" required />
+      </div>
 
-      <button type="submit">{{ modoEdicion ? 'Guardar cambios' : 'Agregar Promoción' }}</button>
-      <button type="button" class="btn-secondary" (click)="cancelar()">Cancelar</button>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">{{ modoEdicion ? 'Guardar cambios' : 'Agregar promoción' }}</button>
+        <button type="button" class="btn-secondary" (click)="cancelar()">Cancelar</button>
+      </div>
     </form>
   </div>
 

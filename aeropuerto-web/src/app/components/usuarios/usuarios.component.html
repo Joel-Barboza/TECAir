@@ -2,7 +2,7 @@
   <!-- Tabla de usuarios -->
   <div class="usuarios-table">
     <div class="table-header">
-      <h3>Lista de usuarios</h3>
+      <h3>👥 Lista de Usuarios</h3>
       <button type="button" class="btn-refresh" (click)="cargarUsuarios()">&#8635; Actualizar</button>
     </div>
 
@@ -12,72 +12,93 @@
     <div *ngIf="usuarios.length === 0" class="placeholder">
       No hay usuarios registrados
     </div>
-    <table *ngIf="usuarios.length > 0">
-      <tr>
-        <th>Nombre</th>
-        <th>Apellido1</th>
-        <th>Apellido2</th>
-        <th>Email</th>
-        <th>Teléfono</th>
-        <th>Carnet</th>
-        <th>Universidad</th>
-        <th>Acciones</th>
-      </tr>
-      <tr *ngFor="let u of usuarios">
-        <td>{{u.nombre}}</td>
-        <td>{{u.apellido1}}</td>
-        <td>{{u.apellido2}}</td>
-        <td>{{u.email}}</td>
-        <td>{{u.telefono}}</td>
-        <td>{{u.carnet}}</td>
-        <td>{{u.universidad}}</td>
-        <td>
-          <button class="btn-edit" (click)="abrirEditar(u)">Editar</button>
-          <button class="btn-delete" (click)="eliminarUsuario(u.usuarioId!)">Eliminar</button>
-        </td>
-      </tr>
+    <table *ngIf="usuarios.length > 0" class="tabla-usuarios">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre Completo</th>
+          <th>Correo</th>
+          <th>Teléfono</th>
+          <th>Estudiante</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let u of usuarios" class="fila-usuario">
+          <td><strong class="codigo-usuario">{{ u.codigoVisible }}</strong></td>
+          <td>{{ u.nombreCompleto }}</td>
+          <td><small>{{ u.email }}</small></td>
+          <td>{{ u.telefono }}</td>
+          <td>
+            <span *ngIf="u.universidad && u.carnet" class="badge-estudiante">
+              ✓ {{ u.universidad }}
+            </span>
+            <span *ngIf="!u.universidad" class="badge-regular">No</span>
+          </td>
+          <td class="acciones">
+            <button class="btn-edit" (click)="abrirEditar(u)" title="Editar">✏️</button>
+            <button class="btn-delete" (click)="eliminarUsuario(u.usuarioId)" title="Eliminar">🗑️</button>
+          </td>
+        </tr>
+      </tbody>
     </table>
   </div>
 
   <!-- Formulario -->
   <div class="usuarios-form" *ngIf="mostrarFormulario">
-    <h3>{{ modoEdicion ? 'Editar usuario' : 'Nuevo usuario' }}</h3>
+    <h3>{{ modoEdicion ? '✏️ Editar usuario' : '➕ Nuevo usuario' }}</h3>
 
     <p class="error" *ngIf="error && mostrarFormulario">{{ error }}</p>
 
-    <form (ngSubmit)="guardar()">
-      <label>Nombre</label>
-      <input type="text" [(ngModel)]="formulario.nombre" name="nombre" required />
+    <form (ngSubmit)="guardar()" class="form-usuario">
+      <div class="form-group">
+        <label for="nombre">Nombre</label>
+        <input type="text" [(ngModel)]="formulario.nombre" name="nombre" id="nombre" placeholder="Juan" required />
+      </div>
 
-      <label>Apellido 1</label>
-      <input type="text" [(ngModel)]="formulario.apellido1" name="apellido1" required />
+      <div class="form-group">
+        <label for="apellido1">Primer Apellido</label>
+        <input type="text" [(ngModel)]="formulario.apellido1" name="apellido1" id="apellido1" placeholder="Pérez" required />
+      </div>
 
-      <label>Apellido 2</label>
-      <input type="text" [(ngModel)]="formulario.apellido2" name="apellido2" />
+      <div class="form-group">
+        <label for="apellido2">Segundo Apellido</label>
+        <input type="text" [(ngModel)]="formulario.apellido2" name="apellido2" id="apellido2" placeholder="Opcional" />
+      </div>
 
-      <label>Correo electrónico</label>
-      <input type="email" [(ngModel)]="formulario.email" name="email" required />
+      <div class="form-group">
+        <label for="email">Correo Electrónico</label>
+        <input type="email" [(ngModel)]="formulario.email" name="email" id="email" placeholder="usuario@correo.com" required />
+      </div>
 
-      <label>Teléfono</label>
-      <input type="tel" [(ngModel)]="formulario.telefono" name="telefono" required />
+      <div class="form-group">
+        <label for="telefono">Teléfono</label>
+        <input type="tel" [(ngModel)]="formulario.telefono" name="telefono" id="telefono" placeholder="+506 2222-3333" required />
+      </div>
 
-      <div class="checkbox">
-        <label>
+      <div class="form-group checkbox-group">
+        <label class="checkbox-label">
           <input type="checkbox" [(ngModel)]="esEstudiante" name="esEstudiante" (change)="toggleEstudiante()" />
-          Soy estudiante
+          <span>Soy estudiante</span>
         </label>
       </div>
 
       <div *ngIf="esEstudiante" class="estudiante-info">
-        <label>Universidad</label>
-        <input type="text" [(ngModel)]="formulario.universidad" name="universidad" />
+        <div class="form-group">
+          <label for="universidad">Universidad</label>
+          <input type="text" [(ngModel)]="formulario.universidad" name="universidad" id="universidad" placeholder="Ej: UCR, UNA, ITCR" />
+        </div>
 
-        <label>Carnet</label>
-        <input type="number" [(ngModel)]="formulario.carnet" name="carnet" />
+        <div class="form-group">
+          <label for="carnet">Carnet Estudiantil</label>
+          <input type="number" [(ngModel)]="formulario.carnet" name="carnet" id="carnet" placeholder="2024001" />
+        </div>
       </div>
 
-      <button type="submit">{{ modoEdicion ? 'Guardar cambios' : 'Agregar usuario' }}</button>
-      <button type="button" class="btn-secondary" *ngIf="modoEdicion" (click)="cancelar()">Cancelar</button>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">{{ modoEdicion ? 'Guardar cambios' : 'Agregar usuario' }}</button>
+        <button type="button" class="btn-secondary" (click)="cancelar()">Cancelar</button>
+      </div>
     </form>
   </div>
 

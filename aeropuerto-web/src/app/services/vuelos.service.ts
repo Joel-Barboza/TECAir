@@ -13,6 +13,24 @@ export interface Vuelo {
   fechaLlegada: string;
 }
 
+export interface VueloDto {
+  vueloId: number;
+  codigoVisible: string; // VUE-001, VUE-002, etc.
+  aeropuertoId: number;
+  nombreAeropuerto: string;
+  ubicacionAeropuerto: string;
+  avionId: number;
+  modeloAvion: string;
+  capacidadAvion: number;
+  asientos: number;
+  origen: string;
+  destino: string;
+  rutaDescripcion: string; // "Origen → Destino"
+  fechaSalida: string;
+  fechaLlegada: string;
+  descripcionCompleta: string; // "VUE-001 - Origen → Destino - 26/05/2026 10:30"
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -21,12 +39,12 @@ export class VuelosService {
 
   constructor(private http: HttpClient) {}
 
-  getVuelos(): Observable<Vuelo[]> {
-    return this.http.get<Vuelo[]>(this.apiUrl);
+  getVuelos(): Observable<VueloDto[]> {
+    return this.http.get<VueloDto[]>(this.apiUrl);
   }
 
-  crearVuelo(vuelo: Vuelo): Observable<Vuelo> {
-    return this.http.post<Vuelo>(this.apiUrl, vuelo);
+  crearVuelo(vuelo: Vuelo): Observable<VueloDto> {
+    return this.http.post<VueloDto>(this.apiUrl, vuelo);
   }
 
   actualizarVuelo(vuelo: Vuelo): Observable<void> {

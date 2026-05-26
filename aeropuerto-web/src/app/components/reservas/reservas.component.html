@@ -2,7 +2,7 @@
   <!-- Tabla de reservas -->
   <div class="reservas-table">
     <div class="table-header">
-      <h3>Lista de reservas</h3>
+      <h3>📅 Lista de Reservas</h3>
       <button type="button" class="btn-refresh" (click)="cargarReservas()">&#8635; Actualizar</button>
     </div>
 
@@ -12,53 +12,85 @@
     <div *ngIf="reservas.length === 0" class="placeholder">
       No hay reservas registradas
     </div>
-    <table *ngIf="reservas.length > 0">
-      <tr>
-        <th>Usuario ID</th>
-        <th>Vuelo ID</th>
-        <th>Fecha Reserva</th>
-        <th>Asientos</th>
-        <th>Estado Pago</th>
-        <th>Acciones</th>
-      </tr>
-      <tr *ngFor="let r of reservas">
-        <td>{{r.usuarioId}}</td>
-        <td>{{r.vueloId}}</td>
-        <td>{{r.fechaReserva | date:'short'}}</td>
-        <td>{{r.asientosReservados}}</td>
-        <td>{{r.estadoPago}}</td>
-        <td>
-          <button class="btn-edit" (click)="abrirEditar(r)">Editar</button>
-          <button class="btn-delete" (click)="eliminarReserva(r.reservaId!)">Eliminar</button>
-        </td>
-      </tr>
+    <table *ngIf="reservas.length > 0" class="tabla-reservas">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Pasajero</th>
+          <th>Vuelo</th>
+          <th>Fecha Reserva</th>
+          <th>Asientos</th>
+          <th>Estado Pago</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of reservas" class="fila-reserva">
+          <td><strong>RES-{{ r.reservaId | number:'3.0-0' }}</strong></td>
+          <td>{{ r.nombreUsuario }}<br><span class="codigo-usuario">{{ r.codigoUsuario }}</span></td>
+          <td><span class="codigo-vuelo">{{ r.codigoVuelo }}</span><br>{{ r.descripcionVuelo }}</td>
+          <td>{{ r.fechaReserva | date:'dd/MM/yyyy' }}</td>
+          <td>{{ r.asientosReservados }}</td>
+          <td><span class="estado" [ngClass]="'estado-' + r.estadoPago.toLowerCase()">{{ r.estadoPago }}</span></td>
+          <td class="acciones">
+            <button class="btn-edit" (click)="abrirEditar(r)" title="Editar">✏️</button>
+            <button class="btn-delete" (click)="eliminarReserva(r.reservaId)" title="Eliminar">🗑️</button>
+          </td>
+        </tr>
+      </tbody>
     </table>
   </div>
 
   <!-- Formulario de nueva reserva -->
   <div class="reservas-form" *ngIf="mostrarFormulario">
-    <h3>{{ modoEdicion ? 'Editar reserva' : 'Agregar nueva reserva' }}</h3>
+    <h3>{{ modoEdicion ? '✏️ Editar reserva' : '➕ Agregar nueva reserva' }}</h3>
 
     <p class="error" *ngIf="error && mostrarFormulario">{{ error }}</p>
 
-    <form (ngSubmit)="guardar()">
-      <label>Usuario ID</label>
-      <input type="number" [(ngModel)]="formulario.usuarioId" name="usuarioId" required />
+    <form (ngSubmit)="guardar()" class="form-reserva">
+      <div class="form-group">
+        <label for="usuario">Pasajero</label>
+        <select [(ngModel)]="formulario.usuarioId" name="usuarioId" id="usuario" required>
+          <option value="" disabled selected>Seleccionar pasajero...</option>
+          <option *ngFor="let u of usuarios" [value]="u.usuarioId">
+            {{ u.nombreCompleto }} ({{ u.codigoVisible }})
+          </option>
+        </select>
+      </div>
 
-      <label>Vuelo ID</label>
-      <input type="number" [(ngModel)]="formulario.vueloId" name="vueloId" required />
+      <div class="form-group">
+        <label for="vuelo">Vuelo</label>
+        <select [(ngModel)]="formulario.vueloId" name="vueloId" id="vuelo" required>
+          <option value="" disabled selected>Seleccionar vuelo...</option>
+          <option *ngFor="let v of vuelos" [value]="v.vueloId">
+            {{ v.descripcionCompleta }}
+          </option>
+        </select>
+      </div>
 
-      <label>Fecha Reserva</label>
-      <input type="datetime-local" [(ngModel)]="formulario.fechaReserva" name="fechaReserva" required />
+      <div class="form-group">
+        <label for="asientos">Cantidad de Asientos</label>
+        <input type="number" [(ngModel)]="formulario.asientosReservados" name="asientosReservados" id="asientos" min="1" required />
+      </div>
 
-      <label>Asientos Reservados</label>
-      <input type="number" [(ngModel)]="formulario.asientosReservados" name="asientosReservados" min="1" required />
+      <div class="form-group">
+        <label for="estadoPago">Estado de Pago</label>
+        <select [(ngModel)]="formulario.estadoPago" name="estadoPago" id="estadoPago" required>
+          <option value="Pendiente">Pendiente</option>
+          <option value="Confirmado">Confirmado</option>
+          <option value="Cancelado">Cancelado</option>
+        </select>
+      </div>
 
-      <label>Estado de Pago</label>
-      <input type="text" [(ngModel)]="formulario.estadoPago" name="estadoPago" required />
+      <div class="form-group">
+        <label for="fechaReserva">Fecha de Reserva</label>
+        <input type="datetime-local" [(ngModel)]="formulario.fechaReserva" name="fechaReserva" id="fechaReserva" required />
+      </div>
 
-      <button type="submit">{{ modoEdicion ? 'Guardar cambios' : 'Agregar Reserva' }}</button>
-      <button type="button" class="btn-secondary" (click)="cancelar()">Cancelar</button>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">{{ modoEdicion ? 'Guardar cambios' : 'Agregar reserva' }}</button>
+        <button type="button" class="btn-secondary" (click)="cancelar()">Cancelar</button>
+      </div>
     </form>
   </div>
 

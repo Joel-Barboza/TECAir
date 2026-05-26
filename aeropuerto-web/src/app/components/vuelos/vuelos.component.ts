@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { VuelosService, Vuelo } from '../../services/vuelos.service';
+import { VuelosService, Vuelo, VueloDto } from '../../services/vuelos.service';
+import { AeropuertosService, AeropuertoDto } from '../../services/aeropuertos.service';
+import { AvionesService, AvionDto } from '../../services/aviones.service';
 
 @Component({
   selector: 'app-vuelos',
@@ -11,17 +13,48 @@ import { VuelosService, Vuelo } from '../../services/vuelos.service';
   imports: [CommonModule, FormsModule]
 })
 export class VuelosComponent implements OnInit {
-  vuelos: Vuelo[] = [];
+  vuelos: VueloDto[] = [];
   formulario: Vuelo = this.formularioVacio();
   modoEdicion = false;
   mostrarFormulario = false;
   mensaje = '';
   error = '';
+  aeropuertos: AeropuertoDto[] = [];
+  aviones: AvionDto[] = [];
 
-  constructor(private vuelosService: VuelosService) {}
+  constructor(
+    private vuelosService: VuelosService,
+    private aeropuertosService: AeropuertosService,
+    private avionesService: AvionesService
+  ) {}
 
   ngOnInit(): void {
     this.cargarVuelos();
+    this.cargarAeropuertos();
+    this.cargarAviones();
+  }
+
+  private cargarAeropuertos(): void {
+    this.aeropuertosService.getAeropuertos().subscribe({
+      next: (data) => {
+        this.aeropuertos = data;
+        this.sincronizarSalidaConAeropuerto();
+      },
+      error: (err) => {
+        console.error('Error cargando aeropuertos:', err);
+      }
+    });
+  }
+
+  private cargarAviones(): void {
+    this.avionesService.getAviones().subscribe({
+      next: (data) => {
+        this.aviones = data;
+      },
+      error: (err) => {
+        console.error('Error cargando aviones:', err);
+      }
+    });
   }
 
   private formularioVacio(): Vuelo {
@@ -34,6 +67,14 @@ export class VuelosComponent implements OnInit {
       fechaSalida: '',
       fechaLlegada: ''
     };
+  }
+
+  sincronizarSalidaConAeropuerto(): void {
+    const aeropuertoSeleccionado = this.aeropuertos.find(
+      aeropuerto => aeropuerto.aeropuertoId === Number(this.formulario.aeropuertoId)
+    );
+
+    this.formulario.salida = aeropuertoSeleccionado?.ubicacion ?? '';
   }
 
   cargarVuelos(): void {
@@ -49,11 +90,20 @@ export class VuelosComponent implements OnInit {
     });
   }
 
-  abrirEditar(vuelo: Vuelo): void {
-    this.formulario = { ...vuelo };
-    // Transformar fechas al formato correcto para datetime-local
-    this.formulario.fechaSalida = this.formatearFecha(vuelo.fechaSalida);
-    this.formulario.fechaLlegada = this.formatearFecha(vuelo.fechaLlegada);
+  abrirEditar(vuelo: VueloDto): void {
+    this.formulario = {
+      vueloId: vuelo.vueloId,
+      aeropuertoId: vuelo.aeropuertoId,
+      avionId: vuelo.avionId,
+      asientos: vuelo.asientos,
+      destino: vuelo.destino,
+      salida: vuelo.origen,
+      fechaSalida: this.formatearFecha(vuelo.fechaSalida),
+      fechaLlegada: this.formatearFecha(vuelo.fechaLlegada)
+    };
+
+    this.sincronizarSalidaConAeropuerto();
+
     this.modoEdicion = true;
     this.mostrarFormulario = true;
     this.mensaje = '';
@@ -62,7 +112,6 @@ export class VuelosComponent implements OnInit {
 
   private formatearFecha(fecha: string): string {
     if (!fecha) return '';
-    // Remover zona horaria si existe
     return fecha.split('+')[0].split('Z')[0].substring(0, 16);
   }
 
@@ -76,7 +125,9 @@ export class VuelosComponent implements OnInit {
     this.error = '';
     this.mensaje = '';
 
-    if (!this.formulario.aeropuertoId || !this.formulario.avionId || !this.formulario.asientos || 
+    this.sincronizarSalidaConAeropuerto();
+
+    if (!this.formulario.aeropuertoId || !this.formulario.avionId || !this.formulario.asientos ||
         !this.formulario.destino || !this.formulario.salida || !this.formulario.fechaSalida || !this.formulario.fechaLlegada) {
       this.error = 'Debe completar todos los campos.';
       return;

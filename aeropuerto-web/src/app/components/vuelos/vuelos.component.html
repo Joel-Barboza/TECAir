@@ -1,7 +1,7 @@
 <div class="vuelos-dashboard">
   <div class="vuelos-table">
     <div class="table-header">
-      <h3>Lista de vuelos</h3>
+      <h3>📋 Lista de Vuelos</h3>
       <button type="button" class="btn-refresh" (click)="cargarVuelos()">&#8635; Actualizar</button>
     </div>
 
@@ -11,62 +11,92 @@
     <div *ngIf="vuelos.length === 0" class="placeholder">
       No hay vuelos registrados
     </div>
-    <table *ngIf="vuelos.length > 0">
-      <tr>
-        <th>Aeropuerto ID</th>
-        <th>Avion ID</th>
-        <th>Asientos</th>
-        <th>Destino</th>
-        <th>Salida</th>
-        <th>Fecha Salida</th>
-        <th>Fecha Llegada</th>
-        <th>Acciones</th>
-      </tr>
-      <tr *ngFor="let v of vuelos">
-        <td>{{v.aeropuertoId}}</td>
-        <td>{{v.avionId}}</td>
-        <td>{{v.asientos}}</td>
-        <td>{{v.destino}}</td>
-        <td>{{v.salida}}</td>
-        <td>{{v.fechaSalida | date:'short'}}</td>
-        <td>{{v.fechaLlegada | date:'short'}}</td>
-        <td>
-          <button class="btn-edit" (click)="abrirEditar(v)">Editar</button>
-          <button class="btn-delete" (click)="eliminarVuelo(v.vueloId!)">Eliminar</button>
-        </td>
-      </tr>
+    <table *ngIf="vuelos.length > 0" class="tabla-vuelos">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Ruta</th>
+          <th>Fecha Salida</th>
+          <th>Hora Salida</th>
+          <th>Aeropuerto</th>
+          <th>Avión</th>
+          <th>Asientos</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let v of vuelos" class="fila-vuelo">
+          <td class="codigo"><strong>{{ v.codigoVisible }}</strong></td>
+          <td class="ruta">{{ v.rutaDescripcion }}</td>
+          <td class="fecha">{{ v.fechaSalida | date:'dd/MM/yyyy' }}</td>
+          <td class="hora">{{ v.fechaSalida | date:'HH:mm' }}</td>
+          <td class="aeropuerto">{{ v.nombreAeropuerto }}</td>
+          <td class="avion">{{ v.modeloAvion }}</td>
+          <td class="asientos">{{ v.asientos }}</td>
+          <td class="acciones">
+            <button class="btn-edit" (click)="abrirEditar(v)" title="Editar">✏️</button>
+            <button class="btn-delete" (click)="eliminarVuelo(v.vueloId)" title="Eliminar">🗑️</button>
+          </td>
+        </tr>
+      </tbody>
     </table>
   </div>
 
   <div class="vuelos-form" *ngIf="mostrarFormulario">
-    <h3>{{ modoEdicion ? 'Editar vuelo' : 'Agregar nuevo vuelo' }}</h3>
+    <h3>{{ modoEdicion ? '✏️ Editar vuelo' : '➕ Agregar nuevo vuelo' }}</h3>
 
     <p class="error" *ngIf="error && mostrarFormulario">{{ error }}</p>
 
-    <form (ngSubmit)="guardar()">
-      <label>Aeropuerto ID</label>
-      <input type="number" [(ngModel)]="formulario.aeropuertoId" name="aeropuertoId" required />
+    <form (ngSubmit)="guardar()" class="form-vuelo">
+      <div class="form-group">
+        <label for="aeropuerto">Aeropuerto de Salida</label>
+        <select [(ngModel)]="formulario.aeropuertoId" name="aeropuertoId" id="aeropuerto" (ngModelChange)="sincronizarSalidaConAeropuerto()" required>
+          <option [ngValue]="0" disabled>Seleccionar aeropuerto...</option>
+          <option *ngFor="let a of aeropuertos" [ngValue]="a.aeropuertoId">
+            {{ a.nombreYUbicacion }}
+          </option>
+        </select>
+      </div>
 
-      <label>Avión ID</label>
-      <input type="number" [(ngModel)]="formulario.avionId" name="avionId" required />
+      <div class="form-group">
+        <label for="avion">Avión</label>
+        <select [(ngModel)]="formulario.avionId" name="avionId" id="avion" required>
+          <option [ngValue]="0" disabled>Seleccionar avión...</option>
+          <option *ngFor="let a of aviones" [ngValue]="a.avionId">
+            {{ a.modeloYCapacidad }}
+          </option>
+        </select>
+      </div>
 
-      <label>Asientos</label>
-      <input type="number" [(ngModel)]="formulario.asientos" name="asientos" required />
+      <div class="form-group">
+        <label for="asientos">Asientos Disponibles</label>
+        <input type="number" [(ngModel)]="formulario.asientos" name="asientos" id="asientos" required />
+      </div>
 
-      <label>Destino</label>
-      <input type="text" [(ngModel)]="formulario.destino" name="destino" required />
+      <div class="form-group">
+        <label for="salida">Ciudad de Salida</label>
+        <input type="text" [(ngModel)]="formulario.salida" name="salida" id="salida" placeholder="Se completa al seleccionar el aeropuerto" readonly required />
+      </div>
 
-      <label>Salida</label>
-      <input type="text" [(ngModel)]="formulario.salida" name="salida" required />
+      <div class="form-group">
+        <label for="destino">Ciudad de Destino</label>
+        <input type="text" [(ngModel)]="formulario.destino" name="destino" id="destino" placeholder="Ej: Panamá" required />
+      </div>
 
-      <label>Fecha Salida</label>
-      <input type="datetime-local" [(ngModel)]="formulario.fechaSalida" name="fechaSalida" required />
+      <div class="form-group">
+        <label for="fechaSalida">Fecha y Hora de Salida</label>
+        <input type="datetime-local" [(ngModel)]="formulario.fechaSalida" name="fechaSalida" id="fechaSalida" required />
+      </div>
 
-      <label>Fecha Llegada</label>
-      <input type="datetime-local" [(ngModel)]="formulario.fechaLlegada" name="fechaLlegada" required />
+      <div class="form-group">
+        <label for="fechaLlegada">Fecha y Hora de Llegada</label>
+        <input type="datetime-local" [(ngModel)]="formulario.fechaLlegada" name="fechaLlegada" id="fechaLlegada" required />
+      </div>
 
-      <button type="submit">{{ modoEdicion ? 'Guardar cambios' : 'Agregar vuelo' }}</button>
-      <button type="button" class="btn-secondary" (click)="cancelar()">Cancelar</button>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">{{ modoEdicion ? 'Guardar cambios' : 'Agregar vuelo' }}</button>
+        <button type="button" class="btn-secondary" (click)="cancelar()">Cancelar</button>
+      </div>
     </form>
   </div>
 

@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ReservasService, Reserva } from '../../services/reservas.service';
+import { ReservasService, Reserva, ReservaDto } from '../../services/reservas.service';
+import { VuelosService, VueloDto } from '../../services/vuelos.service';
+import { UsuarioService, UsuarioDto } from '../../services/usuario.service';
 
 @Component({
   selector: 'app-reservas',
@@ -11,17 +13,47 @@ import { ReservasService, Reserva } from '../../services/reservas.service';
   imports: [CommonModule, FormsModule]
 })
 export class ReservasComponent implements OnInit {
-  reservas: Reserva[] = [];
+  reservas: ReservaDto[] = [];
   formulario: Reserva = this.formularioVacio();
   modoEdicion = false;
   mostrarFormulario = false;
   mensaje = '';
   error = '';
+  vuelos: VueloDto[] = [];
+  usuarios: UsuarioDto[] = [];
 
-  constructor(private reservasService: ReservasService) {}
+  constructor(
+    private reservasService: ReservasService,
+    private vuelosService: VuelosService,
+    private usuarioService: UsuarioService
+  ) {}
 
   ngOnInit(): void {
     this.cargarReservas();
+    this.cargarVuelos();
+    this.cargarUsuarios();
+  }
+
+  private cargarVuelos(): void {
+    this.vuelosService.getVuelos().subscribe({
+      next: (data) => {
+        this.vuelos = data;
+      },
+      error: (err) => {
+        console.error('Error cargando vuelos:', err);
+      }
+    });
+  }
+
+  private cargarUsuarios(): void {
+    this.usuarioService.getUsuarios().subscribe({
+      next: (data) => {
+        this.usuarios = data;
+      },
+      error: (err) => {
+        console.error('Error cargando usuarios:', err);
+      }
+    });
   }
 
   private formularioVacio(): Reserva {
@@ -47,10 +79,16 @@ export class ReservasComponent implements OnInit {
     });
   }
 
-  abrirEditar(reserva: Reserva): void {
-    this.formulario = { ...reserva };
-    // Transformar fecha al formato correcto para datetime-local
-    this.formulario.fechaReserva = this.formatearFecha(reserva.fechaReserva);
+  abrirEditar(reserva: ReservaDto): void {
+    this.formulario = {
+      reservaId: reserva.reservaId,
+      usuarioId: reserva.usuarioId,
+      vueloId: reserva.vueloId,
+      fechaReserva: this.formatearFecha(reserva.fechaReserva),
+      asientosReservados: reserva.asientosReservados,
+      estadoPago: reserva.estadoPago
+    };
+
     this.modoEdicion = true;
     this.mostrarFormulario = true;
     this.mensaje = '';
@@ -59,7 +97,6 @@ export class ReservasComponent implements OnInit {
 
   private formatearFecha(fecha: string): string {
     if (!fecha) return '';
-    // Remover zona horaria si existe
     return fecha.split('+')[0].split('Z')[0].substring(0, 16);
   }
 
@@ -73,7 +110,7 @@ export class ReservasComponent implements OnInit {
     this.error = '';
     this.mensaje = '';
 
-    if (!this.formulario.usuarioId || !this.formulario.vueloId || !this.formulario.fechaReserva || 
+    if (!this.formulario.usuarioId || !this.formulario.vueloId || !this.formulario.fechaReserva ||
         !this.formulario.asientosReservados || !this.formulario.estadoPago) {
       this.error = 'Debe completar todos los campos.';
       return;
