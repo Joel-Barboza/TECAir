@@ -5,6 +5,10 @@
       <h3>Lista de maletas</h3>
       <button type="button" class="btn-refresh" (click)="cargarMaletas()">&#8635; Actualizar</button>
     </div>
+
+    <p class="success" *ngIf="mensaje && !mostrarFormulario">{{ mensaje }}</p>
+    <p class="error" *ngIf="error && !mostrarFormulario">{{ error }}</p>
+
     <div *ngIf="maletas.length === 0" class="placeholder">
       No hay maletas registradas
     </div>
@@ -21,28 +25,39 @@
         <td>{{m.peso}}</td>
         <td>{{m.color}}</td>
         <td>{{m.costoAdicional}}</td>
-        <td><button (click)="eliminarMaleta(m.maletaId!)">Eliminar</button></td>
+        <td>
+          <button class="btn-edit" (click)="abrirEditar(m)">Editar</button>
+          <button class="btn-delete" (click)="eliminarMaleta(m.maletaId!)">Eliminar</button>
+        </td>
       </tr>
     </table>
   </div>
 
   <!-- Formulario -->
-  <div class="maletas-form">
-    <h3>Agregar nueva maleta</h3>
-    <form (ngSubmit)="agregarMaleta()">
+  <div class="maletas-form" *ngIf="mostrarFormulario">
+    <h3>{{ modoEdicion ? 'Editar maleta' : 'Agregar nueva maleta' }}</h3>
+
+    <p class="error" *ngIf="error && mostrarFormulario">{{ error }}</p>
+
+    <form (ngSubmit)="guardar()">
       <label>Reserva ID</label>
-      <input type="number" [(ngModel)]="nuevaMaleta.reservaId" name="reservaId" required />
+      <input type="number" [(ngModel)]="formulario.reservaId" name="reservaId" required />
 
       <label>Peso (kg)</label>
-      <input type="number" [(ngModel)]="nuevaMaleta.peso" name="peso" required />
+      <input type="number" [(ngModel)]="formulario.peso" name="peso" required />
 
       <label>Color</label>
-      <input type="text" [(ngModel)]="nuevaMaleta.color" name="color" required />
+      <input type="text" [(ngModel)]="formulario.color" name="color" required />
 
       <label>Costo Adicional</label>
-      <input type="number" [(ngModel)]="nuevaMaleta.costoAdicional" name="costoAdicional" required />
+      <input type="number" [(ngModel)]="formulario.costoAdicional" name="costoAdicional" required />
 
-      <button type="submit">Agregar Maleta</button>
+      <button type="submit">{{ modoEdicion ? 'Guardar cambios' : 'Agregar Maleta' }}</button>
+      <button type="button" class="btn-secondary" (click)="cancelar()">Cancelar</button>
     </form>
+  </div>
+
+  <div class="maletas-form-button" *ngIf="!mostrarFormulario">
+    <button type="button" (click)="abrirNuevaMaleta()" class="btn-add">+ Agregar nueva maleta</button>
   </div>
 </div>

@@ -26,6 +26,10 @@ export class MaletasService {
     return this.http.post<Maleta>(this.apiUrl, maleta);
   }
 
+  actualizarMaleta(maleta: Maleta): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${maleta.maletaId}`, maleta);
+  }
+
   eliminarMaleta(maletaId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${maletaId}`);
   }

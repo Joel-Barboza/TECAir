@@ -4,6 +4,10 @@
       <h3>Lista de vuelos</h3>
       <button type="button" class="btn-refresh" (click)="cargarVuelos()">&#8635; Actualizar</button>
     </div>
+
+    <p class="success" *ngIf="mensaje && !mostrarFormulario">{{ mensaje }}</p>
+    <p class="error" *ngIf="error && !mostrarFormulario">{{ error }}</p>
+
     <div *ngIf="vuelos.length === 0" class="placeholder">
       No hay vuelos registrados
     </div>
@@ -19,43 +23,54 @@
         <th>Acciones</th>
       </tr>
       <tr *ngFor="let v of vuelos">
-        <td>{{v.AeropuertoId}}</td>
-        <td>{{v.AvionId}}</td>
-        <td>{{v.Asientos}}</td>
-        <td>{{v.Destino}}</td>
-        <td>{{v.Salida}}</td>
-        <td>{{v.FechaSalida | date:'short'}}</td>
-        <td>{{v.FechaLlegada | date:'short'}}</td>
-        <td><button (click)="eliminarVuelo(v.VueloId!)">Eliminar</button></td>
+        <td>{{v.aeropuertoId}}</td>
+        <td>{{v.avionId}}</td>
+        <td>{{v.asientos}}</td>
+        <td>{{v.destino}}</td>
+        <td>{{v.salida}}</td>
+        <td>{{v.fechaSalida | date:'short'}}</td>
+        <td>{{v.fechaLlegada | date:'short'}}</td>
+        <td>
+          <button class="btn-edit" (click)="abrirEditar(v)">Editar</button>
+          <button class="btn-delete" (click)="eliminarVuelo(v.vueloId!)">Eliminar</button>
+        </td>
       </tr>
     </table>
   </div>
 
-  <div class="vuelos-form">
-    <h3>Agregar nuevo vuelo</h3>
-    <form (ngSubmit)="agregarVuelo()">
+  <div class="vuelos-form" *ngIf="mostrarFormulario">
+    <h3>{{ modoEdicion ? 'Editar vuelo' : 'Agregar nuevo vuelo' }}</h3>
+
+    <p class="error" *ngIf="error && mostrarFormulario">{{ error }}</p>
+
+    <form (ngSubmit)="guardar()">
       <label>Aeropuerto ID</label>
-      <input type="number" [(ngModel)]="nuevoVuelo.AeropuertoId" name="aeropuertoId" required />
+      <input type="number" [(ngModel)]="formulario.aeropuertoId" name="aeropuertoId" required />
 
       <label>Avión ID</label>
-      <input type="number" [(ngModel)]="nuevoVuelo.AvionId" name="avionId" required />
+      <input type="number" [(ngModel)]="formulario.avionId" name="avionId" required />
 
       <label>Asientos</label>
-      <input type="number" [(ngModel)]="nuevoVuelo.Asientos" name="asientos" required />
+      <input type="number" [(ngModel)]="formulario.asientos" name="asientos" required />
 
       <label>Destino</label>
-      <input type="text" [(ngModel)]="nuevoVuelo.Destino" name="destino" required />
+      <input type="text" [(ngModel)]="formulario.destino" name="destino" required />
 
       <label>Salida</label>
-      <input type="text" [(ngModel)]="nuevoVuelo.Salida" name="salida" required />
+      <input type="text" [(ngModel)]="formulario.salida" name="salida" required />
 
       <label>Fecha Salida</label>
-      <input type="datetime-local" [(ngModel)]="nuevoVuelo.FechaSalida" name="fechaSalida" required />
+      <input type="datetime-local" [(ngModel)]="formulario.fechaSalida" name="fechaSalida" required />
 
       <label>Fecha Llegada</label>
-      <input type="datetime-local" [(ngModel)]="nuevoVuelo.FechaLlegada" name="fechaLlegada" required />
+      <input type="datetime-local" [(ngModel)]="formulario.fechaLlegada" name="fechaLlegada" required />
 
-      <button type="submit">Agregar vuelo</button>
+      <button type="submit">{{ modoEdicion ? 'Guardar cambios' : 'Agregar vuelo' }}</button>
+      <button type="button" class="btn-secondary" (click)="cancelar()">Cancelar</button>
     </form>
+  </div>
+
+  <div class="vuelos-form-button" *ngIf="!mostrarFormulario">
+    <button type="button" (click)="abrirNuevoVuelo()" class="btn-add">+ Agregar nuevo vuelo</button>
   </div>
 </div>

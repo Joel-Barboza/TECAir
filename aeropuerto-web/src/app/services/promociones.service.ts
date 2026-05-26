@@ -28,6 +28,10 @@ export class PromocionesService {
     return this.http.post<Promocion>(this.apiUrl, promo);
   }
 
+  actualizarPromocion(promo: Promocion): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${promo.promocionId}`, promo);
+  }
+
   eliminarPromocion(promocionId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${promocionId}`);
   }

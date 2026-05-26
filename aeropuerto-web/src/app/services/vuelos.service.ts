@@ -3,14 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface Vuelo {
-  VueloId?: number;
-  AeropuertoId: number;
-  AvionId: number;
-  Asientos: number;
-  Destino: string;
-  Salida: string;
-  FechaSalida: string; // para datetime-local
-  FechaLlegada: string;
+  vueloId?: number;
+  aeropuertoId: number;
+  avionId: number;
+  asientos: number;
+  destino: string;
+  salida: string;
+  fechaSalida: string; // para datetime-local
+  fechaLlegada: string;
 }
 
 @Injectable({
@@ -27,6 +27,10 @@ export class VuelosService {
 
   crearVuelo(vuelo: Vuelo): Observable<Vuelo> {
     return this.http.post<Vuelo>(this.apiUrl, vuelo);
+  }
+
+  actualizarVuelo(vuelo: Vuelo): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${vuelo.vueloId}`, vuelo);
   }
 
   eliminarVuelo(id: number): Observable<void> {

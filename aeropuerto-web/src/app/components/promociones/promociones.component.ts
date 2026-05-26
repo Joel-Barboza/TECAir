@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PromocionesService, Promocion } from '../../services/promociones.service';
@@ -10,42 +10,116 @@ import { PromocionesService, Promocion } from '../../services/promociones.servic
   standalone: true,
   imports: [CommonModule, FormsModule]
 })
-export class PromocionesComponent {
+export class PromocionesComponent implements OnInit {
   promociones: Promocion[] = [];
-  nuevaPromocion: Promocion = {
-    vueloId: 0,
-    origen: '',
-    destino: '',
-    descuento: 0,
-    fechaInicio: '',
-    fechaFin: ''
-  };
+  formulario: Promocion = this.formularioVacio();
+  modoEdicion = false;
+  mostrarFormulario = false;
+  mensaje = '';
+  error = '';
 
-  constructor(private promocionesService: PromocionesService) {
+  constructor(private promocionesService: PromocionesService) {}
+
+  ngOnInit(): void {
     this.cargarPromociones();
   }
 
-  cargarPromociones() {
-    this.promocionesService.getPromociones().subscribe(data => {
-      this.promociones = data;
+  private formularioVacio(): Promocion {
+    return {
+      vueloId: 0,
+      origen: '',
+      destino: '',
+      descuento: 0,
+      fechaInicio: '',
+      fechaFin: ''
+    };
+  }
+
+  cargarPromociones(): void {
+    this.promocionesService.getPromociones().subscribe({
+      next: (data) => {
+        console.log('Promociones cargadas:', data);
+        this.promociones = data;
+      },
+      error: (err) => {
+        console.error('Error cargando promociones:', err);
+        this.error = 'No se pudieron cargar las promociones.';
+      }
     });
   }
 
-  agregarPromocion() {
-    this.promocionesService.crearPromocion(this.nuevaPromocion).subscribe(() => {
-      this.cargarPromociones();
-      this.nuevaPromocion = {
-        vueloId: 0,
-        origen: '',
-        destino: '',
-        descuento: 0,
-        fechaInicio: '',
-        fechaFin: ''
-      };
+  abrirEditar(promocion: Promocion): void {
+    this.formulario = { ...promocion };
+    this.modoEdicion = true;
+    this.mostrarFormulario = true;
+    this.mensaje = '';
+    this.error = '';
+  }
+
+  cancelar(): void {
+    this.formulario = this.formularioVacio();
+    this.modoEdicion = false;
+    this.mostrarFormulario = false;
+  }
+
+  guardar(): void {
+    this.error = '';
+    this.mensaje = '';
+
+    if (!this.formulario.vueloId || !this.formulario.origen || !this.formulario.destino || 
+        !this.formulario.descuento || !this.formulario.fechaInicio || !this.formulario.fechaFin) {
+      this.error = 'Debe completar todos los campos.';
+      return;
+    }
+
+    if (this.modoEdicion && this.formulario.promocionId) {
+      this.promocionesService.actualizarPromocion(this.formulario).subscribe({
+        next: () => {
+          this.mensaje = 'Promoción actualizada correctamente.';
+          this.modoEdicion = false;
+          this.mostrarFormulario = false;
+          this.formulario = this.formularioVacio();
+          this.cargarPromociones();
+        },
+        error: (err) => {
+          console.error('Error actualizando promoción:', err);
+          this.error = 'No se pudo actualizar la promoción.';
+        }
+      });
+    } else {
+      this.promocionesService.crearPromocion(this.formulario).subscribe({
+        next: () => {
+          this.mensaje = 'Promoción agregada correctamente.';
+          this.formulario = this.formularioVacio();
+          this.mostrarFormulario = false;
+          this.cargarPromociones();
+        },
+        error: (err) => {
+          console.error('Error creando promoción:', err);
+          this.error = 'No se pudo crear la promoción.';
+        }
+      });
+    }
+  }
+
+  eliminarPromocion(promocionId: number): void {
+    this.promocionesService.eliminarPromocion(promocionId).subscribe({
+      next: () => {
+        this.mensaje = 'Promoción eliminada.';
+        this.cargarPromociones();
+      },
+      error: (err) => {
+        console.error('Error eliminando promoción:', err);
+        this.error = 'No se pudo eliminar la promoción.';
+      }
     });
   }
 
-  eliminarPromocion(id: number) {
-    this.promocionesService.eliminarPromocion(id).subscribe(() => this.cargarPromociones());
+  abrirNuevaPromocion(): void {
+    this.formulario = this.formularioVacio();
+    this.modoEdicion = false;
+    this.mostrarFormulario = true;
+    this.mensaje = '';
+    this.error = '';
   }
 }
