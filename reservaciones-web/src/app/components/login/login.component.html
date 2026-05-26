@@ -67,17 +67,17 @@
 
         <div class="field">
           <label>Nombre *</label>
-          <input type="text" [(ngModel)]="formulario.nombre" name="nombre" placeholder="Juan" required />
+          <input type="text" [(ngModel)]="formulario.nombre" name="nombre" required />
         </div>
 
         <div class="fields-row">
           <div class="field">
             <label>Primer apellido *</label>
-            <input type="text" [(ngModel)]="formulario.apellido1" name="apellido1" placeholder="Pérez" required />
+            <input type="text" [(ngModel)]="formulario.apellido1" name="apellido1" required />
           </div>
           <div class="field">
             <label>Segundo apellido</label>
-            <input type="text" [(ngModel)]="formulario.apellido2" name="apellido2" placeholder="Arjona" />
+            <input type="text" [(ngModel)]="formulario.apellido2" name="apellido2" />
           </div>
         </div>
 
@@ -107,7 +107,7 @@
           <div class="field">
             <label>Carnet (para programa de millas)</label>
             <input type="number" [(ngModel)]="formulario.carnet" name="carnet"
-                   placeholder="2024123456" />
+                   placeholder="0000000000" />
           </div>
         </div>
 
@@ -123,11 +123,9 @@
 
     <!-- Columna derecha: promociones -->
     <div class="promo-panel">
-      <h2>Promociones Vigentes</h2>
-      <p class="promo-sub">Descubra nuestras mejores ofertas antes de reservar</p>
-
+      <h2>Promociones</h2>
       <div *ngIf="promociones.length === 0" class="promo-empty">
-        Actualmente no hay promociones disponibles. ¡Vuelva pronto!
+        Actualmente no hay promociones disponibles
       </div>
 
       <div class="promo-grid" *ngIf="promociones.length > 0">

@@ -47,7 +47,7 @@ export class ReservasComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: () => {
-        this.error = 'No se pudieron cargar las reservas. Verifique que el servidor esté activo.';
+        this.error = 'No se pudieron cargar las reservas.';
         this.cdr.detectChanges();
       }
     });

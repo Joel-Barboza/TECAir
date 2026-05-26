@@ -31,7 +31,7 @@ export class PromocionesComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        this.error = 'No se pudieron cargar las promociones. Verifique que el servidor esté activo.';
+        this.error = 'No se pudieron cargar las promociones.';
         this.cdr.detectChanges();
         console.error(err);
       }
