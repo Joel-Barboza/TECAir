@@ -23,9 +23,20 @@
 
       <!-- Login Form -->
       <form *ngIf="modo === 'login'" (ngSubmit)="iniciarSesion()" class="auth-form">
-        <p class="form-subtitle">Ingrese su correo para acceder a su cuenta.</p>
+        <p class="form-subtitle">Ingrese su nombre y correo para acceder a su cuenta.</p>
 
         <p class="msg-error" *ngIf="error">{{ error }}</p>
+
+        <div class="msg-warning" *ngIf="emailNoEncontrado">
+          No se encontró una cuenta con esos datos.
+          <button class="btn-warning-action" (click)="cambiarModo('registro')">Crear cuenta</button>
+        </div>
+
+        <div class="field">
+          <label for="loginNombre">Nombre</label>
+          <input type="text" id="loginNombre" [(ngModel)]="loginNombre" name="loginNombre"
+                 placeholder="Juan" required />
+        </div>
 
         <div class="field">
           <label for="loginEmail">Correo electrónico</label>
@@ -48,6 +59,11 @@
 
         <p class="msg-error" *ngIf="error">{{ error }}</p>
         <p class="msg-success" *ngIf="mensaje">{{ mensaje }}</p>
+
+        <div class="msg-warning" *ngIf="emailYaRegistrado">
+          Ese correo ya tiene una cuenta registrada.
+          <button class="btn-warning-action" (click)="cambiarModo('login')">Iniciar sesión</button>
+        </div>
 
         <div class="field">
           <label>Nombre *</label>

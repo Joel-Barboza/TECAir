@@ -228,6 +228,37 @@
   margin: 0;
 }
 
+.msg-warning {
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  color: #92400e;
+  border-radius: 5px;
+  padding: 10px 12px;
+  font-size: 0.825rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0;
+}
+
+.btn-warning-action {
+  background-color: #f59e0b;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-warning-action:hover {
+  background-color: #d97706;
+}
+
 /* Promo panel — columna derecha */
 .promo-panel {
   flex: 1;

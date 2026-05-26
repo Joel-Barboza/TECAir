@@ -8,10 +8,13 @@ export class AuthService {
 
   constructor(private usuarioService: UsuarioService) {}
 
-  login(email: string): Observable<Usuario | null> {
+  login(email: string, nombre: string): Observable<Usuario | null> {
     return this.usuarioService.getUsuarios().pipe(
       map(usuarios => {
-        const user = usuarios.find(u => u.email.toLowerCase() === email.trim().toLowerCase());
+        const user = usuarios.find(u =>
+          u.email.toLowerCase() === email.trim().toLowerCase() &&
+          u.nombre.toLowerCase() === nombre.trim().toLowerCase()
+        );
         if (user) {
           sessionStorage.setItem(this.KEY, JSON.stringify(user));
         }

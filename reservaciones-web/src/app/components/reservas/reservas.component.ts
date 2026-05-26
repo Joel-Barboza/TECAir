@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReservasService, Reserva } from '../../services/reservas.service';
 import { Vuelo, VuelosService } from '../../services/vuelos.service';
@@ -20,7 +20,8 @@ export class ReservasComponent implements OnInit {
   constructor(
     private reservasService: ReservasService,
     private vuelosService: VuelosService,
-    private authService: AuthService
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -33,16 +34,21 @@ export class ReservasComponent implements OnInit {
     const usuarioId = this.authService.currentUser?.usuarioId;
 
     this.vuelosService.getVuelos().subscribe({
-      next: (data) => (this.vuelos = data),
+      next: (data) => {
+        this.vuelos = data;
+        this.cdr.detectChanges();
+      },
       error: () => {}
     });
 
     this.reservasService.getReservas().subscribe({
       next: (data) => {
         this.reservas = data.filter(r => r.usuarioId === usuarioId);
+        this.cdr.detectChanges();
       },
       error: () => {
         this.error = 'No se pudieron cargar las reservas. Verifique que el servidor esté activo.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -64,8 +70,12 @@ export class ReservasComponent implements OnInit {
       next: () => {
         this.mensaje = 'Reserva cancelada exitosamente.';
         this.cargarDatos();
+        this.cdr.detectChanges();
       },
-      error: () => (this.error = 'No se pudo cancelar la reserva.')
+      error: () => {
+        this.error = 'No se pudo cancelar la reserva.';
+        this.cdr.detectChanges();
+      }
     });
   }
 }

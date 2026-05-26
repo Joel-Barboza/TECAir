@@ -46,6 +46,29 @@ namespace TECAirAPI.Controllers
             }
         }
 
+        // PUT: api/aeropuerto/Vuelos/{id}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> ActualizarVuelo(int id, Vuelo vuelo)
+        {
+            if (id != vuelo.VueloId)
+                return BadRequest("El id no coincide.");
+
+            _context.Entry(vuelo).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.Vuelos.Any(v => v.VueloId == id))
+                    return NotFound();
+                throw;
+            }
+
+            return NoContent();
+        }
+
         // DELETE: api/aeropuerto/Vuelos/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> EliminarVuelo(int id)
