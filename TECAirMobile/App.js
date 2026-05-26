@@ -1,29 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { View, ActivityIndicator } from 'react-native';
 import RegisterScreen from './src/screens/RegisterScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import SucursalScreen from './src/screens/SucursalScreen';
-import TicketStack from './src/screens/TicketStack'; // <-- Importamos la nueva vista
+import TicketStack from './src/screens/TicketStack';
+import { initDatabase } from './src/database/database';
 
 export default function App() {
-  const [pantallaActual, setPantallaActual] = useState('Register');
+  const [pantalla, setPantalla] = useState('Register');
+  const [dbReady, setDbReady] = useState(false);
 
-  const cambiarPantalla = (nombrePantalla) => {
-    setPantallaActual(nombrePantalla);
-  };
+  useEffect(() => {
+    initDatabase();
+    setDbReady(true);
+  }, []);
 
-  // Renderizado condicional según la pantalla activa
-  if (pantallaActual === 'Register') {
-    return <RegisterScreen cambiarPantalla={cambiarPantalla} />;
-  }
-  if (pantallaActual === 'Home') {
-    return <HomeScreen cambiarPantalla={cambiarPantalla} />;
-  }
-  if (pantallaActual === 'Sucursal') {
-    return <SucursalScreen cambiarPantalla={cambiarPantalla} />;
-  }
-  if (pantallaActual === 'TicketStack') {
-    return <TicketStack cambiarPantalla={cambiarPantalla} />;
+  if (!dbReady) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#003366" />
+      </View>
+    );
   }
 
-  return null;
+  const cambiarPantalla = (nombre) => setPantalla(nombre);
+
+  if (pantalla === 'Register') return <RegisterScreen cambiarPantalla={cambiarPantalla} />;
+  if (pantalla === 'Home') return <HomeScreen cambiarPantalla={cambiarPantalla} />;
+  if (pantalla === 'Sucursal') return <SucursalScreen cambiarPantalla={cambiarPantalla} />;
+  if (pantalla === 'TicketStack') return <TicketStack cambiarPantalla={cambiarPantalla} />;
+  
+  return <RegisterScreen cambiarPantalla={cambiarPantalla} />;
 }
