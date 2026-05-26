@@ -65,7 +65,8 @@ export class VuelosComponent implements OnInit {
       destino: '',
       salida: '',
       fechaSalida: '',
-      fechaLlegada: ''
+      fechaLlegada: '',
+      puertaAbordaje: ''
     };
   }
 
@@ -99,7 +100,8 @@ export class VuelosComponent implements OnInit {
       destino: vuelo.destino,
       salida: vuelo.origen,
       fechaSalida: this.formatearFecha(vuelo.fechaSalida),
-      fechaLlegada: this.formatearFecha(vuelo.fechaLlegada)
+      fechaLlegada: this.formatearFecha(vuelo.fechaLlegada),
+      puertaAbordaje: vuelo.puertaAbordaje ?? ''
     };
 
     this.sincronizarSalidaConAeropuerto();
@@ -128,13 +130,18 @@ export class VuelosComponent implements OnInit {
     this.sincronizarSalidaConAeropuerto();
 
     if (!this.formulario.aeropuertoId || !this.formulario.avionId || !this.formulario.asientos ||
-        !this.formulario.destino || !this.formulario.salida || !this.formulario.fechaSalida || !this.formulario.fechaLlegada) {
+        !this.formulario.destino || !this.formulario.salida || !this.formulario.fechaSalida || !this.formulario.fechaLlegada || !this.formulario.puertaAbordaje) {
       this.error = 'Debe completar todos los campos.';
       return;
     }
 
+    const vueloParaGuardar: Vuelo = {
+      ...this.formulario,
+      puertaAbordaje: this.formulario.puertaAbordaje?.trim().toUpperCase()
+    };
+
     if (this.modoEdicion && this.formulario.vueloId) {
-      this.vuelosService.actualizarVuelo(this.formulario).subscribe({
+      this.vuelosService.actualizarVuelo(vueloParaGuardar).subscribe({
         next: () => {
           this.mensaje = 'Vuelo actualizado correctamente.';
           this.modoEdicion = false;
@@ -148,7 +155,7 @@ export class VuelosComponent implements OnInit {
         }
       });
     } else {
-      this.vuelosService.crearVuelo(this.formulario).subscribe({
+      this.vuelosService.crearVuelo(vueloParaGuardar).subscribe({
         next: () => {
           this.mensaje = 'Vuelo agregado correctamente.';
           this.formulario = this.formularioVacio();

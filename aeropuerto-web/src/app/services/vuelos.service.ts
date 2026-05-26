@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 export interface Vuelo {
   vueloId?: number;
@@ -11,6 +11,7 @@ export interface Vuelo {
   salida: string;
   fechaSalida: string; // para datetime-local
   fechaLlegada: string;
+  puertaAbordaje?: string;
 }
 
 export interface VueloDto {
@@ -28,6 +29,8 @@ export interface VueloDto {
   rutaDescripcion: string; // "Origen → Destino"
   fechaSalida: string;
   fechaLlegada: string;
+  puertaAbordaje?: string;
+  puerta_abordaje?: string;
   descripcionCompleta: string; // "VUE-001 - Origen → Destino - 26/05/2026 10:30"
 }
 
@@ -40,7 +43,14 @@ export class VuelosService {
   constructor(private http: HttpClient) {}
 
   getVuelos(): Observable<VueloDto[]> {
-    return this.http.get<VueloDto[]>(this.apiUrl);
+    return this.http.get<VueloDto[]>(this.apiUrl).pipe(
+      map(vuelos => vuelos.map(vuelo => ({
+        ...vuelo,
+        // Soporta tanto camelCase como snake_case por si el backend o PostgreSQL
+        // devuelve el nombre de columna directamente en algún momento.
+        puertaAbordaje: vuelo.puertaAbordaje ?? vuelo.puerta_abordaje ?? ''
+      })))
+    );
   }
 
   crearVuelo(vuelo: Vuelo): Observable<VueloDto> {

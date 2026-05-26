@@ -21,6 +21,7 @@
           <th>Aeropuerto</th>
           <th>Avión</th>
           <th>Asientos</th>
+          <th>Puerta</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -33,6 +34,7 @@
           <td class="aeropuerto">{{ v.nombreAeropuerto }}</td>
           <td class="avion">{{ v.modeloAvion }}</td>
           <td class="asientos">{{ v.asientos }}</td>
+          <td class="puerta"><strong>{{ v.puertaAbordaje || 'Sin asignar' }}</strong></td>
           <td class="acciones">
             <button class="btn-edit" (click)="abrirEditar(v)" title="Editar">✏️</button>
             <button class="btn-delete" (click)="eliminarVuelo(v.vueloId)" title="Eliminar">🗑️</button>
@@ -91,6 +93,11 @@
       <div class="form-group">
         <label for="fechaLlegada">Fecha y Hora de Llegada</label>
         <input type="datetime-local" [(ngModel)]="formulario.fechaLlegada" name="fechaLlegada" id="fechaLlegada" required />
+      </div>
+
+      <div class="form-group">
+        <label for="puertaAbordaje">Puerta de Abordaje</label>
+        <input type="text" [(ngModel)]="formulario.puertaAbordaje" name="puertaAbordaje" id="puertaAbordaje" placeholder="Ej: A1" required />
       </div>
 
       <div class="form-actions">

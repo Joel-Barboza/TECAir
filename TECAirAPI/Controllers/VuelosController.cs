@@ -36,6 +36,7 @@ namespace TECAirAPI.Controllers
                 RutaDescripcion = CodeGenerator.GenerateRutaDescripcion(vuelo.Salida, vuelo.Destino),
                 FechaSalida = vuelo.FechaSalida,
                 FechaLlegada = vuelo.FechaLlegada,
+                PuertaAbordaje = vuelo.PuertaAbordaje,
                 DescripcionCompleta = CodeGenerator.GenerateVueloDescripcion(vuelo.VueloId, vuelo.Salida, vuelo.Destino, vuelo.FechaSalida)
             };
         }
@@ -81,6 +82,10 @@ namespace TECAirAPI.Controllers
                 if (!avionExiste)
                     return BadRequest($"No existe el avión con id {vuelo.AvionId}");
 
+                vuelo.PuertaAbordaje = string.IsNullOrWhiteSpace(vuelo.PuertaAbordaje)
+                    ? null
+                    : vuelo.PuertaAbordaje.Trim().ToUpper();
+
                 _context.Vuelos.Add(vuelo);
                 await _context.SaveChangesAsync();
 
@@ -114,7 +119,23 @@ namespace TECAirAPI.Controllers
                 if (!avionExiste)
                     return BadRequest($"No existe el avión con id {vuelo.AvionId}");
 
-                _context.Entry(vuelo).State = EntityState.Modified;
+                var vueloExistente = await _context.Vuelos.FindAsync(id);
+                if (vueloExistente == null)
+                    return NotFound($"No se encontró el vuelo con id {id}");
+
+                // Se actualiza campo por campo para asegurar que puerta_abordaje sí se guarde
+                // y para evitar problemas con entidades desconectadas del frontend.
+                vueloExistente.AeropuertoId = vuelo.AeropuertoId;
+                vueloExistente.AvionId = vuelo.AvionId;
+                vueloExistente.Asientos = vuelo.Asientos;
+                vueloExistente.Salida = aeropuerto.Ubicacion;
+                vueloExistente.Destino = vuelo.Destino;
+                vueloExistente.FechaSalida = vuelo.FechaSalida;
+                vueloExistente.FechaLlegada = vuelo.FechaLlegada;
+                vueloExistente.PuertaAbordaje = string.IsNullOrWhiteSpace(vuelo.PuertaAbordaje)
+                    ? null
+                    : vuelo.PuertaAbordaje.Trim().ToUpper();
+
                 await _context.SaveChangesAsync();
                 return NoContent();
             }

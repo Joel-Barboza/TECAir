@@ -16,5 +16,6 @@ public class VueloDto
     public string RutaDescripcion { get; set; } // "Origen → Destino" para mostrar
     public DateTime FechaSalida { get; set; }
     public DateTime FechaLlegada { get; set; }
+    public string? PuertaAbordaje { get; set; }
     public string DescripcionCompleta { get; set; } // "VUE-001 - Origen → Destino - 26/05/2026 10:30"
 }
