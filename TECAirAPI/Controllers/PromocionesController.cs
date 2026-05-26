@@ -7,7 +7,7 @@ using TECAirAPI.Helpers;
 
 namespace TECAirAPI.Controllers
 {
-    [Route("api/aeropuerto/[controller]")]
+    [Route("api/aeropuerto/Promociones")]
     [ApiController]
     public class PromocionesController : ControllerBase
     {
@@ -18,9 +18,14 @@ namespace TECAirAPI.Controllers
             _context = context;
         }
 
-        private async Task<PromocionDto> ConvertirADto(Promocion promo)
+        private static PromocionDto ConvertirADto(Promocion promo, Vuelo? vuelo)
         {
-            var vuelo = await _context.Vuelos.FindAsync(promo.VueloId);
+            decimal precioBoleto = vuelo?.PrecioBoleto ?? 0m;
+            decimal montoDescuento = Math.Round(precioBoleto * (promo.Descuento / 100m), 2);
+            decimal precioFinal = Math.Round(precioBoleto - montoDescuento, 2);
+
+            string origen = vuelo?.Salida ?? promo.Origen ?? "Origen no disponible";
+            string destino = vuelo?.Destino ?? promo.Destino ?? "Destino no disponible";
 
             return new PromocionDto
             {
@@ -28,11 +33,14 @@ namespace TECAirAPI.Controllers
                 VueloId = promo.VueloId,
                 CodigoVuelo = CodeGenerator.GenerateVueloCode(promo.VueloId),
                 DescripcionVuelo = vuelo == null
-                    ? "Vuelo no encontrado"
+                    ? $"{CodeGenerator.GenerateVueloCode(promo.VueloId)} - Vuelo no encontrado"
                     : CodeGenerator.GenerateVueloDescripcion(vuelo.VueloId, vuelo.Salida, vuelo.Destino, vuelo.FechaSalida),
-                Origen = promo.Origen,
-                Destino = promo.Destino,
+                Origen = origen,
+                Destino = destino,
+                PrecioBoleto = precioBoleto,
                 Descuento = promo.Descuento,
+                MontoDescuento = montoDescuento,
+                PrecioFinal = precioFinal,
                 FechaInicio = promo.FechaInicio,
                 FechaFin = promo.FechaFin
             };
@@ -42,101 +50,106 @@ namespace TECAirAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PromocionDto>>> GetPromociones()
         {
-            try
-            {
-                var promociones = await _context.Promociones.ToListAsync();
-                var promocionesDtos = new List<PromocionDto>();
+            var promociones = await _context.Promociones
+                .AsNoTracking()
+                .OrderBy(p => p.PromocionId)
+                .ToListAsync();
 
-                foreach (var promo in promociones)
-                {
-                    var dto = await ConvertirADto(promo);
-                    promocionesDtos.Add(dto);
-                }
+            var vuelos = await _context.Vuelos
+                .AsNoTracking()
+                .ToDictionaryAsync(v => v.VueloId);
 
-                return Ok(promocionesDtos);
-            }
-            catch (Exception ex)
+            var promocionesDtos = promociones.Select(p =>
             {
-                return StatusCode(500, $"Error al obtener promociones: {ex.Message}");
-            }
+                vuelos.TryGetValue(p.VueloId, out var vuelo);
+                return ConvertirADto(p, vuelo);
+            }).ToList();
+
+            return Ok(promocionesDtos);
+        }
+
+        // GET: api/aeropuerto/Promociones/{id}
+        [HttpGet("{id}")]
+        public async Task<ActionResult<PromocionDto>> GetPromocion(int id)
+        {
+            var promo = await _context.Promociones.AsNoTracking().FirstOrDefaultAsync(p => p.PromocionId == id);
+            if (promo == null)
+                return NotFound();
+
+            var vuelo = await _context.Vuelos.AsNoTracking().FirstOrDefaultAsync(v => v.VueloId == promo.VueloId);
+            return Ok(ConvertirADto(promo, vuelo));
         }
 
         // POST: api/aeropuerto/Promociones
         [HttpPost]
-        public async Task<ActionResult<PromocionDto>> CrearPromocion(Promocion promo)
+        public async Task<ActionResult<PromocionDto>> CrearPromocion([FromBody] Promocion promo)
         {
-            try
-            {
-                var vuelo = await _context.Vuelos.FindAsync(promo.VueloId);
-                if (vuelo == null)
-                    return BadRequest($"No existe el vuelo con id {promo.VueloId}");
+            var vuelo = await _context.Vuelos.FirstOrDefaultAsync(v => v.VueloId == promo.VueloId);
+            if (vuelo == null)
+                return BadRequest($"No existe el vuelo con id {promo.VueloId}.");
 
-                promo.Origen = vuelo.Salida;
-                promo.Destino = vuelo.Destino;
+            if (promo.Descuento <= 0 || promo.Descuento > 100)
+                return BadRequest("El descuento debe ser mayor que 0 y menor o igual a 100.");
 
-                _context.Promociones.Add(promo);
-                await _context.SaveChangesAsync();
+            if (promo.FechaFin.Date < promo.FechaInicio.Date)
+                return BadRequest("La fecha final no puede ser anterior a la fecha inicial.");
 
-                var promoDto = await ConvertirADto(promo);
-                return CreatedAtAction(nameof(GetPromociones), new { id = promo.PromocionId }, promoDto);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al crear promoción: {ex.Message}");
-            }
+            promo.Origen = vuelo.Salida;
+            promo.Destino = vuelo.Destino;
+            promo.FechaInicio = promo.FechaInicio.Date;
+            promo.FechaFin = promo.FechaFin.Date;
+
+            _context.Promociones.Add(promo);
+            await _context.SaveChangesAsync();
+
+            var promoDto = ConvertirADto(promo, vuelo);
+            return CreatedAtAction(nameof(GetPromocion), new { id = promo.PromocionId }, promoDto);
         }
 
         // PUT: api/aeropuerto/Promociones/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> ActualizarPromocion(int id, Promocion promo)
+        public async Task<IActionResult> ActualizarPromocion(int id, [FromBody] Promocion promo)
         {
             if (id != promo.PromocionId)
-                return BadRequest("El ID de la URL no coincide con el ID de la promoción");
+                return BadRequest("El ID de la URL no coincide con el ID de la promoción.");
 
-            try
-            {
-                var vuelo = await _context.Vuelos.FindAsync(promo.VueloId);
-                if (vuelo == null)
-                    return BadRequest($"No existe el vuelo con id {promo.VueloId}");
+            var existente = await _context.Promociones.FirstOrDefaultAsync(p => p.PromocionId == id);
+            if (existente == null)
+                return NotFound();
 
-                promo.Origen = vuelo.Salida;
-                promo.Destino = vuelo.Destino;
+            var vuelo = await _context.Vuelos.FirstOrDefaultAsync(v => v.VueloId == promo.VueloId);
+            if (vuelo == null)
+                return BadRequest($"No existe el vuelo con id {promo.VueloId}.");
 
-                _context.Entry(promo).State = EntityState.Modified;
-                await _context.SaveChangesAsync();
-                return NoContent();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                var existe = await _context.Promociones.AnyAsync(p => p.PromocionId == id);
-                if (!existe)
-                    return NotFound();
-                throw;
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al actualizar promoción: {ex.Message}");
-            }
+            if (promo.Descuento <= 0 || promo.Descuento > 100)
+                return BadRequest("El descuento debe ser mayor que 0 y menor o igual a 100.");
+
+            if (promo.FechaFin.Date < promo.FechaInicio.Date)
+                return BadRequest("La fecha final no puede ser anterior a la fecha inicial.");
+
+            existente.VueloId = promo.VueloId;
+            existente.Origen = vuelo.Salida;
+            existente.Destino = vuelo.Destino;
+            existente.Descuento = promo.Descuento;
+            existente.FechaInicio = promo.FechaInicio.Date;
+            existente.FechaFin = promo.FechaFin.Date;
+
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
 
         // DELETE: api/aeropuerto/Promociones/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> EliminarPromocion(int id)
         {
-            try
-            {
-                var promo = await _context.Promociones.FindAsync(id);
-                if (promo == null) return NotFound();
+            var promo = await _context.Promociones.FindAsync(id);
+            if (promo == null)
+                return NotFound();
 
-                _context.Promociones.Remove(promo);
-                await _context.SaveChangesAsync();
+            _context.Promociones.Remove(promo);
+            await _context.SaveChangesAsync();
 
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al eliminar promoción: {ex.Message}");
-            }
+            return NoContent();
         }
     }
 }

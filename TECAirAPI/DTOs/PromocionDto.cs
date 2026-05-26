@@ -8,7 +8,10 @@ public class PromocionDto
     public string DescripcionVuelo { get; set; } // "VUE-001 - Origen → Destino - 26/05/2026"
     public string Origen { get; set; }
     public string Destino { get; set; }
+    public decimal PrecioBoleto { get; set; }
     public decimal Descuento { get; set; }
+    public decimal MontoDescuento { get; set; }
+    public decimal PrecioFinal { get; set; }
     public DateTime FechaInicio { get; set; }
     public DateTime FechaFin { get; set; }
 }

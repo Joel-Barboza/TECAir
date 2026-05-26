@@ -66,6 +66,7 @@ export class VuelosComponent implements OnInit {
       salida: '',
       fechaSalida: '',
       fechaLlegada: '',
+      precioBoleto: 0,
       puertaAbordaje: ''
     };
   }
@@ -101,6 +102,7 @@ export class VuelosComponent implements OnInit {
       salida: vuelo.origen,
       fechaSalida: this.formatearFecha(vuelo.fechaSalida),
       fechaLlegada: this.formatearFecha(vuelo.fechaLlegada),
+      precioBoleto: vuelo.precioBoleto ?? 0,
       puertaAbordaje: vuelo.puertaAbordaje ?? ''
     };
 
@@ -130,7 +132,9 @@ export class VuelosComponent implements OnInit {
     this.sincronizarSalidaConAeropuerto();
 
     if (!this.formulario.aeropuertoId || !this.formulario.avionId || !this.formulario.asientos ||
-        !this.formulario.destino || !this.formulario.salida || !this.formulario.fechaSalida || !this.formulario.fechaLlegada || !this.formulario.puertaAbordaje) {
+        !this.formulario.destino || !this.formulario.salida || !this.formulario.fechaSalida || !this.formulario.fechaLlegada ||
+        this.formulario.precioBoleto === null || this.formulario.precioBoleto === undefined || this.formulario.precioBoleto < 0 ||
+        !this.formulario.puertaAbordaje) {
       this.error = 'Debe completar todos los campos.';
       return;
     }

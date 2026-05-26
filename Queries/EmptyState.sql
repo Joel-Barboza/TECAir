@@ -170,7 +170,62 @@ ADD CONSTRAINT fk_promocion_vuelo
 FOREIGN KEY (vuelo_id)
 REFERENCES vuelo(vuelo_id);
 
+ALTER TABLE vuelo
+ADD COLUMN puerta_abordaje VARCHAR(10);
 
+ALTER TABLE asiento
+ADD CONSTRAINT uq_asiento_reserva
+UNIQUE (reserva_id);
+
+CREATE TABLE checkin (
+    checkin_id      SERIAL,
+    reserva_id      INT NOT NULL,
+    asiento_id      INT NOT NULL,
+    fecha_checkin   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    metodo_envio    VARCHAR(30),
+    estado_envio    VARCHAR(30) DEFAULT 'Pendiente',
+
+    PRIMARY KEY (checkin_id),
+
+    CONSTRAINT fk_checkin_reserva
+        FOREIGN KEY (reserva_id)
+        REFERENCES reserva(reserva_id),
+
+    CONSTRAINT fk_checkin_asiento
+        FOREIGN KEY (asiento_id)
+        REFERENCES asiento(asiento_id),
+
+    CONSTRAINT uq_checkin_reserva
+        UNIQUE (reserva_id),
+
+    CONSTRAINT uq_checkin_asiento
+        UNIQUE (asiento_id)
+);
+
+ALTER TABLE vuelo
+ADD COLUMN precio_boleto DECIMAL(10,2) DEFAULT 0;
+
+UPDATE vuelo
+SET precio_boleto = 650.00
+WHERE vuelo_id = 10;
+
+UPDATE vuelo
+SET precio_boleto = 420.00
+WHERE vuelo_id = 14;
+
+UPDATE vuelo
+SET precio_boleto = 80.00
+WHERE vuelo_id = 12;
+
+UPDATE vuelo
+SET precio_boleto = 300.00
+WHERE vuelo_id = 13;
+
+UPDATE vuelo
+SET precio_boleto = 720.00
+WHERE vuelo_id = 11;
+
+--- Esto no recuerdo que es jaja
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO tecair_user;
 GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO tecair_user;
 

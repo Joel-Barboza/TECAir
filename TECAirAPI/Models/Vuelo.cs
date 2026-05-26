@@ -12,6 +12,8 @@ public class Vuelo
     public string Salida { get; set; }
     public DateTime FechaSalida { get; set; }
     public DateTime FechaLlegada { get; set; }
+    [Column("precio_boleto")]
+    public decimal PrecioBoleto { get; set; }
     [Column("puerta_abordaje")]
     public string? PuertaAbordaje { get; set; }
 }

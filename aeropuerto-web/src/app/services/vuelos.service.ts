@@ -11,6 +11,8 @@ export interface Vuelo {
   salida: string;
   fechaSalida: string; // para datetime-local
   fechaLlegada: string;
+  precioBoleto: number;
+  precio_boleto?: number;
   puertaAbordaje?: string;
 }
 
@@ -29,6 +31,8 @@ export interface VueloDto {
   rutaDescripcion: string; // "Origen → Destino"
   fechaSalida: string;
   fechaLlegada: string;
+  precioBoleto: number;
+  precio_boleto?: number;
   puertaAbordaje?: string;
   puerta_abordaje?: string;
   descripcionCompleta: string; // "VUE-001 - Origen → Destino - 26/05/2026 10:30"
@@ -48,6 +52,7 @@ export class VuelosService {
         ...vuelo,
         // Soporta tanto camelCase como snake_case por si el backend o PostgreSQL
         // devuelve el nombre de columna directamente en algún momento.
+        precioBoleto: vuelo.precioBoleto ?? vuelo.precio_boleto ?? 0,
         puertaAbordaje: vuelo.puertaAbordaje ?? vuelo.puerta_abordaje ?? ''
       })))
     );

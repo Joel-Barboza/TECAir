@@ -18,7 +18,9 @@
           <th>Código</th>
           <th>Vuelo</th>
           <th>Ruta</th>
+          <th>Precio original</th>
           <th>Descuento</th>
+          <th>Precio final</th>
           <th>Vigencia</th>
           <th>Acciones</th>
         </tr>
@@ -28,7 +30,9 @@
           <td><strong>PROMO-{{ p.promocionId | number:'3.0-0' }}</strong></td>
           <td><span class="codigo-vuelo">{{ p.codigoVuelo }}</span></td>
           <td>{{ p.origen }} → {{ p.destino }}</td>
-          <td><span class="descuento">-{{ p.descuento }}%</span></td>
+          <td>{{ p.precioBoleto | currency:'USD':'symbol':'1.2-2' }}</td>
+          <td><span class="descuento">-{{ p.descuento }}% ({{ p.montoDescuento | currency:'USD':'symbol':'1.2-2' }})</span></td>
+          <td><strong>{{ p.precioFinal | currency:'USD':'symbol':'1.2-2' }}</strong></td>
           <td>{{ p.fechaInicio | date:'dd/MM' }} a {{ p.fechaFin | date:'dd/MM' }}</td>
           <td class="acciones">
             <button class="btn-edit" (click)="abrirEditar(p)" title="Editar">✏️</button>
@@ -67,8 +71,23 @@
       </div>
 
       <div class="form-group">
+        <label>Precio del vuelo</label>
+        <input type="text" [value]="obtenerPrecioVueloSeleccionado() | currency:'USD':'symbol':'1.2-2'" readonly />
+      </div>
+
+      <div class="form-group">
         <label for="descuento">Descuento (%)</label>
         <input type="number" [(ngModel)]="formulario.descuento" name="descuento" id="descuento" min="1" max="100" required />
+      </div>
+
+      <div class="form-group">
+        <label>Monto descontado</label>
+        <input type="text" [value]="obtenerMontoDescuentoFormulario() | currency:'USD':'symbol':'1.2-2'" readonly />
+      </div>
+
+      <div class="form-group">
+        <label>Precio final</label>
+        <input type="text" [value]="obtenerPrecioFinalFormulario() | currency:'USD':'symbol':'1.2-2'" readonly />
       </div>
 
       <div class="form-group">

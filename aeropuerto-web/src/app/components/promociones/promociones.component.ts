@@ -62,6 +62,26 @@ export class PromocionesComponent implements OnInit {
     this.formulario.destino = vueloSeleccionado?.destino ?? '';
   }
 
+
+  obtenerVueloSeleccionado(): VueloDto | undefined {
+    return this.vuelos.find(vuelo => vuelo.vueloId === Number(this.formulario.vueloId));
+  }
+
+  obtenerPrecioVueloSeleccionado(): number {
+    return this.obtenerVueloSeleccionado()?.precioBoleto ?? 0;
+  }
+
+  obtenerMontoDescuentoFormulario(): number {
+    const precio = this.obtenerPrecioVueloSeleccionado();
+    const descuento = Number(this.formulario.descuento) || 0;
+    return Math.round((precio * (descuento / 100)) * 100) / 100;
+  }
+
+  obtenerPrecioFinalFormulario(): number {
+    const precio = this.obtenerPrecioVueloSeleccionado();
+    return Math.round((precio - this.obtenerMontoDescuentoFormulario()) * 100) / 100;
+  }
+
   cargarPromociones(): void {
     this.promocionesService.getPromociones().subscribe({
       next: (data) => {

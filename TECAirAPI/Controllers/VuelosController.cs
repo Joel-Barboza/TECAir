@@ -36,6 +36,7 @@ namespace TECAirAPI.Controllers
                 RutaDescripcion = CodeGenerator.GenerateRutaDescripcion(vuelo.Salida, vuelo.Destino),
                 FechaSalida = vuelo.FechaSalida,
                 FechaLlegada = vuelo.FechaLlegada,
+                PrecioBoleto = vuelo.PrecioBoleto,
                 PuertaAbordaje = vuelo.PuertaAbordaje,
                 DescripcionCompleta = CodeGenerator.GenerateVueloDescripcion(vuelo.VueloId, vuelo.Salida, vuelo.Destino, vuelo.FechaSalida)
             };
@@ -81,6 +82,9 @@ namespace TECAirAPI.Controllers
                 var avionExiste = await _context.Aviones.AnyAsync(a => a.AvionId == vuelo.AvionId);
                 if (!avionExiste)
                     return BadRequest($"No existe el avión con id {vuelo.AvionId}");
+
+                if (vuelo.PrecioBoleto < 0)
+                    return BadRequest("El precio del boleto no puede ser negativo.");
 
                 vuelo.PuertaAbordaje = string.IsNullOrWhiteSpace(vuelo.PuertaAbordaje)
                     ? null
@@ -132,6 +136,7 @@ namespace TECAirAPI.Controllers
                 vueloExistente.Destino = vuelo.Destino;
                 vueloExistente.FechaSalida = vuelo.FechaSalida;
                 vueloExistente.FechaLlegada = vuelo.FechaLlegada;
+                vueloExistente.PrecioBoleto = vuelo.PrecioBoleto;
                 vueloExistente.PuertaAbordaje = string.IsNullOrWhiteSpace(vuelo.PuertaAbordaje)
                     ? null
                     : vuelo.PuertaAbordaje.Trim().ToUpper();

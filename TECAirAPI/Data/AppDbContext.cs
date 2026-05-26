@@ -63,6 +63,7 @@ namespace TECAirAPI.Data
             modelBuilder.Entity<Vuelo>().Property(v => v.Salida).HasColumnName("salida");
             modelBuilder.Entity<Vuelo>().Property(v => v.FechaSalida).HasColumnName("fecha_salida").HasConversion(dateTimeConverter);
             modelBuilder.Entity<Vuelo>().Property(v => v.FechaLlegada).HasColumnName("fecha_llegada").HasConversion(dateTimeConverter);
+            modelBuilder.Entity<Vuelo>().Property(v => v.PrecioBoleto).HasColumnName("precio_boleto");
             modelBuilder.Entity<Vuelo>().Property(v => v.PuertaAbordaje).HasColumnName("puerta_abordaje");
 
             // RESERVA
@@ -119,8 +120,8 @@ namespace TECAirAPI.Data
             modelBuilder.Entity<Promocion>().Property(p => p.Origen).HasColumnName("origen");
             modelBuilder.Entity<Promocion>().Property(p => p.Destino).HasColumnName("destino");
             modelBuilder.Entity<Promocion>().Property(p => p.Descuento).HasColumnName("descuento");
-            modelBuilder.Entity<Promocion>().Property(p => p.FechaInicio).HasColumnName("fecha_inicio").HasConversion(dateTimeConverter);
-            modelBuilder.Entity<Promocion>().Property(p => p.FechaFin).HasColumnName("fecha_fin").HasConversion(dateTimeConverter);
+            modelBuilder.Entity<Promocion>().Property(p => p.FechaInicio).HasColumnName("fecha_inicio").HasColumnType("date");
+            modelBuilder.Entity<Promocion>().Property(p => p.FechaFin).HasColumnName("fecha_fin").HasColumnType("date");
 
             // CHECKIN
             modelBuilder.Entity<Checkin>().ToTable("checkin");

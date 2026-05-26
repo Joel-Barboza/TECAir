@@ -7,7 +7,10 @@ export interface Promocion {
   vueloId: number;
   origen: string;
   destino: string;
+  precioBoleto?: number;
   descuento: number;
+  montoDescuento?: number;
+  precioFinal?: number;
   fechaInicio: string;
   fechaFin: string;
 }
@@ -19,7 +22,10 @@ export interface PromocionDto {
   descripcionVuelo: string; // "VUE-001 - Origen → Destino - 26/05/2026"
   origen: string;
   destino: string;
+  precioBoleto?: number;
   descuento: number;
+  montoDescuento?: number;
+  precioFinal?: number;
   fechaInicio: string;
   fechaFin: string;
 }
