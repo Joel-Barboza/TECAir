@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MaletasService, Maleta, MaletaDto } from '../../services/maletas.service';
-import { ReservasService, ReservaDto } from '../../services/reservas.service';
+import { MaletasService, Maleta, MaletaDto, ReservaChequeadaDto } from '../../services/maletas.service';
 
 @Component({
   selector: 'app-maletas',
@@ -18,14 +17,11 @@ export class MaletasComponent implements OnInit {
   mostrarFormulario = false;
   mensaje = '';
   error = '';
-  reservas: ReservaDto[] = [];
+  reservas: ReservaChequeadaDto[] = [];
   resumenSeleccionado = '';
   costoEstimado = 0;
 
-  constructor(
-    private maletasService: MaletasService,
-    private reservasService: ReservasService
-  ) {}
+  constructor(private maletasService: MaletasService) {}
 
   ngOnInit(): void {
     this.cargarMaletas();
@@ -33,12 +29,13 @@ export class MaletasComponent implements OnInit {
   }
 
   private cargarReservas(): void {
-    this.reservasService.getReservas().subscribe({
+    this.maletasService.getReservasChequeadas().subscribe({
       next: (data) => {
         this.reservas = data;
       },
       error: (err) => {
-        console.error('Error cargando reservas:', err);
+        console.error('Error cargando reservas chequeadas:', err);
+        this.error = 'No se pudieron cargar los pasajeros chequeados.';
       }
     });
   }
@@ -115,7 +112,7 @@ export class MaletasComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error actualizando maleta:', err);
-          this.error = 'No se pudo actualizar la maleta.';
+          this.error = err?.error || 'No se pudo actualizar la maleta.';
         }
       });
     } else {
@@ -130,7 +127,7 @@ export class MaletasComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error creando maleta:', err);
-          this.error = 'No se pudo crear la maleta.';
+          this.error = err?.error || 'No se pudo crear la maleta.';
         }
       });
     }

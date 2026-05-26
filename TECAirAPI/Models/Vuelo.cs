@@ -16,4 +16,10 @@ public class Vuelo
     public decimal PrecioBoleto { get; set; }
     [Column("puerta_abordaje")]
     public string? PuertaAbordaje { get; set; }
+
+    [Column("estado_vuelo")]
+    public string EstadoVuelo { get; set; } = "Programado";
+
+    [Column("fecha_apertura")]
+    public DateTime? FechaApertura { get; set; }
 }

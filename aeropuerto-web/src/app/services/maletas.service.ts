@@ -24,6 +24,20 @@ export interface MaletaDto {
   totalCostoReserva: number;
 }
 
+
+export interface ReservaChequeadaDto {
+  reservaId: number;
+  usuarioId: number;
+  nombreUsuario: string;
+  codigoUsuario: string;
+  vueloId: number;
+  codigoVuelo: string;
+  descripcionVuelo: string;
+  fechaReserva: string;
+  asientosReservados: number;
+  estadoPago: string;
+}
+
 export interface AeropuertoDto {
   aeropuertoId: number;
   nombre: string;
@@ -48,6 +62,10 @@ export class MaletasService {
 
   getMaletas(): Observable<MaletaDto[]> {
     return this.http.get<MaletaDto[]>(this.apiUrl);
+  }
+
+  getReservasChequeadas(): Observable<ReservaChequeadaDto[]> {
+    return this.http.get<ReservaChequeadaDto[]>(`${this.apiUrl}/reservas-chequeadas`);
   }
 
   crearMaleta(maleta: Maleta): Observable<MaletaDto> {

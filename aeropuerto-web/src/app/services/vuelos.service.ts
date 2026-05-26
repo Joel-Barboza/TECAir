@@ -14,6 +14,8 @@ export interface Vuelo {
   precioBoleto: number;
   precio_boleto?: number;
   puertaAbordaje?: string;
+  estadoVuelo?: string;
+  fechaApertura?: string | null;
 }
 
 export interface VueloDto {
@@ -32,9 +34,12 @@ export interface VueloDto {
   fechaSalida: string;
   fechaLlegada: string;
   precioBoleto: number;
-  precio_boleto?: number;
   puertaAbordaje?: string;
   puerta_abordaje?: string;
+  estadoVuelo: string;
+  estado_vuelo?: string;
+  fechaApertura?: string | null;
+  fecha_apertura?: string | null;
   descripcionCompleta: string; // "VUE-001 - Origen → Destino - 26/05/2026 10:30"
 }
 
@@ -52,8 +57,10 @@ export class VuelosService {
         ...vuelo,
         // Soporta tanto camelCase como snake_case por si el backend o PostgreSQL
         // devuelve el nombre de columna directamente en algún momento.
-        precioBoleto: vuelo.precioBoleto ?? vuelo.precio_boleto ?? 0,
-        puertaAbordaje: vuelo.puertaAbordaje ?? vuelo.puerta_abordaje ?? ''
+        precioBoleto: vuelo.precioBoleto ?? 0,
+        puertaAbordaje: vuelo.puertaAbordaje ?? vuelo.puerta_abordaje ?? '',
+        estadoVuelo: vuelo.estadoVuelo ?? vuelo.estado_vuelo ?? 'Programado',
+        fechaApertura: vuelo.fechaApertura ?? vuelo.fecha_apertura ?? null
       })))
     );
   }
@@ -64,6 +71,10 @@ export class VuelosService {
 
   actualizarVuelo(vuelo: Vuelo): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/${vuelo.vueloId}`, vuelo);
+  }
+
+  abrirVuelo(id: number): Observable<VueloDto> {
+    return this.http.post<VueloDto>(`${this.apiUrl}/${id}/abrir`, {});
   }
 
   eliminarVuelo(id: number): Observable<void> {

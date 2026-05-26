@@ -18,5 +18,7 @@ public class VueloDto
     public DateTime FechaLlegada { get; set; }
     public decimal PrecioBoleto { get; set; }
     public string? PuertaAbordaje { get; set; }
+    public string EstadoVuelo { get; set; } = "Programado";
+    public DateTime? FechaApertura { get; set; }
     public string DescripcionCompleta { get; set; } // "VUE-001 - Origen → Destino - 26/05/2026 10:30"
 }

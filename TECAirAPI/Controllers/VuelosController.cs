@@ -38,6 +38,8 @@ namespace TECAirAPI.Controllers
                 FechaLlegada = vuelo.FechaLlegada,
                 PrecioBoleto = vuelo.PrecioBoleto,
                 PuertaAbordaje = vuelo.PuertaAbordaje,
+                EstadoVuelo = string.IsNullOrWhiteSpace(vuelo.EstadoVuelo) ? "Programado" : vuelo.EstadoVuelo,
+                FechaApertura = vuelo.FechaApertura,
                 DescripcionCompleta = CodeGenerator.GenerateVueloDescripcion(vuelo.VueloId, vuelo.Salida, vuelo.Destino, vuelo.FechaSalida)
             };
         }
@@ -90,6 +92,10 @@ namespace TECAirAPI.Controllers
                     ? null
                     : vuelo.PuertaAbordaje.Trim().ToUpper();
 
+                vuelo.EstadoVuelo = string.IsNullOrWhiteSpace(vuelo.EstadoVuelo)
+                    ? "Programado"
+                    : vuelo.EstadoVuelo.Trim();
+
                 _context.Vuelos.Add(vuelo);
                 await _context.SaveChangesAsync();
 
@@ -141,6 +147,8 @@ namespace TECAirAPI.Controllers
                     ? null
                     : vuelo.PuertaAbordaje.Trim().ToUpper();
 
+                // El estado del vuelo se cambia desde Apertura/Cierre, no desde el formulario normal de vuelos.
+
                 await _context.SaveChangesAsync();
                 return NoContent();
             }
@@ -154,6 +162,35 @@ namespace TECAirAPI.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Error al actualizar vuelo: {ex.Message}");
+            }
+        }
+
+        // POST: api/aeropuerto/Vuelos/{id}/abrir
+        [HttpPost("{id}/abrir")]
+        public async Task<ActionResult<VueloDto>> AbrirVuelo(int id)
+        {
+            try
+            {
+                var vuelo = await _context.Vuelos.FindAsync(id);
+                if (vuelo == null)
+                    return NotFound($"No se encontró el vuelo con id {id}");
+
+                if (string.Equals(vuelo.EstadoVuelo, "Cerrado", StringComparison.OrdinalIgnoreCase))
+                    return BadRequest("No se puede abrir un vuelo que ya está cerrado.");
+
+                vuelo.EstadoVuelo = "Abierto";
+                vuelo.FechaApertura = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+
+                var aeropuerto = await _context.Aeropuertos.FindAsync(vuelo.AeropuertoId);
+                var avion = await _context.Aviones.FindAsync(vuelo.AvionId);
+
+                return Ok(ConvertirADto(vuelo, aeropuerto!, avion!));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al abrir vuelo: {ex.Message}");
             }
         }
 

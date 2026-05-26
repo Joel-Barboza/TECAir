@@ -225,6 +225,17 @@ UPDATE vuelo
 SET precio_boleto = 720.00
 WHERE vuelo_id = 11;
 
+ALTER TABLE vuelo
+ADD COLUMN IF NOT EXISTS estado_vuelo VARCHAR(20) DEFAULT 'Programado';
+
+ALTER TABLE vuelo
+ADD COLUMN IF NOT EXISTS fecha_apertura TIMESTAMP;
+
+UPDATE vuelo
+SET estado_vuelo = 'Programado'
+WHERE estado_vuelo IS NULL OR estado_vuelo = '';
+
+
 --- Esto no recuerdo que es jaja
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO tecair_user;
 GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO tecair_user;

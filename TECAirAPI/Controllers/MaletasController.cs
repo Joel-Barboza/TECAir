@@ -25,6 +25,11 @@ namespace TECAirAPI.Controllers
             return 75m;
         }
 
+        private async Task<bool> ReservaTieneCheckin(int reservaId)
+        {
+            return await _context.Checkins.AnyAsync(c => c.ReservaId == reservaId);
+        }
+
         private async Task RecalcularCostosPorReserva(int reservaId)
         {
             var maletasReserva = await _context.Maletas
@@ -112,6 +117,55 @@ namespace TECAirAPI.Controllers
             }
         }
 
+        [HttpGet("reservas-chequeadas")]
+        public async Task<ActionResult<IEnumerable<ReservaDto>>> GetReservasChequeadas()
+        {
+            try
+            {
+                var checkins = await _context.Checkins
+                    .OrderByDescending(c => c.FechaCheckin)
+                    .ToListAsync();
+
+                var resultado = new List<ReservaDto>();
+
+                foreach (var checkin in checkins)
+                {
+                    var reserva = await _context.Reservas.FindAsync(checkin.ReservaId);
+                    if (reserva == null) continue;
+
+                    var usuario = await _context.Usuarios.FindAsync(reserva.UsuarioId);
+                    var vuelo = await _context.Vuelos.FindAsync(reserva.VueloId);
+
+                    if (usuario == null || vuelo == null) continue;
+
+                    var nombreUsuario = $"{usuario.Nombre} {usuario.Apellido1} {usuario.Apellido2}".Trim();
+                    var codigoUsuario = CodeGenerator.GenerateUsuarioCode(usuario.UsuarioId);
+                    var codigoVuelo = CodeGenerator.GenerateVueloCode(vuelo.VueloId);
+                    var descripcionVuelo = CodeGenerator.GenerateVueloDescripcion(vuelo.VueloId, vuelo.Salida, vuelo.Destino, vuelo.FechaSalida);
+
+                    resultado.Add(new ReservaDto
+                    {
+                        ReservaId = reserva.ReservaId,
+                        UsuarioId = reserva.UsuarioId,
+                        NombreUsuario = nombreUsuario,
+                        CodigoUsuario = codigoUsuario,
+                        VueloId = reserva.VueloId,
+                        CodigoVuelo = codigoVuelo,
+                        DescripcionVuelo = descripcionVuelo,
+                        FechaReserva = reserva.FechaReserva,
+                        AsientosReservados = reserva.AsientosReservados,
+                        EstadoPago = reserva.EstadoPago
+                    });
+                }
+
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al obtener reservas chequeadas: {ex.Message}");
+            }
+        }
+
         [HttpPost]
         public async Task<ActionResult<MaletaDto>> CrearMaleta(Maleta maleta)
         {
@@ -120,6 +174,10 @@ namespace TECAirAPI.Controllers
                 var reservaExiste = await _context.Reservas.AnyAsync(r => r.ReservaId == maleta.ReservaId);
                 if (!reservaExiste)
                     return BadRequest($"No existe la reserva con id {maleta.ReservaId}");
+
+                var tieneCheckin = await ReservaTieneCheckin(maleta.ReservaId);
+                if (!tieneCheckin)
+                    return BadRequest("Solo se pueden asignar maletas a pasajeros que ya tienen check-in.");
 
                 // El costo no se escribe desde la interfaz; se calcula según la cantidad de maletas del pasajero/reserva.
                 maleta.CostoAdicional = 0m;
@@ -157,6 +215,10 @@ namespace TECAirAPI.Controllers
                 var reservaExiste = await _context.Reservas.AnyAsync(r => r.ReservaId == maleta.ReservaId);
                 if (!reservaExiste)
                     return BadRequest($"No existe la reserva con id {maleta.ReservaId}");
+
+                var tieneCheckin = await ReservaTieneCheckin(maleta.ReservaId);
+                if (!tieneCheckin)
+                    return BadRequest("Solo se pueden asignar maletas a pasajeros que ya tienen check-in.");
 
                 // El costo se recalcula automáticamente. No se confía en el valor que venga del frontend.
                 maleta.CostoAdicional = maletaExistente.CostoAdicional;

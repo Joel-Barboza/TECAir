@@ -55,9 +55,9 @@
       <div class="form-group">
         <label for="reserva">Pasajero chequeado / Reserva</label>
         <select [(ngModel)]="formulario.reservaId" name="reservaId" id="reserva" (change)="actualizarResumenReserva()" required>
-          <option [ngValue]="0" disabled>Seleccionar pasajero/reserva...</option>
+          <option [ngValue]="0" disabled>Seleccionar pasajero chequeado...</option>
           <option *ngFor="let r of reservas" [ngValue]="r.reservaId">
-            RES-{{ r.reservaId | number:'3.0-0' }} - {{ r.nombreUsuario }} - {{ r.codigoVuelo }} - {{ r.estadoPago }}
+            RES-{{ r.reservaId | number:'3.0-0' }} - {{ r.nombreUsuario }} - {{ r.codigoVuelo }} - Chequeado
           </option>
         </select>
       </div>
