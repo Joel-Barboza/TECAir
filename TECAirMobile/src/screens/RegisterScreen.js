@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, TextInput, Button, Alert, ScrollView, SafeAreaV
 import { registrarUsuarioLocal } from '../database/userQueries';
 import * as SQLite from 'expo-sqlite';
 
-export default function RegisterScreen() {
+export default function RegisterScreen({ cambiarPantalla }) { 
   const [usuarioId, setUsuarioId] = useState('');
   const [nombre, setNombre] = useState('');
   const [apellido1, setApellido1] = useState('');
@@ -67,6 +67,9 @@ export default function RegisterScreen() {
       
       // Forzar la actualización visual inmediata de la lista de abajo
       cargarUsuariosDeSQLite();
+
+      // ✨ ¡CABLE VISUAL CONECTADO! En cuanto se guarde con éxito, saltamos al Home seguido
+      cambiarPantalla('Home');
     } else {
       Alert.alert("Error en la inserción", resultado.message);
     }

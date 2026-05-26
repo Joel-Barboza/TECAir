@@ -1,30 +1,30 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, SafeAreaView, StatusBar } from 'react-native';
-import { initDatabase } from './src/database/database';
-import RegisterScreen from './src/screens/RegisterScreen'; // <-- Sin extensión, Expo lo busca automáticamente como .js
+import React, { useState } from 'react';
+import RegisterScreen from './src/screens/RegisterScreen';
+import HomeScreen from './src/screens/HomeScreen';
+import SucursalScreen from './src/screens/SucursalScreen';
 
 export default function App() {
-  
-  useEffect(() => {
-    try {
-      // Inicializa la base de datos local al arrancar la app
-      initDatabase();
-    } catch (error) {
-      console.error("Error al inicializar la base de datos:", error);
-    }
-  }, []);
+  // Este estado controla cuál pantalla se ve en el emulador.
+  // Iniciamos con 'Register' para que sea lo primero que aparezca.
+  const [pantallaActual, setPantallaActual] = useState('Register');
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      <RegisterScreen />
-    </SafeAreaView>
-  );
+  // Función para cambiar de pantalla de forma limpia
+  const cambiarPantalla = (nombrePantalla) => {
+    setPantallaActual(nombrePantalla);
+  };
+
+  // Dependiendo del valor de 'pantallaActual', renderizamos la interfaz correspondiente
+  if (pantallaActual === 'Register') {
+    return <RegisterScreen cambiarPantalla={cambiarPantalla} />;
+  }
+
+  if (pantallaActual === 'Home') {
+    return <HomeScreen cambiarPantalla={cambiarPantalla} />;
+  }
+
+  if (pantallaActual === 'Sucursal') {
+    return <SucursalScreen cambiarPantalla={cambiarPantalla} />;
+  }
+
+  return null;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-});
