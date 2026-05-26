@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View, Button, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
 
 export default function HomeScreen({ cambiarPantalla }) {
+  // Datos simulados para pintar las tarjetas visualmente en el celular
   const promociones = [
     { id: '1', destino: "San José ✈️ Miami", precio: "$250", clase: "Económica" },
     { id: '2', destino: "San José ✈️ Madrid", precio: "$680", clase: "Ejecutiva" },
@@ -11,10 +12,12 @@ export default function HomeScreen({ cambiarPantalla }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
+        {/* Encabezado de la Aplicación */}
         <Text style={styles.brandTitle}>TECAir ✈️</Text>
         <Text style={styles.pageTitle}>Promociones del Día</Text>
         <Text style={styles.subtitle}>Viaja con las mejores tarifas del mercado</Text>
 
+        {/* Contenedor de Tarjetas de Vuelos */}
         <View style={styles.listaContainer}>
           {promociones.map((vuelo) => (
             <View key={vuelo.id} style={styles.card}>
@@ -34,11 +37,34 @@ export default function HomeScreen({ cambiarPantalla }) {
           ))}
         </View>
 
+        {/* MENÚ DE NAVEGACIÓN INFERIOR CONECTADO */}
         <View style={styles.menuContainer}>
           <Text style={styles.menuTitle}>Menú de Navegación</Text>
-          <Button title="Ir a Sucursales" color="#003366" onPress={() => cambiarPantalla('Sucursal')} />
+          
+          {/* Botón Verde para ir a la vista idéntica a la de Reservaciones Web */}
+          <Button 
+            title="Ir a Reservaciones (Tabla)" 
+            color="#2b8a3e" 
+            onPress={() => cambiarPantalla('TicketStack')} 
+          />
+          
           <View style={{ height: 10 }} />
-          <Button title="Cerrar Sesión" color="#c92a2a" onPress={() => cambiarPantalla('Register')} />
+          
+          {/* Botón Azul para ir a la lista de oficinas */}
+          <Button 
+            title="Ir a Sucursales" 
+            color="#003366" 
+            onPress={() => cambiarPantalla('Sucursal')} 
+          />
+          
+          <View style={{ height: 10 }} />
+          
+          {/* Botón Rojo para regresar al formulario de Registro */}
+          <Button 
+            title="Cerrar Sesión" 
+            color="#c92a2a" 
+            onPress={() => cambiarPantalla('Register')} 
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
