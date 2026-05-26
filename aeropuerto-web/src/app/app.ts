@@ -8,7 +8,7 @@ import { RouterOutlet } from '@angular/router';
   styleUrls: ['./app.css']
 })
 export class App {
-  protected readonly title = signal('aeropuerto-web');
+  protected readonly title = signal('TECAir Aeropuerto');
   isServerOn = signal(false);
 
   async checkServerOn(): Promise<void> {

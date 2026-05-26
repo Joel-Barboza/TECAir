@@ -18,6 +18,7 @@ namespace TECAirAPI.Data
         public DbSet<Maleta> Maletas { get; set; }
         public DbSet<Asiento> Asientos { get; set; }
         public DbSet<Promocion> Promociones { get; set; }
+        public DbSet<Checkin> Checkins { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -62,6 +63,10 @@ namespace TECAirAPI.Data
             modelBuilder.Entity<Vuelo>().Property(v => v.Salida).HasColumnName("salida");
             modelBuilder.Entity<Vuelo>().Property(v => v.FechaSalida).HasColumnName("fecha_salida").HasConversion(dateTimeConverter);
             modelBuilder.Entity<Vuelo>().Property(v => v.FechaLlegada).HasColumnName("fecha_llegada").HasConversion(dateTimeConverter);
+            modelBuilder.Entity<Vuelo>().Property(v => v.PrecioBoleto).HasColumnName("precio_boleto");
+            modelBuilder.Entity<Vuelo>().Property(v => v.PuertaAbordaje).HasColumnName("puerta_abordaje");
+            modelBuilder.Entity<Vuelo>().Property(v => v.EstadoVuelo).HasColumnName("estado_vuelo");
+            modelBuilder.Entity<Vuelo>().Property(v => v.FechaApertura).HasColumnName("fecha_apertura").HasConversion(dateTimeConverter);
 
             // RESERVA
             modelBuilder.Entity<Reserva>().ToTable("reserva");
@@ -119,6 +124,16 @@ namespace TECAirAPI.Data
             modelBuilder.Entity<Promocion>().Property(p => p.Descuento).HasColumnName("descuento");
             modelBuilder.Entity<Promocion>().Property(p => p.FechaInicio).HasColumnName("fecha_inicio").HasConversion(dateTimeConverter);
             modelBuilder.Entity<Promocion>().Property(p => p.FechaFin).HasColumnName("fecha_fin").HasConversion(dateTimeConverter);
+
+            // CHECKIN
+            modelBuilder.Entity<Checkin>().ToTable("checkin");
+            modelBuilder.Entity<Checkin>().HasKey(c => c.CheckinId);
+            modelBuilder.Entity<Checkin>().Property(c => c.CheckinId).HasColumnName("checkin_id");
+            modelBuilder.Entity<Checkin>().Property(c => c.ReservaId).HasColumnName("reserva_id");
+            modelBuilder.Entity<Checkin>().Property(c => c.AsientoId).HasColumnName("asiento_id");
+            modelBuilder.Entity<Checkin>().Property(c => c.FechaCheckin).HasColumnName("fecha_checkin").HasConversion(dateTimeConverter);
+            modelBuilder.Entity<Checkin>().Property(c => c.MetodoEnvio).HasColumnName("metodo_envio");
+            modelBuilder.Entity<Checkin>().Property(c => c.EstadoEnvio).HasColumnName("estado_envio");
         }
     }
 }

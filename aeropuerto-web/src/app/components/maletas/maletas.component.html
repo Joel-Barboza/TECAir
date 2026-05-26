@@ -2,47 +2,95 @@
   <!-- Tabla de maletas -->
   <div class="maletas-table">
     <div class="table-header">
-      <h3>Lista de maletas</h3>
+      <h3>🧳 Lista de Maletas</h3>
       <button type="button" class="btn-refresh" (click)="cargarMaletas()">&#8635; Actualizar</button>
     </div>
+
+    <p class="success" *ngIf="mensaje && !mostrarFormulario">{{ mensaje }}</p>
+    <p class="error" *ngIf="error && !mostrarFormulario">{{ error }}</p>
+
     <div *ngIf="maletas.length === 0" class="placeholder">
       No hay maletas registradas
     </div>
-    <table *ngIf="maletas.length > 0">
-      <tr>
-        <th>Reserva ID</th>
-        <th>Peso (kg)</th>
-        <th>Color</th>
-        <th>Costo Adicional</th>
-        <th>Acciones</th>
-      </tr>
-      <tr *ngFor="let m of maletas">
-        <td>{{m.reservaId}}</td>
-        <td>{{m.peso}}</td>
-        <td>{{m.color}}</td>
-        <td>{{m.costoAdicional}}</td>
-        <td><button (click)="eliminarMaleta(m.maletaId!)">Eliminar</button></td>
-      </tr>
+    <table *ngIf="maletas.length > 0" class="tabla-maletas">
+      <thead>
+        <tr>
+          <th>Número</th>
+          <th>Dueño</th>
+          <th>Reserva</th>
+          <th>Peso (kg)</th>
+          <th>Color</th>
+          <th>Costo de esta maleta</th>
+          <th>Total pasajero</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let m of maletas" class="fila-maleta">
+          <td><strong>{{ getNumeroMaleta(m) }}</strong></td>
+          <td>{{ getNombreDueno(m) }}</td>
+          <td><small>{{ m.descripcionReserva }}</small></td>
+          <td><span class="peso">{{ m.peso }} kg</span></td>
+          <td><span class="color-badge" [style.backgroundColor]="m.color" [title]="m.color"></span> {{ m.color }}</td>
+          <td>${{ getCostoDeEstaMaleta(m) }}</td>
+          <td>
+            {{ getTotalMaletasReserva(m) }} maleta(s) / ${{ getTotalCostoReserva(m) }}
+          </td>
+          <td class="acciones">
+            <button class="btn-edit" (click)="abrirEditar(m)" title="Editar">✏️</button>
+            <button class="btn-delete" (click)="eliminarMaleta(m.maletaId)" title="Eliminar">🗑️</button>
+          </td>
+        </tr>
+      </tbody>
     </table>
   </div>
 
   <!-- Formulario -->
-  <div class="maletas-form">
-    <h3>Agregar nueva maleta</h3>
-    <form (ngSubmit)="agregarMaleta()">
-      <label>Reserva ID</label>
-      <input type="number" [(ngModel)]="nuevaMaleta.reservaId" name="reservaId" required />
+  <div class="maletas-form" *ngIf="mostrarFormulario">
+    <h3>{{ modoEdicion ? '✏️ Editar maleta' : '➕ Agregar nueva maleta' }}</h3>
 
-      <label>Peso (kg)</label>
-      <input type="number" [(ngModel)]="nuevaMaleta.peso" name="peso" required />
+    <p class="error" *ngIf="error && mostrarFormulario">{{ error }}</p>
 
-      <label>Color</label>
-      <input type="text" [(ngModel)]="nuevaMaleta.color" name="color" required />
+    <form (ngSubmit)="guardar()" class="form-maleta">
+      <div class="form-group">
+        <label for="reserva">Pasajero chequeado / Reserva</label>
+        <select [(ngModel)]="formulario.reservaId" name="reservaId" id="reserva" (change)="actualizarResumenReserva()" required>
+          <option [ngValue]="0" disabled>Seleccionar pasajero chequeado...</option>
+          <option *ngFor="let r of reservas" [ngValue]="r.reservaId">
+            RES-{{ r.reservaId | number:'3.0-0' }} - {{ r.nombreUsuario }} - {{ r.codigoVuelo }} - Chequeado
+          </option>
+        </select>
+      </div>
 
-      <label>Costo Adicional</label>
-      <input type="number" [(ngModel)]="nuevaMaleta.costoAdicional" name="costoAdicional" required />
+      <div class="form-group" *ngIf="resumenSeleccionado">
+        <label>Resumen de cobro</label>
+        <input type="text" [value]="resumenSeleccionado" readonly />
+      </div>
 
-      <button type="submit">Agregar Maleta</button>
+      <div class="form-group">
+        <label for="peso">Peso (kg)</label>
+        <input type="number" [(ngModel)]="formulario.peso" name="peso" id="peso" step="0.1" min="0.1" required />
+      </div>
+
+      <div class="form-group">
+        <label for="color">Color</label>
+        <input type="text" [(ngModel)]="formulario.color" name="color" id="color" placeholder="Ej: Negro, Azul, Rojo" required />
+      </div>
+
+      <div class="form-group">
+        <label for="costoAdicional">Costo adicional calculado</label>
+        <input type="number" [(ngModel)]="costoEstimado" name="costoAdicional" id="costoAdicional" readonly />
+        <small>Regla: primera maleta $0, segunda $50 y desde la tercera $75 cada una.</small>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">{{ modoEdicion ? 'Guardar cambios' : 'Agregar maleta' }}</button>
+        <button type="button" class="btn-secondary" (click)="cancelar()">Cancelar</button>
+      </div>
     </form>
+  </div>
+
+  <div class="maletas-form-button" *ngIf="!mostrarFormulario">
+    <button type="button" (click)="abrirNuevaMaleta()" class="btn-add">+ Agregar nueva maleta</button>
   </div>
 </div>

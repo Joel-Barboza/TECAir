@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using TECAirAPI.Data;
 using TECAirAPI.Models;
+using TECAirAPI.DTOs;
+using TECAirAPI.Helpers;
 
 namespace TECAirAPI.Controllers
 {
@@ -16,13 +18,35 @@ namespace TECAirAPI.Controllers
             _context = context;
         }
 
+        private UsuarioDto ConvertirADto(Usuario usuario)
+        {
+            var apellido2 = string.IsNullOrEmpty(usuario.Apellido2) ? "" : $" {usuario.Apellido2}";
+            var nombreCompleto = $"{usuario.Nombre} {usuario.Apellido1}{apellido2}";
+
+            return new UsuarioDto
+            {
+                UsuarioId = usuario.UsuarioId,
+                CodigoVisible = CodeGenerator.GenerateUsuarioCode(usuario.UsuarioId),
+                Nombre = usuario.Nombre,
+                Apellido1 = usuario.Apellido1,
+                Apellido2 = usuario.Apellido2,
+                NombreCompleto = nombreCompleto,
+                Email = usuario.Email,
+                Telefono = usuario.Telefono,
+                Carnet = usuario.Carnet,
+                Universidad = usuario.Universidad
+            };
+        }
+
         // GET: api/aeropuerto/Usuarios
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Usuario>>> GetUsuarios()
+        public async Task<ActionResult<IEnumerable<UsuarioDto>>> GetUsuarios()
         {
             try
             {
-                return await _context.Usuarios.ToListAsync();
+                var usuarios = await _context.Usuarios.ToListAsync();
+                var usuariosDtos = usuarios.Select(u => ConvertirADto(u)).ToList();
+                return Ok(usuariosDtos);
             }
             catch (Exception ex)
             {
@@ -32,13 +56,14 @@ namespace TECAirAPI.Controllers
 
         // POST: api/aeropuerto/Usuarios
         [HttpPost]
-        public async Task<ActionResult<Usuario>> CrearUsuario(Usuario usuario)
+        public async Task<ActionResult<UsuarioDto>> CrearUsuario(Usuario usuario)
         {
             try
             {
                 _context.Usuarios.Add(usuario);
                 await _context.SaveChangesAsync();
-                return CreatedAtAction(nameof(GetUsuarios), new { id = usuario.UsuarioId }, usuario);
+                var usuarioDto = ConvertirADto(usuario);
+                return CreatedAtAction(nameof(GetUsuarios), new { id = usuario.UsuarioId }, usuarioDto);
             }
             catch (Exception ex)
             {

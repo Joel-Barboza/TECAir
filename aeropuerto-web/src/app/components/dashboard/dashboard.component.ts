@@ -5,6 +5,8 @@ import { VuelosComponent } from '../vuelos/vuelos.component'; // nuevo
 import { ReservasComponent } from '../reservas/reservas.component'; // nuevo
 import { PromocionesComponent } from '../promociones/promociones.component'; // nuevo
 import { MaletasComponent } from '../maletas/maletas.component'; // nuevo
+import { CheckinsComponent } from '../checkins/checkins.component';
+import { AperturaVuelosComponent } from '../apertura-vuelos/apertura-vuelos.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,7 +19,9 @@ import { MaletasComponent } from '../maletas/maletas.component'; // nuevo
     VuelosComponent,
     ReservasComponent,
     PromocionesComponent,
-    MaletasComponent
+    MaletasComponent,
+    CheckinsComponent,
+    AperturaVuelosComponent
   ]
 })
 export class DashboardComponent {
@@ -28,7 +32,9 @@ export class DashboardComponent {
     { nombre: 'Vuelos', valor: 'vuelos' },
     { nombre: 'Reservas', valor: 'reservas' },
     { nombre: 'Promociones', valor: 'promociones' },
-    { nombre: 'Maletas', valor: 'maletas' }
+    { nombre: 'Maletas', valor: 'maletas' },
+    { nombre: 'Check-in', valor: 'checkins' },
+    { nombre: 'Apertura de vuelos', valor: 'apertura-vuelos' }
   ];
 
   seleccionarSeccion(valor: string) {

@@ -2,7 +2,7 @@
   <!-- Barra lateral izquierda -->
   <nav class="sidebar">
     <img src="assets/logo.png" alt="Logo TECAir" class="logo">
-    <h2>Aeropuerto</h2>
+    <h2>TECAir Aeropuerto</h2>
     <ul>
       <li *ngFor="let item of menu" (click)="seleccionarSeccion(item.valor)"
           [class.active]="seccionSeleccionada === item.valor">
@@ -33,6 +33,14 @@
 
     <div *ngIf="seccionSeleccionada === 'maletas'">
       <app-maletas></app-maletas>
+    </div>
+
+    <div *ngIf="seccionSeleccionada === 'checkins'">
+      <app-checkins></app-checkins>
+    </div>
+
+    <div *ngIf="seccionSeleccionada === 'apertura-vuelos'">
+      <app-apertura-vuelos></app-apertura-vuelos>
     </div>
   </main>
 </div>
