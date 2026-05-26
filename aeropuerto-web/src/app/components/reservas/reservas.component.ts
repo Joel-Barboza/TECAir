@@ -49,10 +49,18 @@ export class ReservasComponent implements OnInit {
 
   abrirEditar(reserva: Reserva): void {
     this.formulario = { ...reserva };
+    // Transformar fecha al formato correcto para datetime-local
+    this.formulario.fechaReserva = this.formatearFecha(reserva.fechaReserva);
     this.modoEdicion = true;
     this.mostrarFormulario = true;
     this.mensaje = '';
     this.error = '';
+  }
+
+  private formatearFecha(fecha: string): string {
+    if (!fecha) return '';
+    // Remover zona horaria si existe
+    return fecha.split('+')[0].split('Z')[0].substring(0, 16);
   }
 
   cancelar(): void {

@@ -46,6 +46,33 @@ namespace TECAirAPI.Controllers
             }
         }
 
+        // PUT: api/aeropuerto/Reservas/{id}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> ActualizarReserva(int id, Reserva reserva)
+        {
+            if (id != reserva.ReservaId)
+                return BadRequest("El ID de la URL no coincide con el ID de la reserva");
+
+            _context.Entry(reserva).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return NoContent();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                var existe = await _context.Reservas.AnyAsync(r => r.ReservaId == id);
+                if (!existe)
+                    return NotFound();
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al actualizar reserva: {ex.Message}");
+            }
+        }
+
         // DELETE: api/aeropuerto/Reservas/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> EliminarReserva(int id)

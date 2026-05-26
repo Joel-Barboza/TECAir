@@ -44,6 +44,32 @@ namespace TECAirAPI.Controllers
             }
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> ActualizarMaleta(int id, Maleta maleta)
+        {
+            if (id != maleta.MaletaId)
+                return BadRequest("El ID de la URL no coincide con el ID de la maleta");
+
+            _context.Entry(maleta).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return NoContent();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                var existe = await _context.Maletas.AnyAsync(m => m.MaletaId == id);
+                if (!existe)
+                    return NotFound();
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al actualizar maleta: {ex.Message}");
+            }
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> EliminarMaleta(int id)
         {

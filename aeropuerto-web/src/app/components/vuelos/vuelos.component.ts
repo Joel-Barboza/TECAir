@@ -51,10 +51,19 @@ export class VuelosComponent implements OnInit {
 
   abrirEditar(vuelo: Vuelo): void {
     this.formulario = { ...vuelo };
+    // Transformar fechas al formato correcto para datetime-local
+    this.formulario.fechaSalida = this.formatearFecha(vuelo.fechaSalida);
+    this.formulario.fechaLlegada = this.formatearFecha(vuelo.fechaLlegada);
     this.modoEdicion = true;
     this.mostrarFormulario = true;
     this.mensaje = '';
     this.error = '';
+  }
+
+  private formatearFecha(fecha: string): string {
+    if (!fecha) return '';
+    // Remover zona horaria si existe
+    return fecha.split('+')[0].split('Z')[0].substring(0, 16);
   }
 
   cancelar(): void {

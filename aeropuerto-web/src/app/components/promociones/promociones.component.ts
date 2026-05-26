@@ -50,10 +50,19 @@ export class PromocionesComponent implements OnInit {
 
   abrirEditar(promocion: Promocion): void {
     this.formulario = { ...promocion };
+    // Transformar fechas al formato correcto para date input
+    this.formulario.fechaInicio = this.formatearFecha(promocion.fechaInicio);
+    this.formulario.fechaFin = this.formatearFecha(promocion.fechaFin);
     this.modoEdicion = true;
     this.mostrarFormulario = true;
     this.mensaje = '';
     this.error = '';
+  }
+
+  private formatearFecha(fecha: string): string {
+    if (!fecha) return '';
+    // Remover zona horaria si existe y dejar solo la fecha
+    return fecha.split('+')[0].split('Z')[0].split('T')[0];
   }
 
   cancelar(): void {

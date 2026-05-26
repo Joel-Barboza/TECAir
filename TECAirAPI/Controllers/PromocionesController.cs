@@ -46,6 +46,33 @@ namespace TECAirAPI.Controllers
             }
         }
 
+        // PUT: api/aeropuerto/Promociones/{id}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> ActualizarPromocion(int id, Promocion promo)
+        {
+            if (id != promo.PromocionId)
+                return BadRequest("El ID de la URL no coincide con el ID de la promoción");
+
+            _context.Entry(promo).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return NoContent();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                var existe = await _context.Promociones.AnyAsync(p => p.PromocionId == id);
+                if (!existe)
+                    return NotFound();
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al actualizar promoción: {ex.Message}");
+            }
+        }
+
         // DELETE: api/aeropuerto/Promociones/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> EliminarPromocion(int id)
