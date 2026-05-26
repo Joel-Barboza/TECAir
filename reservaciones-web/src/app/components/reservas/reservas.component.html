@@ -1,23 +1,29 @@
 <div class="reservas-page">
 
-  <div class="reservas-toolbar">
-    <button class="btn-refresh" (click)="cargarDatos()">Actualizar</button>
+  <div class="toolbar">
+    <p class="msg-success" *ngIf="mensaje">{{ mensaje }}</p>
+    <p class="msg-error" *ngIf="error">{{ error }}</p>
+    <button class="btn-recargar" (click)="cargarDatos()">Recargar</button>
   </div>
 
-  <p class="msg-success" *ngIf="mensaje">{{ mensaje }}</p>
-  <p class="msg-error" *ngIf="error">{{ error }}</p>
-
-  <div class="loading" *ngIf="cargando">Cargando reservas...</div>
-
-  <div class="empty-state" *ngIf="!cargando && reservas.length === 0 && !error">
+  <!-- Sin reservas -->
+  <div class="placeholder" *ngIf="reservas.length === 0 && !error">
     <p>No tiene reservas activas.</p>
-    <p class="empty-hint">Vaya a <strong>Buscar Vuelos</strong> para hacer su primera reserva.</p>
+    <p class="placeholder-hint">Vaya a <strong>Buscar Vuelos</strong> para hacer su primera reserva.</p>
   </div>
 
-  <div class="reservas-list" *ngIf="!cargando && reservas.length > 0">
+  <!-- Error sin datos -->
+  <div class="placeholder" *ngIf="error && reservas.length === 0">
+    <p>No se pudieron cargar los datos.</p>
+    <button class="btn-cargar btn-cargar-sm" (click)="cargarDatos()">Reintentar</button>
+  </div>
+
+  <!-- Lista de reservas -->
+  <div class="reservas-list" *ngIf="reservas.length > 0">
     <div class="reserva-card" *ngFor="let reserva of reservas">
+
       <div class="reserva-top">
-        <div class="reserva-ruta">{{ getRutaVuelo(reserva.vueloId) }}</div>
+        <span class="reserva-ruta">{{ getRutaVuelo(reserva.vueloId) }}</span>
         <span class="estado-badge" [class.pagado]="reserva.estadoPago === 'Pagado'">
           {{ reserva.estadoPago }}
         </span>
@@ -43,6 +49,7 @@
           Cancelar reserva
         </button>
       </div>
+
     </div>
   </div>
 

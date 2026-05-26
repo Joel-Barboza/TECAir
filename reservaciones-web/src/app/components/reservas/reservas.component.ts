@@ -16,7 +16,6 @@ export class ReservasComponent implements OnInit {
   vuelos: Vuelo[] = [];
   mensaje = '';
   error = '';
-  cargando = true;
 
   constructor(
     private reservasService: ReservasService,
@@ -30,7 +29,7 @@ export class ReservasComponent implements OnInit {
 
   cargarDatos(): void {
     this.error = '';
-    this.cargando = true;
+    this.mensaje = '';
     const usuarioId = this.authService.currentUser?.usuarioId;
 
     this.vuelosService.getVuelos().subscribe({
@@ -41,11 +40,9 @@ export class ReservasComponent implements OnInit {
     this.reservasService.getReservas().subscribe({
       next: (data) => {
         this.reservas = data.filter(r => r.usuarioId === usuarioId);
-        this.cargando = false;
       },
       error: () => {
-        this.error = 'No se pudieron cargar las reservas.';
-        this.cargando = false;
+        this.error = 'No se pudieron cargar las reservas. Verifique que el servidor esté activo.';
       }
     });
   }

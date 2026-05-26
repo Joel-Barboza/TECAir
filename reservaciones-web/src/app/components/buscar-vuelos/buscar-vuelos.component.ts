@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Vuelo, VuelosService } from '../../services/vuelos.service';
 import { Reserva, ReservasService } from '../../services/reservas.service';
 import { AuthService } from '../../services/auth.service';
@@ -24,23 +25,27 @@ export class BuscarVuelosComponent implements OnInit {
   cvc = '';
   mensaje = '';
   error = '';
-  buscado = false;
+  reservaConfirmada = false;
+  vueloConfirmado: Vuelo | null = null;
 
   constructor(
     private vuelosService: VuelosService,
     private reservasService: ReservasService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     this.vuelosService.getVuelos().subscribe({
-      next: (data) => (this.vuelos = data),
+      next: (data) => {
+        this.vuelos = data;
+        this.resultados = data;
+      },
       error: () => (this.error = 'No se pudieron cargar los vuelos.')
     });
   }
 
   buscar(): void {
-    this.buscado = true;
     const origenTexto = this.origen.trim().toLowerCase();
     const destinoTexto = this.destino.trim().toLowerCase();
 
@@ -50,23 +55,68 @@ export class BuscarVuelosComponent implements OnInit {
       return cumpleOrigen && cumpleDestino;
     });
 
-    this.mensaje = this.resultados.length === 0 ? 'No se encontraron vuelos con esos aeropuertos.' : '';
+    this.mensaje = this.resultados.length === 0 ? 'No se encontraron vuelos con esos filtros.' : '';
+    this.selectedVuelo = null;
+  }
+
+  limpiarBusqueda(): void {
+    this.origen = '';
+    this.destino = '';
+    this.resultados = [...this.vuelos];
+    this.mensaje = '';
     this.selectedVuelo = null;
   }
 
   seleccionarVuelo(vuelo: Vuelo): void {
     this.selectedVuelo = vuelo;
-    this.mensaje = '';
     this.error = '';
     this.asientosReservados = 1;
     this.tarjeta = '';
     this.vencimiento = '';
     this.cvc = '';
+    this.reservaConfirmada = false;
   }
 
+  // ── Formateo de tarjeta ─────────────────────────────
+  onTarjetaInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const digits = input.value.replace(/\D/g, '').slice(0, 16);
+    this.tarjeta = digits.replace(/(.{4})/g, '$1 ').trim();
+    input.value = this.tarjeta;
+  }
+
+  onVencimientoInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    let digits = input.value.replace(/\D/g, '').slice(0, 4);
+    if (digits.length >= 3) {
+      digits = digits.slice(0, 2) + '/' + digits.slice(2);
+    }
+    this.vencimiento = digits;
+    input.value = this.vencimiento;
+  }
+
+  onCvcInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.cvc = input.value.replace(/\D/g, '').slice(0, 3);
+    input.value = this.cvc;
+  }
+
+  // ── Validaciones ────────────────────────────────────
+  get tarjetaValida(): boolean {
+    return this.tarjeta.replace(/\s/g, '').length === 16;
+  }
+
+  get vencimientoValido(): boolean {
+    return /^\d{2}\/\d{2}$/.test(this.vencimiento);
+  }
+
+  get cvcValido(): boolean {
+    return this.cvc.length === 3;
+  }
+
+  // ── Crear reserva ───────────────────────────────────
   crearReserva(): void {
     this.error = '';
-    this.mensaje = '';
 
     const usuario = this.authService.currentUser;
     if (!usuario?.usuarioId || !this.selectedVuelo) return;
@@ -76,8 +126,8 @@ export class BuscarVuelosComponent implements OnInit {
       return;
     }
 
-    if (!this.tarjeta.trim() || !this.vencimiento.trim() || !this.cvc.trim()) {
-      this.error = 'Complete todos los datos de la tarjeta de crédito.';
+    if (!this.tarjetaValida || !this.vencimientoValido || !this.cvcValido) {
+      this.error = 'Verifique los datos de la tarjeta.';
       return;
     }
 
@@ -91,7 +141,8 @@ export class BuscarVuelosComponent implements OnInit {
 
     this.reservasService.crearReserva(nuevaReserva).subscribe({
       next: () => {
-        this.mensaje = '¡Reserva confirmada! El pago fue procesado exitosamente.';
+        this.vueloConfirmado = this.selectedVuelo;
+        this.reservaConfirmada = true;
         this.selectedVuelo = null;
         this.asientosReservados = 1;
         this.tarjeta = '';
@@ -100,5 +151,9 @@ export class BuscarVuelosComponent implements OnInit {
       },
       error: () => (this.error = 'No se pudo completar la reserva. Intente de nuevo.')
     });
+  }
+
+  irAReservas(): void {
+    this.router.navigate(['/dashboard/reservas']);
   }
 }

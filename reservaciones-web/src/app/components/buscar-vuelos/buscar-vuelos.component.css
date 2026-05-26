@@ -1,7 +1,6 @@
 .vuelos-page {
   display: flex;
   flex-direction: column;
-  gap: 0;
   font-family: Arial, sans-serif;
 }
 
@@ -68,17 +67,71 @@
   background-color: #2563eb;
 }
 
-/* Messages */
-.msg-success {
-  margin: 15px 30px 0;
-  padding: 8px 12px;
-  background: #ecfdf5;
-  border: 1px solid #d1fae5;
-  color: #10b981;
+.btn-clear {
+  padding: 8px 14px;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
   border-radius: 5px;
   font-size: 0.875rem;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
+.btn-clear:hover {
+  background-color: #e5e7eb;
+}
+
+/* Confirmation banner */
+.confirmacion-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background-color: #ecfdf5;
+  border: 1px solid #6ee7b7;
+  border-left: 4px solid #10b981;
+  padding: 14px 20px;
+  margin: 0;
+  flex-wrap: wrap;
+}
+
+.confirmacion-texto {
+  flex: 1;
+  font-size: 0.9rem;
+  color: #065f46;
+}
+
+.btn-ver-reservas {
+  padding: 7px 16px;
+  background-color: #10b981;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.875rem;
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-ver-reservas:hover {
+  background-color: #059669;
+}
+
+.btn-cerrar-banner {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.btn-cerrar-banner:hover {
+  color: #1f2937;
+}
+
+/* Error */
 .msg-error {
   margin: 15px 30px 0;
   padding: 8px 12px;
@@ -89,34 +142,33 @@
   font-size: 0.875rem;
 }
 
-/* Results area */
+/* Results */
 .results-area {
-  padding: 20px 30px;
+  padding: 16px 30px 20px;
   flex: 1;
 }
 
+.results-count {
+  font-size: 0.825rem;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
 .placeholder-state {
-  height: 300px;
+  height: 200px;
   border: 2px dashed #3b82f6;
   border-radius: 10px;
-  background-color: #f3f4f6;
+  background-color: #ffffff;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  color: #1f2937;
-  gap: 8px;
-}
-
-.placeholder-icon {
-  font-size: 2.5rem;
+  color: #6b7280;
 }
 
 .placeholder-state p {
   font-size: 0.9rem;
   margin: 0;
-  color: #6b7280;
 }
 
 /* Flight cards */
@@ -130,7 +182,7 @@
   background: #fff;
   border: 1px solid #d1d5db;
   border-radius: 10px;
-  padding: 16px 20px;
+  padding: 14px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -146,7 +198,7 @@
 .flight-route {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   flex: 1;
 }
 
@@ -163,7 +215,7 @@
 }
 
 .date {
-  font-size: 0.78rem;
+  font-size: 0.775rem;
   color: #6b7280;
 }
 
@@ -173,7 +225,7 @@
   align-items: center;
   justify-content: center;
   color: #3b82f6;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 
 .flight-meta {
@@ -184,13 +236,13 @@
 }
 
 .seats-badge {
-  font-size: 0.78rem;
+  font-size: 0.775rem;
   color: #6b7280;
   white-space: nowrap;
 }
 
 .btn-select {
-  padding: 8px 16px;
+  padding: 7px 16px;
   background-color: #3b82f6;
   color: #fff;
   border: none;
@@ -230,17 +282,17 @@
 }
 
 .btn-close {
-  background: none;
+  padding: 6px 14px;
+  background-color: #6b7280;
+  color: #fff;
   border: none;
-  font-size: 1.1rem;
-  color: #6b7280;
-  cursor: pointer;
-  padding: 4px 8px;
   border-radius: 5px;
+  font-size: 0.825rem;
+  cursor: pointer;
 }
 
 .btn-close:hover {
-  background: #f3f4f6;
+  background-color: #4b5563;
 }
 
 .booking-flight-summary {
@@ -298,6 +350,15 @@
   border-color: #3b82f6;
 }
 
+.form-field input.input-error {
+  border-color: #ef4444;
+}
+
+.input-hint {
+  font-size: 0.75rem;
+  color: #ef4444;
+}
+
 .payment-section {
   background: #f3f4f6;
   border: 1px solid #d1d5db;
@@ -339,8 +400,13 @@
   cursor: pointer;
 }
 
-.btn-confirm:hover {
+.btn-confirm:hover:not([disabled]) {
   background-color: #2563eb;
+}
+
+.btn-confirm[disabled] {
+  background-color: #93c5fd;
+  cursor: not-allowed;
 }
 
 .btn-cancel {

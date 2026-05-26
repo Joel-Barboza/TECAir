@@ -119,7 +119,7 @@ export class LoginComponent implements OnInit {
   cargarPromociones(): void {
     this.promocionesService.getPromociones().subscribe({
       next: (data) => (this.promociones = data),
-      error: () => {}
+      error: (err) => console.error('No se pudieron cargar las promociones:', err)
     });
   }
 }

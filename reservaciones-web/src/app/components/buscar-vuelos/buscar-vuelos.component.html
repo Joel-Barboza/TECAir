@@ -12,22 +12,35 @@
         <label for="destino">Destino</label>
         <input type="text" id="destino" [(ngModel)]="destino" name="destino" placeholder="Ciudad o aeropuerto" />
       </div>
-      <button type="submit" class="btn-search">Buscar Vuelos</button>
+      <button type="submit" class="btn-search">Buscar</button>
+      <button type="button" class="btn-clear" (click)="limpiarBusqueda()">Ver todos</button>
     </form>
   </div>
 
-  <!-- Success message after reservation -->
-  <div class="msg-success" *ngIf="mensaje && !selectedVuelo">{{ mensaje }}</div>
+  <!-- Confirmation banner -->
+  <div class="confirmacion-banner" *ngIf="reservaConfirmada && vueloConfirmado">
+    <div class="confirmacion-texto">
+      <strong>Pago confirmado.</strong>
+      Reserva para {{ vueloConfirmado.salida }} &rarr; {{ vueloConfirmado.destino }} registrada exitosamente.
+    </div>
+    <button class="btn-ver-reservas" (click)="irAReservas()">Ver mis reservas</button>
+    <button class="btn-cerrar-banner" (click)="reservaConfirmada = false">&times;</button>
+  </div>
+
   <div class="msg-error" *ngIf="error && !selectedVuelo">{{ error }}</div>
 
-  <!-- Results -->
+  <!-- Flight list -->
   <div class="results-area">
-    <div *ngIf="!buscado" class="placeholder-state">
-      <p>Ingrese su aeropuerto de origen y destino para ver los vuelos disponibles.</p>
+    <div class="results-count" *ngIf="resultados.length > 0">
+      {{ resultados.length }} vuelo{{ resultados.length !== 1 ? 's' : '' }} disponible{{ resultados.length !== 1 ? 's' : '' }}
     </div>
 
-    <div *ngIf="buscado && resultados.length === 0" class="placeholder-state">
-      <p>{{ mensaje || 'No se encontraron vuelos disponibles.' }}</p>
+    <div *ngIf="resultados.length === 0 && mensaje" class="placeholder-state">
+      <p>{{ mensaje }}</p>
+    </div>
+
+    <div *ngIf="resultados.length === 0 && !mensaje" class="placeholder-state">
+      <p>No hay vuelos disponibles en este momento.</p>
     </div>
 
     <div class="flight-cards" *ngIf="resultados.length > 0">
@@ -45,9 +58,9 @@
           </div>
         </div>
         <div class="flight-meta">
-          <span class="seats-badge">{{ vuelo.asientos }} asientos disponibles</span>
+          <span class="seats-badge">{{ vuelo.asientos }} asientos disp.</span>
           <button type="button" class="btn-select" (click)="seleccionarVuelo(vuelo)">
-            {{ selectedVuelo?.vueloId === vuelo.vueloId ? 'Seleccionado' : 'Seleccionar' }}
+            {{ selectedVuelo?.vueloId === vuelo.vueloId ? 'Seleccionado' : 'Reservar' }}
           </button>
         </div>
       </div>
@@ -79,27 +92,44 @@
 
       <div class="payment-section">
         <h4>Pago con Tarjeta de Credito</h4>
+
         <div class="form-field">
-          <label for="tarjeta">Numero de tarjeta</label>
-          <input type="text" id="tarjeta" [(ngModel)]="tarjeta" name="tarjeta"
-                 placeholder="0000 0000 0000 0000" maxlength="19" required />
+          <label for="tarjeta">Numero de tarjeta (16 digitos)</label>
+          <input type="text" id="tarjeta" [value]="tarjeta" name="tarjeta"
+                 placeholder="0000 0000 0000 0000" maxlength="19"
+                 (input)="onTarjetaInput($event)"
+                 [class.input-error]="tarjeta && !tarjetaValida"
+                 required />
+          <span class="input-hint" *ngIf="tarjeta && !tarjetaValida">Ingrese los 16 digitos</span>
         </div>
+
         <div class="card-row">
           <div class="form-field">
             <label for="vencimiento">Vencimiento</label>
-            <input type="text" id="vencimiento" [(ngModel)]="vencimiento" name="vencimiento"
-                   placeholder="MM/AA" maxlength="5" required />
+            <input type="text" id="vencimiento" [value]="vencimiento" name="vencimiento"
+                   placeholder="MM/AA" maxlength="5"
+                   (input)="onVencimientoInput($event)"
+                   [class.input-error]="vencimiento && !vencimientoValido"
+                   required />
+            <span class="input-hint" *ngIf="vencimiento && !vencimientoValido">Formato MM/AA</span>
           </div>
           <div class="form-field">
             <label for="cvc">CVC</label>
-            <input type="text" id="cvc" [(ngModel)]="cvc" name="cvc"
-                   placeholder="123" maxlength="4" required />
+            <input type="text" id="cvc" [value]="cvc" name="cvc"
+                   placeholder="123" maxlength="3"
+                   (input)="onCvcInput($event)"
+                   [class.input-error]="cvc && !cvcValido"
+                   required />
+            <span class="input-hint" *ngIf="cvc && !cvcValido">3 digitos</span>
           </div>
         </div>
       </div>
 
       <div class="booking-actions">
-        <button type="submit" class="btn-confirm">Confirmar y Pagar</button>
+        <button type="submit" class="btn-confirm"
+                [disabled]="!tarjetaValida || !vencimientoValido || !cvcValido">
+          Confirmar y Pagar
+        </button>
         <button type="button" class="btn-cancel" (click)="selectedVuelo = null">Cancelar</button>
       </div>
     </form>

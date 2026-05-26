@@ -11,18 +11,23 @@ import { PromocionesService, Promocion } from '../../services/promociones.servic
 })
 export class PromocionesComponent implements OnInit {
   promociones: Promocion[] = [];
-  mensaje = '';
   error = '';
 
   constructor(private promocionesService: PromocionesService) {}
 
   ngOnInit(): void {
+    this.cargarPromociones();
+  }
+
+  cargarPromociones(): void {
+    this.error = '';
+
     this.promocionesService.getPromociones().subscribe({
       next: (data) => {
         this.promociones = data;
       },
       error: (err) => {
-        this.error = 'No se pudieron cargar las promociones.';
+        this.error = 'No se pudieron cargar las promociones. Verifique que el servidor esté activo.';
         console.error(err);
       }
     });
