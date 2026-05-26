@@ -1,21 +1,24 @@
 import { Routes } from '@angular/router';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { UsuariosComponent } from './components/usuarios/usuarios.component';
 import { BuscarVuelosComponent } from './components/buscar-vuelos/buscar-vuelos.component';
 import { ReservasComponent } from './components/reservas/reservas.component';
 import { PromocionesComponent } from './components/promociones/promociones.component';
+import { LoginComponent } from './components/login/login.component';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: 'login', component: LoginComponent },
   {
-    path: '',
+    path: 'dashboard',
     component: DashboardComponent,
+    canActivate: [authGuard],
     children: [
-      { path: 'usuarios', component: UsuariosComponent },
       { path: 'vuelos', component: BuscarVuelosComponent },
       { path: 'reservas', component: ReservasComponent },
       { path: 'promociones', component: PromocionesComponent },
-      { path: '', redirectTo: 'usuarios', pathMatch: 'full' }
+      { path: '', redirectTo: 'vuelos', pathMatch: 'full' }
     ]
   },
-  { path: '**', redirectTo: '' }
+  { path: '**', redirectTo: 'login' }
 ];

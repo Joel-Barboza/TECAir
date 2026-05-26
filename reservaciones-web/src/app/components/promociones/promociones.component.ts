@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PromocionesService, Promocion } from '../../services/promociones.service';
 
@@ -11,18 +11,28 @@ import { PromocionesService, Promocion } from '../../services/promociones.servic
 })
 export class PromocionesComponent implements OnInit {
   promociones: Promocion[] = [];
-  mensaje = '';
   error = '';
 
-  constructor(private promocionesService: PromocionesService) {}
+  constructor(
+    private promocionesService: PromocionesService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
+    this.cargarPromociones();
+  }
+
+  cargarPromociones(): void {
+    this.error = '';
+
     this.promocionesService.getPromociones().subscribe({
       next: (data) => {
         this.promociones = data;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'No se pudieron cargar las promociones.';
+        this.cdr.detectChanges();
         console.error(err);
       }
     });

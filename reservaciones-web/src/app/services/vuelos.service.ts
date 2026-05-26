@@ -24,4 +24,8 @@ export class VuelosService {
   getVuelos(): Observable<Vuelo[]> {
     return this.http.get<Vuelo[]>(this.apiUrl);
   }
+
+  actualizarVuelo(vuelo: Vuelo): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${vuelo.vueloId}`, vuelo);
+  }
 }

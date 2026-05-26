@@ -1,0 +1,152 @@
+<div class="login-page">
+
+  <!-- Header -->
+  <header class="login-header">
+    <div class="header-content">
+      <img src="assets/logo.png" alt="TECAir" class="login-logo" />
+      <div>
+        <h1>TECAir</h1>
+        <p>Reservaciones en línea</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main: Auth + Promociones en dos columnas -->
+  <main class="login-main">
+
+    <!-- Columna izquierda: formulario -->
+    <div class="auth-card">
+      <div class="tabs">
+        <button [class.active]="modo === 'login'" (click)="cambiarModo('login')">Iniciar Sesión</button>
+        <button [class.active]="modo === 'registro'" (click)="cambiarModo('registro')">Crear Cuenta</button>
+      </div>
+
+      <!-- Login Form -->
+      <form *ngIf="modo === 'login'" (ngSubmit)="iniciarSesion()" class="auth-form">
+        <p class="form-subtitle">Ingrese su nombre y correo para acceder a su cuenta.</p>
+
+        <p class="msg-error" *ngIf="error">{{ error }}</p>
+
+        <div class="msg-warning" *ngIf="emailNoEncontrado">
+          No se encontró una cuenta con esos datos.
+          <button class="btn-warning-action" (click)="cambiarModo('registro')">Crear cuenta</button>
+        </div>
+
+        <div class="field">
+          <label for="loginNombre">Nombre</label>
+          <input type="text" id="loginNombre" [(ngModel)]="loginNombre" name="loginNombre"
+                 placeholder="Juan" required />
+        </div>
+
+        <div class="field">
+          <label for="loginEmail">Correo electrónico</label>
+          <input type="email" id="loginEmail" [(ngModel)]="loginEmail" name="loginEmail"
+                 placeholder="correo@ejemplo.com" required />
+        </div>
+
+        <button type="submit" class="btn-primary" [disabled]="cargando">
+          {{ cargando ? 'Verificando...' : 'Entrar' }}
+        </button>
+
+        <p class="toggle-hint">¿No tiene cuenta?
+          <a (click)="cambiarModo('registro')">Regístrese aquí</a>
+        </p>
+      </form>
+
+      <!-- Register Form -->
+      <form *ngIf="modo === 'registro'" (ngSubmit)="registrarse()" class="auth-form">
+        <p class="form-subtitle">Complete los datos para crear su cuenta.</p>
+
+        <p class="msg-error" *ngIf="error">{{ error }}</p>
+        <p class="msg-success" *ngIf="mensaje">{{ mensaje }}</p>
+
+        <div class="msg-warning" *ngIf="emailYaRegistrado">
+          Ese correo ya tiene una cuenta registrada.
+          <button class="btn-warning-action" (click)="cambiarModo('login')">Iniciar sesión</button>
+        </div>
+
+        <div class="field">
+          <label>Nombre *</label>
+          <input type="text" [(ngModel)]="formulario.nombre" name="nombre" required />
+        </div>
+
+        <div class="fields-row">
+          <div class="field">
+            <label>Primer apellido *</label>
+            <input type="text" [(ngModel)]="formulario.apellido1" name="apellido1" required />
+          </div>
+          <div class="field">
+            <label>Segundo apellido</label>
+            <input type="text" [(ngModel)]="formulario.apellido2" name="apellido2" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Correo electrónico *</label>
+          <input type="email" [(ngModel)]="formulario.email" name="email" placeholder="correo@ejemplo.com" required />
+        </div>
+
+        <div class="field">
+          <label>Teléfono *</label>
+          <input type="tel" [(ngModel)]="formulario.telefono" name="telefono" placeholder="+506-8888-8888" required />
+        </div>
+
+        <div class="checkbox-row">
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="esEstudiante" name="esEstudiante" (change)="toggleEstudiante()" />
+            Soy estudiante universitario
+          </label>
+        </div>
+
+        <div *ngIf="esEstudiante" class="estudiante-fields">
+          <div class="field">
+            <label>Universidad</label>
+            <input type="text" [(ngModel)]="formulario.universidad" name="universidad"
+                   placeholder="Instituto Tecnológico de Costa Rica" />
+          </div>
+          <div class="field">
+            <label>Carnet (para programa de millas)</label>
+            <input type="number" [(ngModel)]="formulario.carnet" name="carnet"
+                   placeholder="0000000000" />
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" [disabled]="cargando">
+          {{ cargando ? 'Creando cuenta...' : 'Crear cuenta' }}
+        </button>
+
+        <p class="toggle-hint">¿Ya tiene cuenta?
+          <a (click)="cambiarModo('login')">Inicie sesión</a>
+        </p>
+      </form>
+    </div>
+
+    <!-- Columna derecha: promociones -->
+    <div class="promo-panel">
+      <h2>Promociones</h2>
+      <div *ngIf="promociones.length === 0" class="promo-empty">
+        Actualmente no hay promociones disponibles
+      </div>
+
+      <div class="promo-grid" *ngIf="promociones.length > 0">
+        <div class="promo-card" *ngFor="let promo of promociones">
+          <div class="promo-badge">{{ promo.descuento }}% OFF</div>
+          <div class="promo-ruta">
+            <span class="ciudad">{{ promo.origen }}</span>
+            <span class="flecha">&rarr;</span>
+            <span class="ciudad">{{ promo.destino }}</span>
+          </div>
+          <div class="promo-periodo">
+            {{ promo.fechaInicio | date:'dd MMM yyyy' }} — {{ promo.fechaFin | date:'dd MMM yyyy' }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="login-footer">
+    <p>&copy; 2026 TECAir</p>
+  </footer>
+
+</div>

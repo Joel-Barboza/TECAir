@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { Usuario } from '../../services/usuario.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -11,16 +13,24 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
 })
 export class DashboardComponent {
   menu = [
-    { nombre: 'Usuarios', valor: 'usuarios' },
-    { nombre: 'Buscar vuelos', valor: 'vuelos' },
-    { nombre: 'Reservas', valor: 'reservas' },
+    { nombre: 'Buscar Vuelos', valor: 'vuelos' },
+    { nombre: 'Mis Reservas', valor: 'reservas' },
     { nombre: 'Promociones', valor: 'promociones' }
   ];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
+
+  get currentUser(): Usuario | null {
+    return this.authService.currentUser;
+  }
 
   get seccionActual(): string {
-    const seg = this.router.url.split('/').pop() || 'usuarios';
-    return this.menu.find(m => m.valor === seg)?.nombre ?? 'TECAir';
+    const seg = this.router.url.split('/').pop()?.split('?')[0] || 'vuelos';
+    return this.menu.find(m => m.valor === seg)?.nombre ?? 'Dashboard';
+  }
+
+  cerrarSesion(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }

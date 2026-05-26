@@ -109,7 +109,6 @@ namespace TECAirAPI.Controllers
                 return StatusCode(500, $"Error al crear vuelo: {ex.Message}");
             }
         }
-
         // PUT: api/aeropuerto/Vuelos/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> ActualizarVuelo(int id, Vuelo vuelo)
@@ -133,8 +132,6 @@ namespace TECAirAPI.Controllers
                 if (vueloExistente == null)
                     return NotFound($"No se encontró el vuelo con id {id}");
 
-                // Se actualiza campo por campo para asegurar que puerta_abordaje sí se guarde
-                // y para evitar problemas con entidades desconectadas del frontend.
                 vueloExistente.AeropuertoId = vuelo.AeropuertoId;
                 vueloExistente.AvionId = vuelo.AvionId;
                 vueloExistente.Asientos = vuelo.Asientos;
@@ -146,8 +143,6 @@ namespace TECAirAPI.Controllers
                 vueloExistente.PuertaAbordaje = string.IsNullOrWhiteSpace(vuelo.PuertaAbordaje)
                     ? null
                     : vuelo.PuertaAbordaje.Trim().ToUpper();
-
-                // El estado del vuelo se cambia desde Apertura/Cierre, no desde el formulario normal de vuelos.
 
                 await _context.SaveChangesAsync();
                 return NoContent();

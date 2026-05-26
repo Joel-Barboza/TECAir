@@ -1,23 +1,35 @@
-<div class="promociones-dashboard">
-  <h3>Promociones disponibles</h3>
+<div class="promociones-page">
 
-  <p *ngIf="error" class="error">{{ error }}</p>
-
-  <div *ngIf="promociones.length === 0 && !error" class="placeholder">
-    Actualmente no hay promociones registradas.
+  <div class="toolbar">
+    <p class="msg-error" *ngIf="error">{{ error }}</p>
+    <button class="btn-recargar" (click)="cargarPromociones()">Recargar</button>
   </div>
 
-  <div class="promociones-grid" *ngIf="promociones.length > 0">
+  <!-- Sin promociones -->
+  <div class="placeholder" *ngIf="promociones.length === 0 && !error">
+    <p>Actualmente no hay promociones registradas.</p>
+    <button class="btn-cargar btn-cargar-sm" (click)="cargarPromociones()">Reintentar</button>
+  </div>
+
+  <!-- Error -->
+  <div class="placeholder" *ngIf="error && promociones.length === 0">
+    <p>No se pudieron cargar los datos.</p>
+    <button class="btn-cargar btn-cargar-sm" (click)="cargarPromociones()">Reintentar</button>
+  </div>
+
+  <!-- Grid de promociones -->
+  <div class="promo-grid" *ngIf="promociones.length > 0">
     <div class="promo-card" *ngFor="let promo of promociones">
+      <div class="promo-descuento">{{ promo.descuento }}% OFF</div>
       <div class="promo-ruta">
         <span class="promo-ciudad">{{ promo.origen }}</span>
-        <span class="promo-flecha">→</span>
+        <span class="promo-flecha">&rarr;</span>
         <span class="promo-ciudad">{{ promo.destino }}</span>
       </div>
-      <div class="promo-descuento">{{ promo.descuento }}% de descuento</div>
       <div class="promo-periodo">
         Válido del {{ promo.fechaInicio | date:'dd/MM/yyyy' }} al {{ promo.fechaFin | date:'dd/MM/yyyy' }}
       </div>
     </div>
   </div>
+
 </div>
