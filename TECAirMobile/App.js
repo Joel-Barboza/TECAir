@@ -1,30 +1,34 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, SafeAreaView, StatusBar } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, ActivityIndicator } from 'react-native';
+import RegisterScreen from './src/screens/RegisterScreen';
+import HomeScreen from './src/screens/HomeScreen';
+import SucursalScreen from './src/screens/SucursalScreen';
+import TicketStack from './src/screens/TicketStack';
 import { initDatabase } from './src/database/database';
-import RegisterScreen from './src/screens/RegisterScreen'; // <-- Sin extensión, Expo lo busca automáticamente como .js
 
 export default function App() {
-  
+  const [pantalla, setPantalla] = useState('Register');
+  const [dbReady, setDbReady] = useState(false);
+
   useEffect(() => {
-    try {
-      // Inicializa la base de datos local al arrancar la app
-      initDatabase();
-    } catch (error) {
-      console.error("Error al inicializar la base de datos:", error);
-    }
+    initDatabase();
+    setDbReady(true);
   }, []);
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      <RegisterScreen />
-    </SafeAreaView>
-  );
-}
+  if (!dbReady) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#003366" />
+      </View>
+    );
+  }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-});
+  const cambiarPantalla = (nombre) => setPantalla(nombre);
+
+  if (pantalla === 'Register') return <RegisterScreen cambiarPantalla={cambiarPantalla} />;
+  if (pantalla === 'Home') return <HomeScreen cambiarPantalla={cambiarPantalla} />;
+  if (pantalla === 'Sucursal') return <SucursalScreen cambiarPantalla={cambiarPantalla} />;
+  if (pantalla === 'TicketStack') return <TicketStack cambiarPantalla={cambiarPantalla} />;
+  
+  return <RegisterScreen cambiarPantalla={cambiarPantalla} />;
+}

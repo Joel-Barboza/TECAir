@@ -1,15 +1,9 @@
 import * as SQLite from 'expo-sqlite';
 
-// Abre o crea el archivo de base de datos local en el celular llamado tecair.db
-const db = SQLite.openDatabaseSync('tecair.db');
-
-/**
- * Función que crea las tablas locales si no existen.
- * Mapeada fielmente con el modelo Usuario.cs de C# (.NET).
- */
+// Quitamos la apertura global de la base de datos para evitar el NullPointerException
 export const initDatabase = () => {
   try {
-    // Ejecutamos el comando SQL para crear la tabla espejo de usuarios
+    const db = SQLite.openDatabaseSync('tecair.db');
     db.execSync(`
       CREATE TABLE IF NOT EXISTS usuario (
         usuario_id INTEGER PRIMARY KEY NOT NULL,
@@ -22,10 +16,10 @@ export const initDatabase = () => {
         universidad TEXT
       );
     `);
-    console.log("¡[SQLite] Base de datos y tabla 'usuario' creadas con éxito en el móvil!");
+    console.log("✅ Base de datos inicializada correctamente.");
+    return db;
   } catch (error) {
-    console.error("Error al inicializar la base de datos local SQLite: ", error);
+    console.error("❌ Error inicializando BD:", error);
+    return null;
   }
 };
-
-export default db;
