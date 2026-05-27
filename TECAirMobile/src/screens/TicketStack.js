@@ -19,6 +19,9 @@ export default function TicketStack({ cambiarPantalla, usuarioActual }) {
   const [reservas, setReservas] = useState([]);
   const [pagos, setPagos] = useState([]);
 
+  const [origenBusqueda, setOrigenBusqueda] = useState('');
+  const [destinoBusqueda, setDestinoBusqueda] = useState('');
+
   const [vueloSeleccionado, setVueloSeleccionado] = useState(null);
   const [asientosAReservar, setAsientosAReservar] = useState('');
 
@@ -27,12 +30,12 @@ export default function TicketStack({ cambiarPantalla, usuarioActual }) {
   const [nombreTarjeta, setNombreTarjeta] = useState('');
 
   useEffect(() => {
-    cargarVuelosSQLite();
+    cargarTodosLosVuelosSQLite();
     cargarReservasSQLite();
     cargarPagosSQLite();
   }, []);
 
-  const cargarVuelosSQLite = async () => {
+  const cargarTodosLosVuelosSQLite = async () => {
     try {
       const db = getDatabase();
       const data = await db.getAllAsync('SELECT * FROM vuelo ORDER BY vuelo_id');
@@ -41,6 +44,42 @@ export default function TicketStack({ cambiarPantalla, usuarioActual }) {
       console.error('Error cargando vuelos:', error);
       Alert.alert('Error', 'No se pudieron cargar los vuelos desde SQLite.');
     }
+  };
+
+  const buscarVuelosSQLite = async () => {
+    try {
+      if (!origenBusqueda.trim() || !destinoBusqueda.trim()) {
+        Alert.alert('Campos incompletos', 'Ingrese aeropuerto de origen y aeropuerto de llegada.');
+        return;
+      }
+
+      const db = getDatabase();
+
+      const data = await db.getAllAsync(
+        `SELECT * FROM vuelo
+         WHERE LOWER(origen) LIKE LOWER(?)
+         AND LOWER(destino) LIKE LOWER(?)
+         ORDER BY vuelo_id`,
+        [`%${origenBusqueda.trim()}%`, `%${destinoBusqueda.trim()}%`]
+      );
+
+      setVuelos(data);
+      setVueloSeleccionado(null);
+
+      if (data.length === 0) {
+        Alert.alert('Sin resultados', 'No se encontraron vuelos con ese origen y destino.');
+      }
+    } catch (error) {
+      console.error('Error buscando vuelos:', error);
+      Alert.alert('Error', 'No se pudo realizar la búsqueda en SQLite.');
+    }
+  };
+
+  const limpiarBusqueda = () => {
+    setOrigenBusqueda('');
+    setDestinoBusqueda('');
+    setVueloSeleccionado(null);
+    cargarTodosLosVuelosSQLite();
   };
 
   const cargarReservasSQLite = async () => {
@@ -176,7 +215,12 @@ export default function TicketStack({ cambiarPantalla, usuarioActual }) {
       setVueloSeleccionado(null);
       setAsientosAReservar('');
 
-      cargarVuelosSQLite();
+      if (origenBusqueda.trim() && destinoBusqueda.trim()) {
+        buscarVuelosSQLite();
+      } else {
+        cargarTodosLosVuelosSQLite();
+      }
+
       cargarReservasSQLite();
 
     } catch (error) {
@@ -306,31 +350,63 @@ export default function TicketStack({ cambiarPantalla, usuarioActual }) {
         </View>
 
         <View style={styles.sectionBox}>
-          <Text style={styles.sectionTitle}>1. Seleccionar vuelo</Text>
+          <Text style={styles.sectionTitle}>1. Buscar vuelos</Text>
 
-          {vuelos.map((vuelo) => (
-            <TouchableOpacity
-              key={vuelo.vuelo_id}
-              style={[
-                styles.flightCard,
-                vueloSeleccionado?.vuelo_id === vuelo.vuelo_id && styles.flightCardSelected
-              ]}
-              onPress={() => setVueloSeleccionado(vuelo)}
-            >
-              <View style={styles.cardHeader}>
-                <Text style={styles.codigoText}>{vuelo.codigo}</Text>
-                <Text style={styles.priceText}>${vuelo.precio_boleto}</Text>
-              </View>
+          <Text style={styles.inputLabel}>Aeropuerto de origen</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Ej: San José"
+            value={origenBusqueda}
+            onChangeText={setOrigenBusqueda}
+          />
 
-              <Text style={styles.rutaText}>{vuelo.origen} → {vuelo.destino}</Text>
-              <Text style={styles.detailText}>Fecha: {vuelo.fecha_salida} | Hora: {vuelo.salida}</Text>
-              <Text style={styles.detailText}>Asientos disponibles: {vuelo.asientos}</Text>
-            </TouchableOpacity>
-          ))}
+          <Text style={styles.inputLabel}>Aeropuerto de llegada</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Ej: Miami"
+            value={destinoBusqueda}
+            onChangeText={setDestinoBusqueda}
+          />
+
+          <TouchableOpacity style={styles.btnPrimary} onPress={buscarVuelosSQLite}>
+            <Text style={styles.btnText}>BUSCAR VUELOS</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.btnSecondary} onPress={limpiarBusqueda}>
+            <Text style={styles.btnSecondaryText}>Ver todos los vuelos</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.sectionBox}>
-          <Text style={styles.sectionTitle}>2. Crear reservación</Text>
+          <Text style={styles.sectionTitle}>2. Resultados disponibles</Text>
+
+          {vuelos.length === 0 ? (
+            <Text style={styles.emptyText}>No hay vuelos para mostrar.</Text>
+          ) : (
+            vuelos.map((vuelo) => (
+              <TouchableOpacity
+                key={vuelo.vuelo_id}
+                style={[
+                  styles.flightCard,
+                  vueloSeleccionado?.vuelo_id === vuelo.vuelo_id && styles.flightCardSelected
+                ]}
+                onPress={() => setVueloSeleccionado(vuelo)}
+              >
+                <View style={styles.cardHeader}>
+                  <Text style={styles.codigoText}>{vuelo.codigo}</Text>
+                  <Text style={styles.priceText}>${vuelo.precio_boleto}</Text>
+                </View>
+
+                <Text style={styles.rutaText}>{vuelo.origen} → {vuelo.destino}</Text>
+                <Text style={styles.detailText}>Fecha: {vuelo.fecha_salida} | Hora: {vuelo.salida}</Text>
+                <Text style={styles.detailText}>Asientos disponibles: {vuelo.asientos}</Text>
+              </TouchableOpacity>
+            ))
+          )}
+        </View>
+
+        <View style={styles.sectionBox}>
+          <Text style={styles.sectionTitle}>3. Crear reservación</Text>
 
           <Text style={styles.inputLabel}>Vuelo seleccionado</Text>
           <TextInput
@@ -355,7 +431,7 @@ export default function TicketStack({ cambiarPantalla, usuarioActual }) {
         </View>
 
         <View style={styles.sectionBox}>
-          <Text style={styles.sectionTitle}>3. Reservas pendientes de pago</Text>
+          <Text style={styles.sectionTitle}>4. Reservas pendientes de pago</Text>
 
           {reservasPendientes.length === 0 ? (
             <Text style={styles.emptyText}>No hay reservas pendientes.</Text>
@@ -381,7 +457,7 @@ export default function TicketStack({ cambiarPantalla, usuarioActual }) {
         </View>
 
         <View style={styles.sectionBox}>
-          <Text style={styles.sectionTitle}>4. Pago simulado</Text>
+          <Text style={styles.sectionTitle}>5. Pago simulado</Text>
 
           <Text style={styles.inputLabel}>Reserva seleccionada</Text>
           <TextInput
@@ -414,7 +490,7 @@ export default function TicketStack({ cambiarPantalla, usuarioActual }) {
         </View>
 
         <View style={styles.sectionBox}>
-          <Text style={styles.sectionTitle}>5. Reservas pagadas</Text>
+          <Text style={styles.sectionTitle}>6. Reservas pagadas</Text>
 
           {reservasPagadas.length === 0 ? (
             <Text style={styles.emptyText}>No hay reservas pagadas todavía.</Text>
@@ -436,7 +512,7 @@ export default function TicketStack({ cambiarPantalla, usuarioActual }) {
         </View>
 
         <View style={styles.sectionBox}>
-          <Text style={styles.sectionTitle}>6. Pagos guardados localmente</Text>
+          <Text style={styles.sectionTitle}>7. Pagos guardados localmente</Text>
 
           {pagos.length === 0 ? (
             <Text style={styles.emptyText}>No hay pagos locales todavía.</Text>
@@ -643,6 +719,20 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 5
+  },
+
+  btnSecondary: {
+    backgroundColor: '#e9ecef',
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 8
+  },
+
+  btnSecondaryText: {
+    color: '#495057',
+    fontWeight: 'bold',
+    fontSize: 14
   },
 
   btnSuccess: {
