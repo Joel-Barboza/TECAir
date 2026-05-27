@@ -6,3 +6,8 @@ TECAirAPI/bin
 TECAirAPI/obj
 TECAirAPI/appsettings.Development.json
 TECAirAPI/appsettings.json
+
+TECAirMobile/node_modules/
+TECAirMobile/.expo/
+TECAirMobile/dist/
+TECAirMobile/*.log

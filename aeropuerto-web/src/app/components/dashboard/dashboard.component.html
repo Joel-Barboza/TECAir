@@ -1,0 +1,46 @@
+<div class="dashboard-container">
+  <!-- Barra lateral izquierda -->
+  <nav class="sidebar">
+    <img src="assets/logo.png" alt="Logo TECAir" class="logo">
+    <h2>TECAir Aeropuerto</h2>
+    <ul>
+      <li *ngFor="let item of menu" (click)="seleccionarSeccion(item.valor)"
+          [class.active]="seccionSeleccionada === item.valor">
+        {{ item.nombre }}
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Contenido principal -->
+  <main class="main-content">
+    <h1>{{ seccionSeleccionada | titlecase }}</h1>
+
+    <div *ngIf="seccionSeleccionada === 'usuarios'">
+      <app-usuarios></app-usuarios>
+    </div>
+
+    <div *ngIf="seccionSeleccionada === 'vuelos'">
+      <app-vuelos></app-vuelos>
+    </div>
+
+    <div *ngIf="seccionSeleccionada === 'reservas'">
+      <app-reservas></app-reservas>
+    </div>
+
+    <div *ngIf="seccionSeleccionada === 'promociones'">
+      <app-promociones></app-promociones>
+    </div>
+
+    <div *ngIf="seccionSeleccionada === 'maletas'">
+      <app-maletas></app-maletas>
+    </div>
+
+    <div *ngIf="seccionSeleccionada === 'checkins'">
+      <app-checkins></app-checkins>
+    </div>
+
+    <div *ngIf="seccionSeleccionada === 'apertura-vuelos'">
+      <app-apertura-vuelos></app-apertura-vuelos>
+    </div>
+  </main>
+</div>

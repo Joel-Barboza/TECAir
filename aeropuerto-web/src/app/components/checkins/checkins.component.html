@@ -1,0 +1,158 @@
+<div class="checkins-dashboard">
+  <div class="checkins-table">
+    <div class="table-header">
+      <h3>🎫 Check-in de Pasajeros</h3>
+      <button type="button" class="btn-refresh" (click)="cargarDatos()">&#8635; Actualizar</button>
+    </div>
+
+    <p class="success" *ngIf="mensaje && !mostrarFormulario">{{ mensaje }}</p>
+    <p class="error" *ngIf="error && !mostrarFormulario">{{ error }}</p>
+
+    <div *ngIf="checkins.length === 0" class="placeholder">
+      No hay pasajeros chequeados todavía
+    </div>
+
+    <table *ngIf="checkins.length > 0" class="tabla-checkins">
+      <thead>
+        <tr>
+          <th>Reserva</th>
+          <th>Pasajero</th>
+          <th>Vuelo</th>
+          <th>Ruta</th>
+          <th>Salida</th>
+          <th>Puerta</th>
+          <th>Asiento</th>
+          <th>Envío</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of checkins" class="fila-checkin">
+          <td><strong>{{ c.codigoReserva }}</strong></td>
+          <td>{{ c.nombrePasajero }}</td>
+          <td><strong>{{ c.codigoVuelo }}</strong></td>
+          <td>{{ c.origen }} → {{ c.destino }}</td>
+          <td>{{ c.horaSalida | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td><span class="puerta">{{ c.puertaAbordaje }}</span></td>
+          <td><span class="asiento">{{ c.numAsiento }}</span> <small>({{ c.tipoAsiento }})</small></td>
+          <td>{{ c.metodoEnvio || 'No indicado' }}</td>
+          <td class="acciones">
+            <button class="btn-pass" (click)="verPase(c)" title="Ver pase">🎟️</button>
+            <button class="btn-delete" (click)="eliminarCheckin(c.checkinId)" title="Eliminar">🗑️</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="checkins-form" *ngIf="mostrarFormulario">
+    <h3>➕ Realizar check-in</h3>
+
+    <p class="error" *ngIf="error && mostrarFormulario">{{ error }}</p>
+
+    <form (ngSubmit)="guardar()" class="form-checkin">
+      <div class="form-group full-width">
+        <label for="reserva">Pasajero / Reserva pendiente</label>
+        <select [(ngModel)]="formulario.reservaId" name="reservaId" id="reserva" (ngModelChange)="actualizarSeleccionReserva()" required>
+          <option [ngValue]="0" disabled>Seleccionar reserva...</option>
+          <option *ngFor="let r of reservasPendientes" [ngValue]="r.reservaId">
+            {{ r.codigoUsuario }} - {{ r.nombreUsuario }} | {{ r.descripcionVuelo }}
+          </option>
+        </select>
+      </div>
+
+      <div class="info-reserva" *ngIf="reservaSeleccionada">
+        {{ getInfoReservaSeleccionada() }}
+      </div>
+
+      <div class="warning" *ngIf="vueloSeleccionado && !vueloSeleccionado.puertaAbordaje">
+        Este vuelo no tiene puerta de abordaje asignada. Edite el vuelo antes de hacer el check-in.
+      </div>
+
+      <div class="form-group">
+        <label for="numAsiento">Asiento preferido</label>
+        <select [(ngModel)]="formulario.numAsiento" name="numAsiento" id="numAsiento" required>
+          <option value="" disabled>Seleccionar asiento...</option>
+          <option *ngFor="let asiento of asientoOpciones" [value]="asiento">
+            {{ asiento }}
+          </option>
+        </select>
+        <small *ngIf="vueloSeleccionado">Se muestran solo los asientos disponibles del vuelo seleccionado.</small>
+      </div>
+
+      <div class="form-group">
+        <label for="tipo">Tipo de asiento</label>
+        <select [(ngModel)]="formulario.tipo" name="tipo" id="tipo" required>
+          <option *ngFor="let tipo of tiposAsiento" [value]="tipo">{{ tipo }}</option>
+        </select>
+      </div>
+
+      <div class="form-group full-width">
+        <label for="metodoEnvio">Método para el pase de abordar</label>
+        <select [(ngModel)]="formulario.metodoEnvio" name="metodoEnvio" id="metodoEnvio">
+          <option *ngFor="let metodo of metodosEnvio" [value]="metodo.valor">
+            {{ metodo.texto }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">Confirmar check-in</button>
+        <button type="button" class="btn-secondary" (click)="cancelar()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="checkins-form-button" *ngIf="!mostrarFormulario">
+    <button type="button" (click)="abrirNuevoCheckin()" class="btn-add">+ Chequear pasajero</button>
+  </div>
+
+  <div class="boarding-pass" *ngIf="paseSeleccionado" id="boarding-pass">
+    <div class="pass-header">
+      <div>
+        <h3>TECAir</h3>
+        <p>Pase de abordar</p>
+      </div>
+      <button type="button" class="btn-close no-print" (click)="cerrarPase()">×</button>
+    </div>
+
+    <div class="pass-grid">
+      <div>
+        <span>Pasajero</span>
+        <strong>{{ paseSeleccionado.nombrePasajero }}</strong>
+      </div>
+      <div>
+        <span>Vuelo</span>
+        <strong>{{ paseSeleccionado.numeroVuelo }}</strong>
+      </div>
+      <div>
+        <span>Ruta</span>
+        <strong>{{ paseSeleccionado.origen }} → {{ paseSeleccionado.destino }}</strong>
+      </div>
+      <div>
+        <span>Hora de salida</span>
+        <strong>{{ paseSeleccionado.horaSalida | date:'dd/MM/yyyy HH:mm' }}</strong>
+      </div>
+      <div>
+        <span>Puerta</span>
+        <strong>{{ paseSeleccionado.puertaAbordaje }}</strong>
+      </div>
+      <div>
+        <span>Asiento</span>
+        <strong>{{ paseSeleccionado.numAsiento }}</strong>
+      </div>
+      <div>
+        <span>Reserva</span>
+        <strong>{{ paseSeleccionado.codigoReserva }}</strong>
+      </div>
+      <div>
+        <span>Envío</span>
+        <strong>{{ paseSeleccionado.metodoEnvio || 'No indicado' }}</strong>
+      </div>
+    </div>
+
+    <div class="pass-actions no-print">
+      <button type="button" class="btn-primary" (click)="imprimirPase()">Imprimir pase</button>
+    </div>
+  </div>
+</div>

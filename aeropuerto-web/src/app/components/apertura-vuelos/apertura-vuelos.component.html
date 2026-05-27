@@ -1,0 +1,85 @@
+<div class="apertura-dashboard">
+  <div class="apertura-table">
+    <div class="table-header">
+      <div>
+        <h3>🛫 Apertura de vuelos</h3>
+        <p>Confirma qué pasajeros tienen check-in y cuántas maletas lleva el vuelo antes de carga y balance.</p>
+      </div>
+      <button type="button" class="btn-refresh" (click)="cargarDatos()">&#8635; Actualizar</button>
+    </div>
+
+    <p class="success" *ngIf="mensaje">{{ mensaje }}</p>
+    <p class="error" *ngIf="error">{{ error }}</p>
+
+    <table class="tabla-apertura" *ngIf="vuelos.length > 0">
+      <thead>
+        <tr>
+          <th>Vuelo</th>
+          <th>Ruta</th>
+          <th>Salida</th>
+          <th>Puerta</th>
+          <th>Estado</th>
+          <th>Pasajeros chequeados</th>
+          <th>Maletas</th>
+          <th>Peso total</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let v of vuelos">
+          <td><strong>{{ v.codigoVisible }}</strong></td>
+          <td>{{ v.rutaDescripcion }}</td>
+          <td>{{ v.fechaSalida | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td>{{ v.puertaAbordaje || 'Sin asignar' }}</td>
+          <td><span class="estado" [ngClass]="getEstadoClase(v)">{{ v.estadoVuelo || 'Programado' }}</span></td>
+          <td>{{ getCantidadPasajeros(v.vueloId) }}</td>
+          <td>{{ getCantidadMaletas(v.vueloId) }}</td>
+          <td>{{ getPesoTotal(v.vueloId) | number:'1.1-1' }} kg</td>
+          <td class="acciones">
+            <button type="button" class="btn-view" (click)="seleccionarVuelo(v)">Ver lista</button>
+            <button type="button" class="btn-open" (click)="abrirVuelo(v)" [disabled]="(v.estadoVuelo || 'Programado') === 'Abierto' || (v.estadoVuelo || 'Programado') === 'Cerrado'">
+              Abrir
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="vuelos.length === 0" class="placeholder">No hay vuelos registrados.</div>
+  </div>
+
+  <div class="detalle-vuelo" *ngIf="vueloSeleccionado">
+    <h3>Lista para {{ vueloSeleccionado.codigoVisible }}</h3>
+    <p>
+      <strong>Ruta:</strong> {{ vueloSeleccionado.rutaDescripcion }}<br>
+      <strong>Salida:</strong> {{ vueloSeleccionado.fechaSalida | date:'dd/MM/yyyy HH:mm' }}<br>
+      <strong>Puerta:</strong> {{ vueloSeleccionado.puertaAbordaje || 'Sin asignar' }}<br>
+      <strong>Estado:</strong> {{ vueloSeleccionado.estadoVuelo || 'Programado' }}
+    </p>
+
+    <div *ngIf="getCheckinsVuelo(vueloSeleccionado.vueloId).length === 0" class="placeholder">
+      Este vuelo todavía no tiene pasajeros chequeados.
+    </div>
+
+    <table *ngIf="getCheckinsVuelo(vueloSeleccionado.vueloId).length > 0" class="tabla-pasajeros">
+      <thead>
+        <tr>
+          <th>Pasajero</th>
+          <th>Reserva</th>
+          <th>Asiento</th>
+          <th>Maletas</th>
+          <th>Peso total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of getCheckinsVuelo(vueloSeleccionado.vueloId)">
+          <td>{{ c.nombrePasajero }}</td>
+          <td>{{ c.codigoReserva }}</td>
+          <td>{{ c.numAsiento }} - {{ c.tipoAsiento }}</td>
+          <td>{{ getMaletasReserva(c.reservaId).length }}</td>
+          <td>{{ getPesoReserva(c.reservaId) | number:'1.1-1' }} kg</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

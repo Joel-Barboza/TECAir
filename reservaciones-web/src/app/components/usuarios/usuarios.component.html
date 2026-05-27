@@ -1,0 +1,84 @@
+<div class="usuarios-dashboard">
+
+  <!-- Tabla de usuarios -->
+  <div class="usuarios-table">
+    <div class="table-header">
+      <h3>Lista de usuarios</h3>
+      <button type="button" class="btn-refresh" (click)="cargarUsuarios()">&#8635; Actualizar</button>
+    </div>
+
+    <p class="success" *ngIf="mensaje">{{ mensaje }}</p>
+    <p class="error" *ngIf="error && !mostrarFormulario">{{ error }}</p>
+
+    <div *ngIf="usuarios.length === 0" class="placeholder">
+      No hay usuarios registrados
+    </div>
+
+    <table *ngIf="usuarios.length > 0">
+      <tr>
+        <th>Nombre</th>
+        <th>Apellido</th>
+        <th>Email</th>
+        <th>Teléfono</th>
+        <th>Estudiante</th>
+        <th>Universidad</th>
+        <th>Acciones</th>
+      </tr>
+      <tr *ngFor="let u of usuarios">
+        <td>{{ u.nombre }}</td>
+        <td>{{ u.apellido1 }} {{ u.apellido2 }}</td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.telefono }}</td>
+        <td>{{ u.carnet ? 'Sí' : 'No' }}</td>
+        <td>{{ u.universidad || '-' }}</td>
+        <td>
+          <button class="btn-edit" (click)="abrirEditar(u)">Editar</button>
+          <button class="btn-delete" (click)="eliminar(u.usuarioId!)">Eliminar</button>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Formulario crear / editar -->
+  <div class="usuarios-form">
+    <h3>{{ modoEdicion ? 'Editar usuario' : 'Nuevo usuario' }}</h3>
+
+    <p class="error" *ngIf="error && mostrarFormulario">{{ error }}</p>
+
+    <form (ngSubmit)="guardar()">
+      <label>Nombre</label>
+      <input type="text" [(ngModel)]="formulario.nombre" name="nombre" required />
+
+      <label>Apellido 1</label>
+      <input type="text" [(ngModel)]="formulario.apellido1" name="apellido1" required />
+
+      <label>Apellido 2</label>
+      <input type="text" [(ngModel)]="formulario.apellido2" name="apellido2" />
+
+      <label>Correo electrónico</label>
+      <input type="email" [(ngModel)]="formulario.email" name="email" required />
+
+      <label>Teléfono</label>
+      <input type="tel" [(ngModel)]="formulario.telefono" name="telefono" required />
+
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" [(ngModel)]="esEstudiante" name="esEstudiante" (change)="toggleEstudiante()" />
+          Soy estudiante
+        </label>
+      </div>
+
+      <div *ngIf="esEstudiante" class="estudiante-info">
+        <label>Universidad</label>
+        <input type="text" [(ngModel)]="formulario.universidad" name="universidad" />
+
+        <label>Carnet</label>
+        <input type="number" [(ngModel)]="formulario.carnet" name="carnet" />
+      </div>
+
+      <button type="submit">{{ modoEdicion ? 'Guardar cambios' : 'Agregar usuario' }}</button>
+      <button type="button" class="btn-secondary" *ngIf="modoEdicion" (click)="cancelar()">Cancelar</button>
+    </form>
+  </div>
+
+</div>

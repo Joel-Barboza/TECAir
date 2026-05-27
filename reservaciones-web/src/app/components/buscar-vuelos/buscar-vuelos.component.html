@@ -1,0 +1,138 @@
+<div class="vuelos-page">
+
+  <!-- Search Bar -->
+  <div class="search-bar">
+    <form (ngSubmit)="buscar()" class="search-form">
+      <div class="search-field">
+        <label for="origen">Origen</label>
+        <input type="text" id="origen" [(ngModel)]="origen" name="origen" placeholder="Ciudad o aeropuerto" />
+      </div>
+      <div class="search-arrow">&rarr;</div>
+      <div class="search-field">
+        <label for="destino">Destino</label>
+        <input type="text" id="destino" [(ngModel)]="destino" name="destino" placeholder="Ciudad o aeropuerto" />
+      </div>
+      <button type="submit" class="btn-search">Buscar</button>
+      <button type="button" class="btn-clear" (click)="limpiarBusqueda()">Ver todos</button>
+    </form>
+  </div>
+
+  <!-- Confirmation banner -->
+  <div class="confirmacion-banner" *ngIf="reservaConfirmada && vueloConfirmado">
+    <div class="confirmacion-texto">
+      <strong>Pago confirmado.</strong>
+      Reserva para {{ vueloConfirmado.salida }} &rarr; {{ vueloConfirmado.destino }} registrada exitosamente.
+    </div>
+    <button class="btn-ver-reservas" (click)="irAReservas()">Ver mis reservas</button>
+    <button class="btn-cerrar-banner" (click)="reservaConfirmada = false">&times;</button>
+  </div>
+
+  <div class="msg-error" *ngIf="error && !selectedVuelo">{{ error }}</div>
+
+  <!-- Flight list -->
+  <div class="results-area">
+    <div class="results-count" *ngIf="resultados.length > 0">
+      {{ resultados.length }} vuelo{{ resultados.length !== 1 ? 's' : '' }} disponible{{ resultados.length !== 1 ? 's' : '' }}
+    </div>
+
+    <div *ngIf="resultados.length === 0 && mensaje" class="placeholder-state">
+      <p>{{ mensaje }}</p>
+    </div>
+
+    <div *ngIf="resultados.length === 0 && !mensaje" class="placeholder-state">
+      <p>No hay vuelos disponibles en este momento.</p>
+    </div>
+
+    <div class="flight-cards" *ngIf="resultados.length > 0">
+      <div class="flight-card" *ngFor="let vuelo of resultados"
+           [class.selected]="selectedVuelo?.vueloId === vuelo.vueloId">
+        <div class="flight-route">
+          <div class="route-point">
+            <span class="city">{{ vuelo.salida }}</span>
+            <span class="date">{{ vuelo.fechaSalida | date:'dd MMM, HH:mm' }}</span>
+          </div>
+          <div class="route-line">&rarr;</div>
+          <div class="route-point">
+            <span class="city">{{ vuelo.destino }}</span>
+            <span class="date">{{ vuelo.fechaLlegada | date:'dd MMM, HH:mm' }}</span>
+          </div>
+        </div>
+        <div class="flight-meta">
+          <span class="seats-badge">{{ vuelo.asientos }} asientos disp.</span>
+          <button type="button" class="btn-select" (click)="seleccionarVuelo(vuelo)">
+            {{ selectedVuelo?.vueloId === vuelo.vueloId ? 'Seleccionado' : 'Reservar' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booking Panel -->
+  <div class="booking-panel" *ngIf="selectedVuelo">
+    <div class="booking-header">
+      <h3>Confirmar Reserva</h3>
+      <button type="button" class="btn-close" (click)="selectedVuelo = null">Cancelar</button>
+    </div>
+
+    <div class="booking-flight-summary">
+      <strong>{{ selectedVuelo.salida }}</strong>
+      <span class="summary-arrow">&rarr;</span>
+      <strong>{{ selectedVuelo.destino }}</strong>
+      <span class="summary-date">Salida: {{ selectedVuelo.fechaSalida | date:'dd/MM/yyyy HH:mm' }}</span>
+    </div>
+
+    <p class="msg-error" *ngIf="error">{{ error }}</p>
+
+    <form (ngSubmit)="crearReserva()" class="booking-form">
+      <div class="form-field">
+        <label for="asientos">Cantidad de asientos</label>
+        <input type="number" id="asientos" [(ngModel)]="asientosReservados" name="asientos"
+               min="1" [max]="selectedVuelo.asientos" required />
+      </div>
+
+      <div class="payment-section">
+        <h4>Pago con Tarjeta de Credito</h4>
+
+        <div class="form-field">
+          <label for="tarjeta">Numero de tarjeta (16 digitos)</label>
+          <input type="text" id="tarjeta" [value]="tarjeta" name="tarjeta"
+                 placeholder="0000 0000 0000 0000" maxlength="19"
+                 (input)="onTarjetaInput($event)"
+                 [class.input-error]="tarjeta && !tarjetaValida"
+                 required />
+          <span class="input-hint" *ngIf="tarjeta && !tarjetaValida">Ingrese los 16 digitos</span>
+        </div>
+
+        <div class="card-row">
+          <div class="form-field">
+            <label for="vencimiento">Vencimiento</label>
+            <input type="text" id="vencimiento" [value]="vencimiento" name="vencimiento"
+                   placeholder="MM/AA" maxlength="5"
+                   (input)="onVencimientoInput($event)"
+                   [class.input-error]="vencimiento && !vencimientoValido"
+                   required />
+            <span class="input-hint" *ngIf="vencimiento && !vencimientoValido">Formato MM/AA</span>
+          </div>
+          <div class="form-field">
+            <label for="cvc">CVC</label>
+            <input type="text" id="cvc" [value]="cvc" name="cvc"
+                   placeholder="123" maxlength="3"
+                   (input)="onCvcInput($event)"
+                   [class.input-error]="cvc && !cvcValido"
+                   required />
+            <span class="input-hint" *ngIf="cvc && !cvcValido">3 digitos</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="booking-actions">
+        <button type="submit" class="btn-confirm"
+                [disabled]="!tarjetaValida || !vencimientoValido || !cvcValido">
+          Confirmar y Pagar
+        </button>
+        <button type="button" class="btn-cancel" (click)="selectedVuelo = null">Cancelar</button>
+      </div>
+    </form>
+  </div>
+
+</div>
