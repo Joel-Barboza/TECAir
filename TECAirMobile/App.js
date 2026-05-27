@@ -5,6 +5,7 @@ import HomeScreen from './src/screens/HomeScreen';
 import SucursalScreen from './src/screens/SucursalScreen';
 import TicketStack from './src/screens/TicketStack';
 import { initDatabase } from './src/database/database';
+import { SincronizarAPostresDB } from './src/services/SyncService';
 
 export default function App() {
   const [pantalla, setPantalla] = useState('Register');
@@ -13,6 +14,7 @@ export default function App() {
   useEffect(() => {
     initDatabase();
     setDbReady(true);
+    SincronizarAPostresDB();
   }, []);
 
   if (!dbReady) {
