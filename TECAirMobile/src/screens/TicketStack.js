@@ -17,6 +17,7 @@ import { agregarPendienteSync, sincronizarPendientes } from '../services/SyncSer
 export default function TicketStack({ cambiarPantalla, usuarioActual }) {
   const [vuelos, setVuelos] = useState([]);
   const [reservas, setReservas] = useState([]);
+  const [pagos, setPagos] = useState([]);
 
   const [vueloSeleccionado, setVueloSeleccionado] = useState(null);
   const [asientosAReservar, setAsientosAReservar] = useState('');
@@ -28,36 +29,77 @@ export default function TicketStack({ cambiarPantalla, usuarioActual }) {
   useEffect(() => {
     cargarVuelosSQLite();
     cargarReservasSQLite();
+    cargarPagosSQLite();
   }, []);
 
   const cargarVuelosSQLite = async () => {
-    const db = getDatabase();
-    const data = await db.getAllAsync('SELECT * FROM vuelo ORDER BY vuelo_id');
-    setVuelos(data);
+    try {
+      const db = getDatabase();
+      const data = await db.getAllAsync('SELECT * FROM vuelo ORDER BY vuelo_id');
+      setVuelos(data);
+    } catch (error) {
+      console.error('Error cargando vuelos:', error);
+      Alert.alert('Error', 'No se pudieron cargar los vuelos desde SQLite.');
+    }
   };
 
   const cargarReservasSQLite = async () => {
-    const db = getDatabase();
+    try {
+      const db = getDatabase();
 
-    const data = await db.getAllAsync(`
-      SELECT 
-        r.reserva_id,
-        r.usuario_id,
-        r.vuelo_id,
-        r.fecha_reserva,
-        r.asientos_reservados,
-        r.estado_pago,
-        r.total,
-        r.synced,
-        v.codigo,
-        v.origen,
-        v.destino
-      FROM reserva r
-      INNER JOIN vuelo v ON r.vuelo_id = v.vuelo_id
-      ORDER BY r.fecha_reserva DESC
-    `);
+      const data = await db.getAllAsync(`
+        SELECT 
+          r.reserva_id,
+          r.usuario_id,
+          r.vuelo_id,
+          r.fecha_reserva,
+          r.asientos_reservados,
+          r.estado_pago,
+          r.total,
+          r.synced,
+          v.codigo,
+          v.origen,
+          v.destino
+        FROM reserva r
+        INNER JOIN vuelo v ON r.vuelo_id = v.vuelo_id
+        ORDER BY r.fecha_reserva DESC
+      `);
 
-    setReservas(data);
+      setReservas(data);
+    } catch (error) {
+      console.error('Error cargando reservas:', error);
+      Alert.alert('Error', 'No se pudieron cargar las reservas locales.');
+    }
+  };
+
+  const cargarPagosSQLite = async () => {
+    try {
+      const db = getDatabase();
+
+      const data = await db.getAllAsync(`
+        SELECT 
+          p.pago_id,
+          p.reserva_id,
+          p.monto,
+          p.metodo_pago,
+          p.ultimos_digitos,
+          p.fecha_pago,
+          p.synced,
+          r.usuario_id,
+          v.codigo,
+          v.origen,
+          v.destino
+        FROM pago p
+        INNER JOIN reserva r ON p.reserva_id = r.reserva_id
+        INNER JOIN vuelo v ON r.vuelo_id = v.vuelo_id
+        ORDER BY p.fecha_pago DESC
+      `);
+
+      setPagos(data);
+    } catch (error) {
+      console.error('Error cargando pagos:', error);
+      Alert.alert('Error', 'No se pudieron cargar los pagos locales.');
+    }
   };
 
   const confirmarReserva = async () => {
@@ -68,6 +110,11 @@ export default function TicketStack({ cambiarPantalla, usuarioActual }) {
 
     if (!vueloSeleccionado || !asientosAReservar) {
       Alert.alert('Campos incompletos', 'Seleccione vuelo y cantidad de asientos.');
+      return;
+    }
+
+    if (!/^\d+$/.test(asientosAReservar)) {
+      Alert.alert('Error', 'La cantidad de asientos debe ser un número entero.');
       return;
     }
 
@@ -133,7 +180,7 @@ export default function TicketStack({ cambiarPantalla, usuarioActual }) {
       cargarReservasSQLite();
 
     } catch (error) {
-      console.error(error);
+      console.error('Error guardando reserva:', error);
       Alert.alert('Error', 'No se pudo guardar la reserva.');
     }
   };
@@ -149,16 +196,38 @@ export default function TicketStack({ cambiarPantalla, usuarioActual }) {
       return;
     }
 
-    if (!numeroTarjeta || numeroTarjeta.length < 4 || !nombreTarjeta.trim()) {
-      Alert.alert('Error', 'Ingrese nombre y número de tarjeta válido.');
+    if (!nombreTarjeta.trim()) {
+      Alert.alert('Error', 'Ingrese el nombre del titular.');
+      return;
+    }
+
+    const tarjetaLimpia = numeroTarjeta.replace(/\s/g, '');
+
+    if (!/^\d+$/.test(tarjetaLimpia)) {
+      Alert.alert('Error', 'La tarjeta solo debe contener números.');
+      return;
+    }
+
+    if (tarjetaLimpia.length < 12) {
+      Alert.alert('Error', 'La tarjeta debe tener al menos 12 dígitos.');
       return;
     }
 
     try {
       const db = getDatabase();
 
+      const pagoExistente = await db.getFirstAsync(
+        'SELECT * FROM pago WHERE reserva_id = ?',
+        [reservaSeleccionada.reserva_id]
+      );
+
+      if (pagoExistente) {
+        Alert.alert('Aviso', 'Esta reserva ya tiene un pago registrado.');
+        return;
+      }
+
       const pagoId = Math.floor(Math.random() * 100000);
-      const ultimosDigitos = numeroTarjeta.slice(-4);
+      const ultimosDigitos = tarjetaLimpia.slice(-4);
 
       const pago = {
         pago_id: pagoId,
@@ -192,7 +261,7 @@ export default function TicketStack({ cambiarPantalla, usuarioActual }) {
 
       Alert.alert(
         'Pago realizado',
-        `Pago simulado guardado en SQLite.\nMonto: $${pago.monto}\nTarjeta: **** ${ultimosDigitos}`
+        `Pago guardado localmente en SQLite.\nMonto: $${pago.monto}\nTarjeta: **** ${ultimosDigitos}`
       );
 
       setReservaSeleccionada(null);
@@ -200,9 +269,10 @@ export default function TicketStack({ cambiarPantalla, usuarioActual }) {
       setNombreTarjeta('');
 
       cargarReservasSQLite();
+      cargarPagosSQLite();
 
     } catch (error) {
-      console.error(error);
+      console.error('Error guardando pago:', error);
       Alert.alert('Error', 'No se pudo guardar el pago.');
     }
   };
@@ -210,97 +280,108 @@ export default function TicketStack({ cambiarPantalla, usuarioActual }) {
   const sincronizar = async () => {
     const result = await sincronizarPendientes();
     Alert.alert('Sincronización', result.message);
+
     cargarReservasSQLite();
+    cargarPagosSQLite();
   };
+
+  const reservasPendientes = reservas.filter((r) => r.estado_pago !== 'Pagado');
+  const reservasPagadas = reservas.filter((r) => r.estado_pago === 'Pagado');
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
 
-        <Text style={styles.brandTitle}>TECAir ✈️</Text>
-        <Text style={styles.pageTitle}>Reservaciones móviles</Text>
+        <View style={styles.headerBox}>
+          <Text style={styles.brandTitle}>TECAir ✈️</Text>
+          <Text style={styles.pageTitle}>Reservaciones móviles</Text>
 
-        {usuarioActual && (
-          <View style={styles.userBox}>
-            <Text style={styles.userText}>Usuario: {usuarioActual.nombre}</Text>
-            <Text style={styles.userText}>ID: {usuarioActual.usuario_id}</Text>
-          </View>
-        )}
+          {usuarioActual ? (
+            <Text style={styles.headerText}>
+              Usuario: {usuarioActual.nombre} | ID: {usuarioActual.usuario_id}
+            </Text>
+          ) : (
+            <Text style={styles.headerText}>No hay usuario activo</Text>
+          )}
+        </View>
 
-        <Text style={styles.sectionTitle}>Vuelos disponibles</Text>
+        <View style={styles.sectionBox}>
+          <Text style={styles.sectionTitle}>1. Seleccionar vuelo</Text>
 
-        {vuelos.map((vuelo) => (
-          <View key={vuelo.vuelo_id} style={styles.card}>
-            <Text style={styles.codigoText}>{vuelo.codigo}</Text>
-            <Text style={styles.rutaText}>{vuelo.origen} → {vuelo.destino}</Text>
-            <Text>Fecha: {vuelo.fecha_salida}</Text>
-            <Text>Hora: {vuelo.salida}</Text>
-            <Text>Precio: ${vuelo.precio_boleto}</Text>
-            <Text>Asientos disponibles: {vuelo.asientos}</Text>
-
+          {vuelos.map((vuelo) => (
             <TouchableOpacity
-              style={styles.btnSeleccionar}
+              key={vuelo.vuelo_id}
+              style={[
+                styles.flightCard,
+                vueloSeleccionado?.vuelo_id === vuelo.vuelo_id && styles.flightCardSelected
+              ]}
               onPress={() => setVueloSeleccionado(vuelo)}
             >
-              <Text style={styles.btnSeleccionarText}>Seleccionar vuelo</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
+              <View style={styles.cardHeader}>
+                <Text style={styles.codigoText}>{vuelo.codigo}</Text>
+                <Text style={styles.priceText}>${vuelo.precio_boleto}</Text>
+              </View>
 
-        <View style={styles.formularioContainer}>
-          <Text style={styles.formTitle}>Crear reservación</Text>
+              <Text style={styles.rutaText}>{vuelo.origen} → {vuelo.destino}</Text>
+              <Text style={styles.detailText}>Fecha: {vuelo.fecha_salida} | Hora: {vuelo.salida}</Text>
+              <Text style={styles.detailText}>Asientos disponibles: {vuelo.asientos}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <View style={styles.sectionBox}>
+          <Text style={styles.sectionTitle}>2. Crear reservación</Text>
 
           <Text style={styles.inputLabel}>Vuelo seleccionado</Text>
           <TextInput
             style={styles.input}
             value={vueloSeleccionado ? `${vueloSeleccionado.codigo} - ${vueloSeleccionado.destino}` : ''}
             editable={false}
-            placeholder="Seleccione un vuelo"
+            placeholder="Seleccione un vuelo arriba"
           />
 
           <Text style={styles.inputLabel}>Cantidad de asientos</Text>
           <TextInput
             style={styles.input}
-            placeholder="Cantidad"
+            placeholder="Ej: 1"
             keyboardType="numeric"
             value={asientosAReservar}
             onChangeText={setAsientosAReservar}
           />
 
-          <TouchableOpacity style={styles.btnConfirmar} onPress={confirmarReserva}>
-            <Text style={styles.btnConfirmarText}>GUARDAR RESERVA EN SQLITE</Text>
+          <TouchableOpacity style={styles.btnPrimary} onPress={confirmarReserva}>
+            <Text style={styles.btnText}>GUARDAR RESERVA EN SQLITE</Text>
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.sectionTitle}>Reservas guardadas localmente</Text>
+        <View style={styles.sectionBox}>
+          <Text style={styles.sectionTitle}>3. Reservas pendientes de pago</Text>
 
-        {reservas.length === 0 ? (
-          <Text style={styles.emptyText}>No hay reservas locales todavía.</Text>
-        ) : (
-          reservas.map((reserva) => (
-            <View key={reserva.reserva_id} style={styles.reservaCard}>
-              <Text style={styles.codigoText}>Reserva #{reserva.reserva_id}</Text>
-              <Text>Vuelo: {reserva.codigo}</Text>
-              <Text>Ruta: {reserva.origen} → {reserva.destino}</Text>
-              <Text>Asientos: {reserva.asientos_reservados}</Text>
-              <Text>Total: ${reserva.total}</Text>
-              <Text>Pago: {reserva.estado_pago}</Text>
-              <Text>Sync: {reserva.synced === 1 ? 'Sincronizada' : 'Pendiente'}</Text>
+          {reservasPendientes.length === 0 ? (
+            <Text style={styles.emptyText}>No hay reservas pendientes.</Text>
+          ) : (
+            reservasPendientes.map((reserva) => (
+              <TouchableOpacity
+                key={reserva.reserva_id}
+                style={[
+                  styles.reservaCard,
+                  reservaSeleccionada?.reserva_id === reserva.reserva_id && styles.reservaCardSelected
+                ]}
+                onPress={() => setReservaSeleccionada(reserva)}
+              >
+                <Text style={styles.codigoText}>Reserva #{reserva.reserva_id}</Text>
+                <Text style={styles.detailText}>Vuelo: {reserva.codigo}</Text>
+                <Text style={styles.detailText}>Ruta: {reserva.origen} → {reserva.destino}</Text>
+                <Text style={styles.detailText}>Asientos: {reserva.asientos_reservados}</Text>
+                <Text style={styles.totalText}>Total: ${reserva.total}</Text>
+                <Text style={styles.pendingText}>Estado: Pendiente de pago</Text>
+              </TouchableOpacity>
+            ))
+          )}
+        </View>
 
-              {reserva.estado_pago !== 'Pagado' && (
-                <TouchableOpacity
-                  style={styles.btnPagar}
-                  onPress={() => setReservaSeleccionada(reserva)}
-                >
-                  <Text style={styles.btnConfirmarText}>Seleccionar para pagar</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          ))
-        )}
-
-        <View style={styles.formularioPago}>
-          <Text style={styles.formTitle}>Pago simulado</Text>
+        <View style={styles.sectionBox}>
+          <Text style={styles.sectionTitle}>4. Pago simulado</Text>
 
           <Text style={styles.inputLabel}>Reserva seleccionada</Text>
           <TextInput
@@ -327,13 +408,58 @@ export default function TicketStack({ cambiarPantalla, usuarioActual }) {
             keyboardType="numeric"
           />
 
-          <TouchableOpacity style={styles.btnPagar} onPress={pagarReserva}>
-            <Text style={styles.btnConfirmarText}>PAGAR RESERVA</Text>
+          <TouchableOpacity style={styles.btnSuccess} onPress={pagarReserva}>
+            <Text style={styles.btnText}>PAGAR RESERVA</Text>
           </TouchableOpacity>
         </View>
 
+        <View style={styles.sectionBox}>
+          <Text style={styles.sectionTitle}>5. Reservas pagadas</Text>
+
+          {reservasPagadas.length === 0 ? (
+            <Text style={styles.emptyText}>No hay reservas pagadas todavía.</Text>
+          ) : (
+            reservasPagadas.map((reserva) => (
+              <View key={reserva.reserva_id} style={styles.paidCard}>
+                <Text style={styles.codigoText}>Reserva #{reserva.reserva_id}</Text>
+                <Text style={styles.detailText}>Vuelo: {reserva.codigo}</Text>
+                <Text style={styles.detailText}>Ruta: {reserva.origen} → {reserva.destino}</Text>
+                <Text style={styles.detailText}>Asientos: {reserva.asientos_reservados}</Text>
+                <Text style={styles.totalText}>Total: ${reserva.total}</Text>
+                <Text style={styles.successText}>Estado: Pagado</Text>
+                <Text style={styles.detailText}>
+                  Sync: {reserva.synced === 1 ? 'Sincronizada' : 'Pendiente'}
+                </Text>
+              </View>
+            ))
+          )}
+        </View>
+
+        <View style={styles.sectionBox}>
+          <Text style={styles.sectionTitle}>6. Pagos guardados localmente</Text>
+
+          {pagos.length === 0 ? (
+            <Text style={styles.emptyText}>No hay pagos locales todavía.</Text>
+          ) : (
+            pagos.map((pago) => (
+              <View key={pago.pago_id} style={styles.pagoCard}>
+                <Text style={styles.codigoText}>Pago #{pago.pago_id}</Text>
+                <Text style={styles.detailText}>Reserva: #{pago.reserva_id}</Text>
+                <Text style={styles.detailText}>Vuelo: {pago.codigo}</Text>
+                <Text style={styles.detailText}>Ruta: {pago.origen} → {pago.destino}</Text>
+                <Text style={styles.totalText}>Monto: ${pago.monto}</Text>
+                <Text style={styles.detailText}>Método: {pago.metodo_pago}</Text>
+                <Text style={styles.detailText}>Tarjeta: **** {pago.ultimos_digitos}</Text>
+                <Text style={styles.detailText}>
+                  Sync: {pago.synced === 1 ? 'Sincronizado' : 'Pendiente'}
+                </Text>
+              </View>
+            ))
+          )}
+        </View>
+
         <TouchableOpacity style={styles.btnSync} onPress={sincronizar}>
-          <Text style={styles.btnConfirmarText}>SINCRONIZAR PENDIENTES</Text>
+          <Text style={styles.btnText}>SINCRONIZAR PENDIENTES</Text>
         </TouchableOpacity>
 
         <View style={styles.menuContainer}>
@@ -351,27 +477,204 @@ export default function TicketStack({ cambiarPantalla, usuarioActual }) {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#f8f9fa' },
-  container: { padding: 20 },
-  brandTitle: { fontSize: 14, fontWeight: 'bold', color: '#003366', letterSpacing: 2 },
-  pageTitle: { fontSize: 24, fontWeight: 'bold', color: '#212529', marginBottom: 10 },
-  userBox: { backgroundColor: '#e7f5ff', padding: 12, borderRadius: 8, marginBottom: 15 },
-  userText: { color: '#003366', fontWeight: 'bold' },
-  sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#003366', marginTop: 20, marginBottom: 10 },
-  card: { backgroundColor: '#fff', padding: 15, borderRadius: 10, marginBottom: 15, borderWidth: 1, borderColor: '#ced4da' },
-  reservaCard: { backgroundColor: '#fff7e6', padding: 15, borderRadius: 10, marginBottom: 15, borderWidth: 1, borderColor: '#ffd43b' },
-  codigoText: { fontSize: 16, fontWeight: 'bold', color: '#0056b3' },
-  rutaText: { fontSize: 16, fontWeight: 'bold', color: '#212529', marginBottom: 8 },
-  btnSeleccionar: { backgroundColor: '#f1f3f5', marginTop: 10, paddingVertical: 8, borderRadius: 6, alignItems: 'center' },
-  btnSeleccionarText: { color: '#495057', fontSize: 12, fontWeight: 'bold' },
-  formularioContainer: { marginTop: 10, padding: 15, backgroundColor: '#f0f4f8', borderRadius: 10, borderWidth: 1, borderColor: '#b8daff' },
-  formularioPago: { marginTop: 15, padding: 15, backgroundColor: '#edf7ed', borderRadius: 10, borderWidth: 1, borderColor: '#b2d8b2' },
-  formTitle: { fontSize: 18, fontWeight: 'bold', color: '#003366', marginBottom: 15 },
-  inputLabel: { fontSize: 13, fontWeight: 'bold', color: '#495057', marginBottom: 5 },
-  input: { backgroundColor: '#fff', padding: 10, borderRadius: 6, marginBottom: 12, borderWidth: 1, borderColor: '#ced4da' },
-  btnConfirmar: { backgroundColor: '#0056b3', paddingVertical: 12, borderRadius: 6, alignItems: 'center', marginTop: 5 },
-  btnPagar: { backgroundColor: '#2b8a3e', paddingVertical: 10, borderRadius: 6, alignItems: 'center', marginTop: 10 },
-  btnSync: { backgroundColor: '#495057', paddingVertical: 12, borderRadius: 6, alignItems: 'center', marginTop: 20 },
-  btnConfirmarText: { color: '#fff', fontWeight: 'bold', fontSize: 14 },
-  emptyText: { color: '#6c757d', fontStyle: 'italic', marginBottom: 15 },
-  menuContainer: { marginTop: 20, width: '100%' }
+  container: { padding: 18 },
+
+  headerBox: {
+    backgroundColor: '#003366',
+    padding: 18,
+    borderRadius: 14,
+    marginBottom: 16
+  },
+
+  brandTitle: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#dbeafe',
+    letterSpacing: 2,
+    textTransform: 'uppercase'
+  },
+
+  pageTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginTop: 4
+  },
+
+  headerText: {
+    fontSize: 13,
+    color: '#e7f5ff',
+    marginTop: 8
+  },
+
+  sectionBox: {
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 14,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#dee2e6'
+  },
+
+  sectionTitle: {
+    fontSize: 17,
+    fontWeight: 'bold',
+    color: '#003366',
+    marginBottom: 12
+  },
+
+  flightCard: {
+    backgroundColor: '#f8f9fa',
+    padding: 13,
+    borderRadius: 10,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#ced4da'
+  },
+
+  flightCardSelected: {
+    borderColor: '#2b8a3e',
+    backgroundColor: '#ebfbee'
+  },
+
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 5
+  },
+
+  codigoText: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#0056b3'
+  },
+
+  priceText: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#2b8a3e'
+  },
+
+  rutaText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#212529',
+    marginBottom: 5
+  },
+
+  detailText: {
+    fontSize: 13,
+    color: '#495057',
+    marginBottom: 3
+  },
+
+  totalText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#2b8a3e',
+    marginTop: 3
+  },
+
+  pendingText: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#f08c00',
+    marginTop: 4
+  },
+
+  successText: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#2b8a3e',
+    marginTop: 4
+  },
+
+  inputLabel: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#495057',
+    marginBottom: 5
+  },
+
+  input: {
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#ced4da'
+  },
+
+  reservaCard: {
+    backgroundColor: '#fff7e6',
+    padding: 13,
+    borderRadius: 10,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#ffd43b'
+  },
+
+  reservaCardSelected: {
+    borderColor: '#f08c00',
+    backgroundColor: '#fff3bf'
+  },
+
+  paidCard: {
+    backgroundColor: '#ebfbee',
+    padding: 13,
+    borderRadius: 10,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#8ce99a'
+  },
+
+  pagoCard: {
+    backgroundColor: '#e7f5ff',
+    padding: 13,
+    borderRadius: 10,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#74c0fc'
+  },
+
+  btnPrimary: {
+    backgroundColor: '#0056b3',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 5
+  },
+
+  btnSuccess: {
+    backgroundColor: '#2b8a3e',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 5
+  },
+
+  btnSync: {
+    backgroundColor: '#495057',
+    paddingVertical: 13,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 5,
+    marginBottom: 15
+  },
+
+  btnText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14
+  },
+
+  emptyText: {
+    color: '#6c757d',
+    fontStyle: 'italic'
+  },
+
+  menuContainer: {
+    marginTop: 5,
+    marginBottom: 20
+  }
 });

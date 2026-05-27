@@ -17,7 +17,6 @@ export default function HomeScreen({ cambiarPantalla }) {
   const [promociones, setPromociones] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [promocionSeleccionada, setPromocionSeleccionada] = useState(null);
-  const [cantidadAsientos, setCantidadAsientos] = useState(1);
 
   useEffect(() => {
     cargarPromocionesSQLite();
@@ -54,117 +53,79 @@ export default function HomeScreen({ cambiarPantalla }) {
 
   const abrirDetalles = (promo) => {
     setPromocionSeleccionada(promo);
-    setCantidadAsientos(1);
     setModalVisible(true);
-  };
-
-  const ajustarAsientos = (operacion) => {
-    if (operacion === 'mas' && cantidadAsientos < 10) {
-      setCantidadAsientos(cantidadAsientos + 1);
-    } else if (operacion === 'menos' && cantidadAsientos > 1) {
-      setCantidadAsientos(cantidadAsientos - 1);
-    }
-  };
-
-  const confirmarReservaPromocion = () => {
-    setModalVisible(false);
-
-    Alert.alert(
-      'Promoción seleccionada',
-      `Promoción cargada desde SQLite.\n\n` +
-      `Vuelo: ${promocionSeleccionada.codigo}\n` +
-      `Ruta: ${promocionSeleccionada.origen} → ${promocionSeleccionada.destino}\n` +
-      `Asientos: ${cantidadAsientos}\n` +
-      `Total: $${promocionSeleccionada.precio_promocion * cantidadAsientos}\n\n` +
-      `Para completar la reserva, vaya al buscador de vuelos.`
-    );
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
 
-        <Text style={styles.brandTitle}>TECAir ✈️</Text>
-        <Text style={styles.pageTitle}>Promociones</Text>
-        <Text style={styles.subtitle}>
-          Promociones cargadas desde SQLite
-        </Text>
-
-        <View style={styles.listaContainer}>
-          {promociones.length === 0 ? (
-            <Text style={styles.emptyText}>No hay promociones disponibles.</Text>
-          ) : (
-            promociones.map((promo) => (
-              <View key={promo.promocion_id} style={styles.card}>
-                <View style={styles.cardHeader}>
-                  <Text style={styles.codigoText}>
-                    {promo.codigo || `PROMO-${promo.promocion_id}`}
-                  </Text>
-                  <Text style={styles.claseBadge}>Promoción</Text>
-                </View>
-
-                <Text style={styles.destinoText}>
-                  {promo.origen} ✈️ {promo.destino}
-                </Text>
-
-                <Text style={styles.precioText}>
-                  Precio promocional:{' '}
-                  <Text style={styles.monto}>${promo.precio_promocion}</Text>
-                </Text>
-
-                <Text style={styles.detalleText}>
-                  Vigencia: {promo.fecha_inicio} al {promo.fecha_fin}
-                </Text>
-
-                <Text style={styles.detalleText}>
-                  Fecha de salida: {promo.fecha_salida || 'No definida'}
-                </Text>
-
-                <Text style={styles.detalleText}>
-                  Hora: {promo.salida || 'No definida'}
-                </Text>
-
-                <Text style={styles.detalleText}>
-                  Asientos disponibles: {promo.asientos ?? 'No definido'}
-                </Text>
-
-                <TouchableOpacity
-                  style={styles.btnComprar}
-                  onPress={() => abrirDetalles(promo)}
-                >
-                  <Text style={styles.btnText}>Ver detalles</Text>
-                </TouchableOpacity>
-              </View>
-            ))
-          )}
+        <View style={styles.headerBox}>
+          <Text style={styles.brandTitle}>TECAir ✈️</Text>
+          <Text style={styles.pageTitle}>App Móvil de Reservaciones</Text>
+          <Text style={styles.subtitle}>
+            Promociones, vuelos, reservas y pagos usando SQLite local.
+          </Text>
         </View>
 
+        <TouchableOpacity
+          style={styles.mainButton}
+          onPress={() => cambiarPantalla('TicketStack')}
+        >
+          <Text style={styles.mainButtonText}>IR A RESERVACIONES</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.sectionTitle}>Promociones disponibles</Text>
+
+        {promociones.length === 0 ? (
+          <Text style={styles.emptyText}>No hay promociones disponibles.</Text>
+        ) : (
+          promociones.map((promo) => (
+            <View key={promo.promocion_id} style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.codigoText}>
+                  {promo.codigo || `PROMO-${promo.promocion_id}`}
+                </Text>
+                <Text style={styles.badge}>SQLite</Text>
+              </View>
+
+              <Text style={styles.destinoText}>
+                {promo.origen} → {promo.destino}
+              </Text>
+
+              <Text style={styles.precioText}>
+                Precio promocional: <Text style={styles.monto}>${promo.precio_promocion}</Text>
+              </Text>
+
+              <Text style={styles.detalleText}>
+                Vigencia: {promo.fecha_inicio} al {promo.fecha_fin}
+              </Text>
+
+              <Text style={styles.detalleText}>
+                Salida: {promo.fecha_salida || 'No definida'} - {promo.salida || 'No definida'}
+              </Text>
+
+              <Text style={styles.detalleText}>
+                Asientos disponibles: {promo.asientos ?? 'No definido'}
+              </Text>
+
+              <TouchableOpacity
+                style={styles.secondaryButton}
+                onPress={() => abrirDetalles(promo)}
+              >
+                <Text style={styles.secondaryButtonText}>Ver detalles</Text>
+              </TouchableOpacity>
+            </View>
+          ))
+        )}
+
         <View style={styles.menuContainer}>
-          <Text style={styles.menuTitle}>Menú de navegación</Text>
-
-          <Button
-            title="Ir a Buscador de Vuelos"
-            color="#2b8a3e"
-            onPress={() => cambiarPantalla('TicketStack')}
-          />
-
-          <View style={{ height: 10 }} />
-
-          <Button
-            title="Ir a Sucursales"
-            color="#003366"
-            onPress={() => cambiarPantalla('Sucursal')}
-          />
-
-          <View style={{ height: 10 }} />
-
           <Button
             title="Cerrar Sesión"
             color="#c92a2a"
             onPress={() => cambiarPantalla('Register')}
           />
         </View>
-
       </ScrollView>
 
       {promocionSeleccionada && (
@@ -176,8 +137,7 @@ export default function HomeScreen({ cambiarPantalla }) {
         >
           <View style={styles.modalCentrado}>
             <View style={styles.modalView}>
-
-              <Text style={styles.modalTitle}>Resumen de Promoción</Text>
+              <Text style={styles.modalTitle}>Detalle de promoción</Text>
 
               <Text style={styles.modalCodigo}>
                 {promocionSeleccionada.codigo || `PROMO-${promocionSeleccionada.promocion_id}`}
@@ -201,39 +161,20 @@ export default function HomeScreen({ cambiarPantalla }) {
                 Hora salida: {promocionSeleccionada.salida || 'No definida'}
               </Text>
 
+              <Text style={styles.modalText}>
+                Asientos disponibles: {promocionSeleccionada.asientos ?? 'No definido'}
+              </Text>
+
               <View style={styles.divisor} />
-
-              <Text style={styles.sectionTitle}>
-                ¿Cuántos campos desea reservar?
-              </Text>
-
-              <View style={styles.selectorAsientosContainer}>
-                <TouchableOpacity
-                  style={styles.btnContador}
-                  onPress={() => ajustarAsientos('menos')}
-                >
-                  <Text style={styles.btnContadorText}>-</Text>
-                </TouchableOpacity>
-
-                <Text style={styles.cantidadText}>{cantidadAsientos}</Text>
-
-                <TouchableOpacity
-                  style={styles.btnContador}
-                  onPress={() => ajustarAsientos('mas')}
-                >
-                  <Text style={styles.btnContadorText}>+</Text>
-                </TouchableOpacity>
-              </View>
-
-              <Text style={styles.modalPrecio}>
-                Total: ${promocionSeleccionada.precio_promocion * cantidadAsientos}
-              </Text>
 
               <TouchableOpacity
                 style={styles.btnModalReservar}
-                onPress={confirmarReservaPromocion}
+                onPress={() => {
+                  setModalVisible(false);
+                  cambiarPantalla('TicketStack');
+                }}
               >
-                <Text style={styles.btnModalReservarText}>CONTINUAR</Text>
+                <Text style={styles.btnModalReservarText}>Ir a reservar</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -242,7 +183,6 @@ export default function HomeScreen({ cambiarPantalla }) {
               >
                 <Text style={styles.btnModalCerrarText}>Cerrar</Text>
               </TouchableOpacity>
-
             </View>
           </View>
         </Modal>
@@ -256,28 +196,54 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#f8f9fa' },
   container: { padding: 20 },
 
+  headerBox: {
+    backgroundColor: '#003366',
+    padding: 18,
+    borderRadius: 14,
+    marginBottom: 18
+  },
+
   brandTitle: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#003366',
+    color: '#dbeafe',
     letterSpacing: 2,
     textTransform: 'uppercase',
-    marginBottom: 5
+    marginBottom: 6
   },
 
   pageTitle: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#212529'
+    color: '#fff'
   },
 
   subtitle: {
     fontSize: 13,
-    color: '#6c757d',
+    color: '#e7f5ff',
+    marginTop: 6
+  },
+
+  mainButton: {
+    backgroundColor: '#2b8a3e',
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: 'center',
     marginBottom: 20
   },
 
-  listaContainer: { width: '100%' },
+  mainButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 15
+  },
+
+  sectionTitle: {
+    fontSize: 19,
+    fontWeight: 'bold',
+    color: '#212529',
+    marginBottom: 12
+  },
 
   card: {
     backgroundColor: '#fff',
@@ -292,7 +258,6 @@ const styles = StyleSheet.create({
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
     marginBottom: 8
   },
 
@@ -302,11 +267,11 @@ const styles = StyleSheet.create({
     color: '#0056b3',
     backgroundColor: '#e7f5ff',
     paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4
+    paddingVertical: 3,
+    borderRadius: 6
   },
 
-  claseBadge: {
+  badge: {
     backgroundColor: '#f1f3f5',
     color: '#495057',
     fontSize: 11,
@@ -320,7 +285,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#212529',
-    marginBottom: 5
+    marginBottom: 6
   },
 
   precioText: {
@@ -341,7 +306,7 @@ const styles = StyleSheet.create({
     marginBottom: 3
   },
 
-  btnComprar: {
+  secondaryButton: {
     backgroundColor: '#003366',
     paddingVertical: 10,
     borderRadius: 8,
@@ -349,10 +314,9 @@ const styles = StyleSheet.create({
     marginTop: 12
   },
 
-  btnText: {
+  secondaryButtonText: {
     color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 14
+    fontWeight: 'bold'
   },
 
   emptyText: {
@@ -366,14 +330,6 @@ const styles = StyleSheet.create({
     padding: 15,
     backgroundColor: '#e9ecef',
     borderRadius: 10
-  },
-
-  menuTitle: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#6c757d',
-    marginBottom: 10,
-    textAlign: 'center'
   },
 
   modalCentrado: {
@@ -392,7 +348,7 @@ const styles = StyleSheet.create({
   },
 
   modalTitle: {
-    fontSize: 19,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#212529',
     marginBottom: 4
@@ -408,60 +364,13 @@ const styles = StyleSheet.create({
   modalText: {
     fontSize: 14,
     color: '#212529',
-    marginBottom: 6
+    marginBottom: 8
   },
 
   divisor: {
     height: 1,
     backgroundColor: '#dee2e6',
     marginVertical: 12
-  },
-
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#495057',
-    textAlign: 'center',
-    marginBottom: 10
-  },
-
-  selectorAsientosContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginVertical: 5
-  },
-
-  btnContador: {
-    backgroundColor: '#e9ecef',
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ced4da'
-  },
-
-  btnContadorText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#212529'
-  },
-
-  cantidadText: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginHorizontal: 25,
-    color: '#003366'
-  },
-
-  modalPrecio: {
-    fontSize: 19,
-    fontWeight: 'bold',
-    color: '#2b8a3e',
-    textAlign: 'center',
-    marginVertical: 8
   },
 
   btnModalReservar: {

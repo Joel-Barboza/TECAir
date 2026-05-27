@@ -44,6 +44,13 @@ export default function RegisterScreen({ cambiarPantalla, setUsuarioActual }) {
       return;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email.trim())) {
+      Alert.alert('Error', 'Ingrese un correo válido.');
+      return;
+    }
+
     const db = getDatabase();
 
     try {
@@ -55,7 +62,10 @@ export default function RegisterScreen({ cambiarPantalla, setUsuarioActual }) {
 
         if (user) {
           console.log('🟢 Login exitoso:', user);
-          setUsuarioActual(user);
+
+          if (setUsuarioActual) {
+            setUsuarioActual(user);
+          }
 
           Alert.alert(
             'Sesión iniciada',
@@ -187,6 +197,7 @@ export default function RegisterScreen({ cambiarPantalla, setUsuarioActual }) {
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
+            autoCapitalize="none"
           />
 
           {!isLogin && (
