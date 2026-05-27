@@ -1,0 +1,108 @@
+<div class="usuarios-dashboard">
+  <!-- Tabla de usuarios -->
+  <div class="usuarios-table">
+    <div class="table-header">
+      <h3>👥 Lista de Usuarios</h3>
+      <button type="button" class="btn-refresh" (click)="cargarUsuarios()">&#8635; Actualizar</button>
+    </div>
+
+    <p class="success" *ngIf="mensaje && !mostrarFormulario">{{ mensaje }}</p>
+    <p class="error" *ngIf="error && !mostrarFormulario">{{ error }}</p>
+
+    <div *ngIf="usuarios.length === 0" class="placeholder">
+      No hay usuarios registrados
+    </div>
+    <table *ngIf="usuarios.length > 0" class="tabla-usuarios">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre Completo</th>
+          <th>Correo</th>
+          <th>Teléfono</th>
+          <th>Estudiante</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let u of usuarios" class="fila-usuario">
+          <td><strong class="codigo-usuario">{{ u.codigoVisible }}</strong></td>
+          <td>{{ u.nombreCompleto }}</td>
+          <td><small>{{ u.email }}</small></td>
+          <td>{{ u.telefono }}</td>
+          <td>
+            <span *ngIf="u.universidad && u.carnet" class="badge-estudiante">
+              ✓ {{ u.universidad }}
+            </span>
+            <span *ngIf="!u.universidad" class="badge-regular">No</span>
+          </td>
+          <td class="acciones">
+            <button class="btn-edit" (click)="abrirEditar(u)" title="Editar">✏️</button>
+            <button class="btn-delete" (click)="eliminarUsuario(u.usuarioId)" title="Eliminar">🗑️</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Formulario -->
+  <div class="usuarios-form" *ngIf="mostrarFormulario">
+    <h3>{{ modoEdicion ? '✏️ Editar usuario' : '➕ Nuevo usuario' }}</h3>
+
+    <p class="error" *ngIf="error && mostrarFormulario">{{ error }}</p>
+
+    <form (ngSubmit)="guardar()" class="form-usuario">
+      <div class="form-group">
+        <label for="nombre">Nombre</label>
+        <input type="text" [(ngModel)]="formulario.nombre" name="nombre" id="nombre" placeholder="Juan" required />
+      </div>
+
+      <div class="form-group">
+        <label for="apellido1">Primer Apellido</label>
+        <input type="text" [(ngModel)]="formulario.apellido1" name="apellido1" id="apellido1" placeholder="Pérez" required />
+      </div>
+
+      <div class="form-group">
+        <label for="apellido2">Segundo Apellido</label>
+        <input type="text" [(ngModel)]="formulario.apellido2" name="apellido2" id="apellido2" placeholder="Opcional" />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Correo Electrónico</label>
+        <input type="email" [(ngModel)]="formulario.email" name="email" id="email" placeholder="usuario@correo.com" required />
+      </div>
+
+      <div class="form-group">
+        <label for="telefono">Teléfono</label>
+        <input type="tel" [(ngModel)]="formulario.telefono" name="telefono" id="telefono" placeholder="+506 2222-3333" required />
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="esEstudiante" name="esEstudiante" (change)="toggleEstudiante()" />
+          <span>Soy estudiante</span>
+        </label>
+      </div>
+
+      <div *ngIf="esEstudiante" class="estudiante-info">
+        <div class="form-group">
+          <label for="universidad">Universidad</label>
+          <input type="text" [(ngModel)]="formulario.universidad" name="universidad" id="universidad" placeholder="Ej: UCR, UNA, ITCR" />
+        </div>
+
+        <div class="form-group">
+          <label for="carnet">Carnet Estudiantil</label>
+          <input type="number" [(ngModel)]="formulario.carnet" name="carnet" id="carnet" placeholder="2024001" />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">{{ modoEdicion ? 'Guardar cambios' : 'Agregar usuario' }}</button>
+        <button type="button" class="btn-secondary" (click)="cancelar()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="usuarios-form-button" *ngIf="!mostrarFormulario">
+    <button type="button" (click)="abrirNuevoUsuario()" class="btn-add">+ Agregar nuevo usuario</button>
+  </div>
+</div>

@@ -5,15 +5,15 @@ import { RouterOutlet } from '@angular/router';
   selector: 'app-root',
   imports: [RouterOutlet],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrls: ['./app.css']
 })
 export class App {
-  protected readonly title = signal('aeropuerto-web');
+  protected readonly title = signal('TECAir Aeropuerto');
   isServerOn = signal(false);
 
   async checkServerOn(): Promise<void> {
     try {
-      const response = await fetch('http://localhost:5005/api/usuario');
+      const response = await fetch('http://localhost:5005/api/Usuarios');
 
       if (!response.ok) {
         throw new Error(`Error ${response.status}: ${response.statusText}`);

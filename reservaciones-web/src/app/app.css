@@ -1,0 +1,65 @@
+:host {
+  display: block;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #263238;
+  background: #f4f6f8;
+  min-height: 100vh;
+}
+
+body {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+}
+
+.app-header {
+  background: #0d47a1;
+  color: white;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.brand p {
+  margin: 0.25rem 0 0;
+  color: #bbdefb;
+}
+
+.app-nav {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.app-nav a {
+  color: #bbdefb;
+  text-decoration: none;
+  padding: 0.5rem 0.85rem;
+  border-radius: 0.5rem;
+}
+
+.app-nav a:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+main {
+  padding: 1.25rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+footer {
+  text-align: center;
+  padding: 1rem;
+  color: #546e7a;
+}

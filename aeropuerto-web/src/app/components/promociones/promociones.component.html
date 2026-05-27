@@ -1,0 +1,113 @@
+<div class="promociones-dashboard">
+  <!-- Tabla de promociones -->
+  <div class="promociones-table">
+    <div class="table-header">
+      <h3>🎉 Lista de Promociones</h3>
+      <button type="button" class="btn-refresh" (click)="cargarPromociones()">&#8635; Actualizar</button>
+    </div>
+
+    <p class="success" *ngIf="mensaje && !mostrarFormulario">{{ mensaje }}</p>
+    <p class="error" *ngIf="error && !mostrarFormulario">{{ error }}</p>
+
+    <div *ngIf="promociones.length === 0" class="placeholder">
+      No hay promociones registradas
+    </div>
+    <table *ngIf="promociones.length > 0" class="tabla-promociones">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Vuelo</th>
+          <th>Ruta</th>
+          <th>Precio original</th>
+          <th>Descuento</th>
+          <th>Precio final</th>
+          <th>Vigencia</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of promociones" class="fila-promo">
+          <td><strong>PROMO-{{ p.promocionId | number:'3.0-0' }}</strong></td>
+          <td><span class="codigo-vuelo">{{ p.codigoVuelo }}</span></td>
+          <td>{{ p.origen }} → {{ p.destino }}</td>
+          <td>{{ p.precioBoleto | currency:'USD':'symbol':'1.2-2' }}</td>
+          <td><span class="descuento">-{{ p.descuento }}% ({{ p.montoDescuento | currency:'USD':'symbol':'1.2-2' }})</span></td>
+          <td><strong>{{ p.precioFinal | currency:'USD':'symbol':'1.2-2' }}</strong></td>
+          <td>{{ p.fechaInicio | date:'dd/MM' }} a {{ p.fechaFin | date:'dd/MM' }}</td>
+          <td class="acciones">
+            <button class="btn-edit" (click)="abrirEditar(p)" title="Editar">✏️</button>
+            <button class="btn-delete" (click)="eliminarPromocion(p.promocionId)" title="Eliminar">🗑️</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Formulario -->
+  <div class="promociones-form" *ngIf="mostrarFormulario">
+    <h3>{{ modoEdicion ? '✏️ Editar promoción' : '➕ Agregar nueva promoción' }}</h3>
+
+    <p class="error" *ngIf="error && mostrarFormulario">{{ error }}</p>
+
+    <form (ngSubmit)="guardar()" class="form-promo">
+      <div class="form-group">
+        <label for="vuelo">Seleccionar Vuelo</label>
+        <select [(ngModel)]="formulario.vueloId" name="vueloId" id="vuelo" (ngModelChange)="sincronizarRutaConVuelo()" required>
+          <option [ngValue]="0" disabled>Seleccionar vuelo...</option>
+          <option *ngFor="let v of vuelos" [ngValue]="v.vueloId">
+            {{ v.descripcionCompleta }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="origen">Ciudad de Origen</label>
+        <input type="text" [(ngModel)]="formulario.origen" name="origen" id="origen" placeholder="Se completa al seleccionar el vuelo" readonly required />
+      </div>
+
+      <div class="form-group">
+        <label for="destino">Ciudad de Destino</label>
+        <input type="text" [(ngModel)]="formulario.destino" name="destino" id="destino" placeholder="Se completa al seleccionar el vuelo" readonly required />
+      </div>
+
+      <div class="form-group">
+        <label>Precio del vuelo</label>
+        <input type="text" [value]="obtenerPrecioVueloSeleccionado() | currency:'USD':'symbol':'1.2-2'" readonly />
+      </div>
+
+      <div class="form-group">
+        <label for="descuento">Descuento (%)</label>
+        <input type="number" [(ngModel)]="formulario.descuento" name="descuento" id="descuento" min="1" max="100" required />
+      </div>
+
+      <div class="form-group">
+        <label>Monto descontado</label>
+        <input type="text" [value]="obtenerMontoDescuentoFormulario() | currency:'USD':'symbol':'1.2-2'" readonly />
+      </div>
+
+      <div class="form-group">
+        <label>Precio final</label>
+        <input type="text" [value]="obtenerPrecioFinalFormulario() | currency:'USD':'symbol':'1.2-2'" readonly />
+      </div>
+
+      <div class="form-group">
+        <label for="fechaInicio">Fecha de Inicio</label>
+        <input type="date" [(ngModel)]="formulario.fechaInicio" name="fechaInicio" id="fechaInicio" required />
+      </div>
+
+      <div class="form-group">
+        <label for="fechaFin">Fecha de Fin</label>
+        <input type="date" [(ngModel)]="formulario.fechaFin" name="fechaFin" id="fechaFin" required />
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">{{ modoEdicion ? 'Guardar cambios' : 'Agregar promoción' }}</button>
+        <button type="button" class="btn-secondary" (click)="cancelar()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="promociones-form-button" *ngIf="!mostrarFormulario">
+    <button type="button" (click)="abrirNuevaPromocion()" class="btn-add">+ Agregar nueva promoción</button>
+  </div>
+</div>

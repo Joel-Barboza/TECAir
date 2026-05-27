@@ -1,0 +1,377 @@
+.reservas-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8fafc;
+}
+
+.reservas-table {
+  flex: 1;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 20px;
+}
+
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 15px;
+}
+
+.table-header h3 {
+  margin: 0;
+  font-size: 24px;
+  color: #1e293b;
+}
+
+.btn-refresh {
+  padding: 8px 16px;
+  background-color: #64748b;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-refresh:hover {
+  background-color: #475569;
+  transform: scale(1.05);
+}
+
+.tabla-reservas {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.tabla-reservas thead {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: white;
+}
+
+.tabla-reservas th {
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 14px;
+  border-bottom: 3px solid #0f172a;
+}
+
+.tabla-reservas td {
+  padding: 12px;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 14px;
+  color: #334155;
+}
+
+.fila-reserva:hover {
+  background-color: #f1f5f9;
+  transition: background-color 0.2s ease;
+}
+
+.codigo-usuario, .codigo-vuelo {
+  font-size: 12px;
+  color: #7c3aed;
+  font-weight: 600;
+}
+
+.estado {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.estado-pendiente {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.estado-confirmado {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.estado-cancelado {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.tabla-reservas .acciones {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-edit, .btn-delete {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.btn-edit {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.btn-edit:hover {
+  background-color: #bfdbfe;
+  transform: scale(1.1);
+}
+
+.btn-delete {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.btn-delete:hover {
+  background-color: #fecaca;
+  transform: scale(1.1);
+}
+
+.placeholder {
+  height: 300px;
+  border: 3px dashed #cbd5e1;
+  border-radius: 10px;
+  background-color: #f8fafc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #64748b;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.reservas-form {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-left: 5px solid #8b5cf6;
+}
+
+.reservas-form h3 {
+  margin-bottom: 25px;
+  font-size: 20px;
+  color: #1e293b;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 10px;
+}
+
+.form-reserva {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-reserva > .form-group:nth-child(4),
+.form-reserva > .form-group:nth-child(5) {
+  grid-column: 1 / -1;
+}
+
+.reservas-form label {
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.reservas-form input,
+.reservas-form select {
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 2px solid #e2e8f0;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.reservas-form input:focus,
+.reservas-form select:focus {
+  outline: none;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  background-color: #faf5ff;
+}
+
+.form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.btn-primary, .btn-secondary {
+  padding: 11px 24px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  flex: 1;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.btn-secondary {
+  background-color: #e2e8f0;
+  color: #475569;
+}
+
+.btn-secondary:hover {
+  background-color: #cbd5e1;
+}
+
+.reservas-form-button {
+  text-align: center;
+}
+
+.btn-add {
+  padding: 12px 32px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-add:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.success, .error {
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+.success {
+  background-color: #d1fae5;
+  color: #065f46;
+  border-left: 4px solid #10b981;
+}
+
+.error {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border-left: 4px solid #ef4444;
+}
+
+.reservas-table {
+  flex: 1;
+}
+
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.table-header h3 {
+  margin: 0;
+}
+
+.btn-refresh {
+  padding: 6px 14px;
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-refresh:hover {
+  background-color: #4b5563;
+}
+
+.reservas-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.reservas-table th, .reservas-table td {
+  border: 1px solid #d1d5db;
+  padding: 8px;
+  text-align: left;
+}
+
+.reservas-table .placeholder {
+  height: 400px;
+  border: 2px dashed #3b82f6;
+  border-radius: 10px;
+  background-color: #f3f4f6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #1f2937;
+}
+
+.reservas-form {
+  flex: 1;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+}
+
+.reservas-form h3 {
+  margin-bottom: 15px;
+}
+
+.reservas-form label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.reservas-form input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border-radius: 5px;
+  border: 1px solid #d1d5db;
+}
+
+.reservas-form button {
+  margin-top: 15px;
+  padding: 10px 15px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}

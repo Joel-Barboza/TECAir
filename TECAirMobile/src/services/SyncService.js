@@ -4,7 +4,7 @@ export const SincronizarAPostresDB = async () => {
 
   try {
 
-    const res = await fetch(`${API_URL}/Usuario`);
+    const res = await fetch(`${API_URL}/aeropuerto/Usuarios`);
 
     if (!res.ok) {
       throw new Error('Error al obtener usuarios');
