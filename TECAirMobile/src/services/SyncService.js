@@ -1,4 +1,4 @@
-const API_URL = 'http://192.168.1.34:5262/api';
+const API_URL = 'http://192.168.1.34:5005/api';
 
 export const SincronizarAPostresDB = async () => {
 

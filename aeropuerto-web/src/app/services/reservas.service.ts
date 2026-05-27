@@ -28,7 +28,7 @@ export interface ReservaDto {
   providedIn: 'root'
 })
 export class ReservasService {
-  private apiUrl = 'http://localhost:5262/api/aeropuerto/Reservas';
+  private apiUrl = 'http://localhost:5005/api/aeropuerto/Reservas';
 
   constructor(private http: HttpClient) {}
 

@@ -8,7 +8,7 @@ Generado con [Angular CLI](https://github.com/angular/angular-cli) versión 21.2
 
 - [Node.js](https://nodejs.org/) v18 o superior
 - Angular CLI: `npm install -g @angular/cli`
-- **TECAirAPI corriendo** en `http://localhost:5262` (ver `TECAirAPI/README.md`)
+- **TECAirAPI corriendo** en `http://localhost:5005` (ver `TECAirAPI/README.md`)
 - Base de datos PostgreSQL inicializada con `EmptyState.sql` e `InitialState.sql`
 
 ## Instalación

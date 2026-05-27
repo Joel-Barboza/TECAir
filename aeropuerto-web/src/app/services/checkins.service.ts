@@ -37,7 +37,7 @@ export interface CheckinDto {
   providedIn: 'root'
 })
 export class CheckinsService {
-  private apiUrl = 'http://localhost:5262/api/aeropuerto/Checkins';
+  private apiUrl = 'http://localhost:5005/api/aeropuerto/Checkins';
 
   constructor(private http: HttpClient) {}
 

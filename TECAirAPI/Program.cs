@@ -3,7 +3,7 @@ using TECAirAPI.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.UseUrls("http://0.0.0.0:5262");
+builder.WebHost.UseUrls("http://0.0.0.0:5005");
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
