@@ -1,4 +1,5 @@
 import { getDatabase } from '../database/database';
+//const API_URL = 'http://192.168.1.34:5005/api';
 
 const API_URL = 'http://10.0.2.2:5262/api';
 

@@ -13,7 +13,7 @@ export class App {
 
   async checkServerOn(): Promise<void> { 
     try {
-      const response = await fetch('http://localhost:5262/api/aeropuerto/Usuarios');
+      const response = await fetch('http://localhost:5005/api/aeropuerto/Usuarios');
  
       if (!response.ok) {
         throw new Error(`Error ${response.status}: ${response.statusText}`);

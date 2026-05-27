@@ -13,7 +13,7 @@ export interface AeropuertoDto {
   providedIn: 'root'
 })
 export class AeropuertosService {
-  private apiUrl = 'http://localhost:5262/api/aeropuerto/Aeropuertos';
+  private apiUrl = 'http://localhost:5005/api/aeropuerto/Aeropuertos';
 
   constructor(private http: HttpClient) { }
 
