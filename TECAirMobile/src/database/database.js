@@ -87,14 +87,17 @@ export const initDatabase = () => {
         fecha_creacion TEXT DEFAULT (datetime('now'))
       );
 
-      INSERT OR IGNORE INTO vuelo 
+      DELETE FROM promocion;
+      DELETE FROM vuelo;
+
+      INSERT INTO vuelo 
       (vuelo_id, codigo, origen, destino, salida, fecha_salida, fecha_llegada, precio_boleto, asientos)
       VALUES
       (1, 'VUE-011', 'San José', 'Dinamarca', '15:46', '2026-06-01', '2026-06-02', 750, 45),
       (2, 'VUE-012', 'San José', 'Miami', '08:30', '2026-06-05', '2026-06-05', 250, 120),
       (3, 'VUE-013', 'San José', 'Madrid', '22:15', '2026-06-12', '2026-06-13', 680, 90);
 
-      INSERT OR IGNORE INTO promocion
+      INSERT INTO promocion
       (promocion_id, vuelo_id, origen, destino, precio_promocion, fecha_inicio, fecha_fin)
       VALUES
       (1, 2, 'San José', 'Miami', 250, '2026-06-01', '2026-06-05'),
